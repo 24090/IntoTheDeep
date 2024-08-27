@@ -36,7 +36,14 @@
       </state>
     </system>
   </component>
-  <component name="RunManager" selected="Application.MeepMeepTesting">
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.17",
+    "project.structure.side.proportion": "0.54959786"
+  }
+}]]></component>
+  <component name="RunManager" selected="Android App.TeamCode">
     <configuration name="TeamCode" type="AndroidRunConfigurationType" factoryName="Android App">
       <module name="TrojanRobotics2425.TeamCode.main" />
       <option name="DEPLOY" value="true" />
