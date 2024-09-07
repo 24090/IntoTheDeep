@@ -22,23 +22,23 @@ public class GameMap {
     // -------SPIKE MARKS----------------
     // The center of the spike mark
     // RED
-    public static final Vector2d SpikeMarkRedInner = new Vector2d(24, -24-3.5/2);
-    public static final Vector2d SpikeMarkRedCenter = new Vector2d(34, -24-3.5/2);
-    public static final Vector2d SpikeMarkRedOuter = new Vector2d(44, -24-3.5/2);
+    public static final Vector2d SpikeMarkRedInner = new Vector2d(48, -24-3.5/2);
+    public static final Vector2d SpikeMarkRedCenter = new Vector2d(58, -24-3.5/2);
+    public static final Vector2d SpikeMarkRedOuter = new Vector2d(68, -24-3.5/2);
     // BLUE
-    public static final Vector2d SpikeMarkBlueInner = new Vector2d(-24, 24+3.5/2);
-    public static final Vector2d SpikeMarkBlueCenter = new Vector2d(-34, 24+3.5/2);
-    public static final Vector2d SpikeMarkBlueOuter = new Vector2d(-44, 24+3.5/2);
+    public static final Vector2d SpikeMarkBlueInner = new Vector2d(-48, 24+3.5/2);
+    public static final Vector2d SpikeMarkBlueCenter = new Vector2d(-58, 24+3.5/2);
+    public static final Vector2d SpikeMarkBlueOuter = new Vector2d(-68, 24+3.5/2);
     // NEUTRAL RIGHT
     // right = +x
-    public static final Vector2d SpikeMarkNeutralRightInner = new Vector2d(24, 24+3.5/2);
-    public static final Vector2d SpikeMarkNeutralRightCenter = new Vector2d(34, 24+3.5/2);
-    public static final Vector2d SpikeMarkNeutralRightOuter = new Vector2d(44, 24+3.5/2);
+    public static final Vector2d SpikeMarkNeutralRightInner = new Vector2d(48, 24+3.5/2);
+    public static final Vector2d SpikeMarkNeutralRightCenter = new Vector2d(58, 24+3.5/2);
+    public static final Vector2d SpikeMarkNeutralRightOuter = new Vector2d(68, 24+3.5/2);
     // NEUTRAL LEFT
     // left = -x
-    public static final Vector2d SpikeMarkNeutralLeftInner = new Vector2d(-24, -24-3.5/2);
-    public static final Vector2d SpikeMarkNeutralLeftCenter = new Vector2d(-34, -24-3.5/2);
-    public static final Vector2d SpikeMarkNeutralLeftOuter = new Vector2d(-44, -24-3.5/2);
+    public static final Vector2d SpikeMarkNeutralLeftInner = new Vector2d(-48, -24-3.5/2);
+    public static final Vector2d SpikeMarkNeutralLeftCenter = new Vector2d(-58, -24-3.5/2);
+    public static final Vector2d SpikeMarkNeutralLeftOuter = new Vector2d(-68, -24-3.5/2);
     // -------APRIL TAGS-----------------
     // the center of the april tag in x/y
     // BLUE
