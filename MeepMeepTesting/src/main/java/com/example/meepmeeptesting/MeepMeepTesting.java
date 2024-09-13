@@ -25,7 +25,7 @@ public class MeepMeepTesting {
                 .setConstraints(50, 50, PI, PI, 15)
                 .build();
 
-        myBot.runAction(redObservationZoneToRedSubmersibleEdge(myBot));
+        myBot.runAction(rightNeutralSpikeMarksToRedSubmersibleEdgeBlocked(myBot));
         Image image = null;
         try {image = ImageIO.read(new File("./MeepMeepTesting/src/main/java/com/example/meepmeeptesting/ftc-map.png"));
         } catch (IOException ex) {ex.printStackTrace();}
@@ -53,7 +53,8 @@ public class MeepMeepTesting {
     }
     public static Action redNetZoneToRedAscentZone(RoadRunnerBotEntity robot){
         return robot.getDrive().actionBuilder(new Pose2d(GameMap.NetRedCorner.times(0.666), -3*PI/4))
-                .splineTo(GameMap.AscentZoneEdgeRed.minus(new Vector2d(10,0)), 0)
+                .strafeToSplineHeading(GameMap.NetRedCorner.times(0.5), -PI/4)
+                .splineTo(GameMap.AscentZoneEdgeRed.minus(new Vector2d(12,0)), PI/2)
                 .build();
     }
     public static Action redNetZoneToRedObservationZone(RoadRunnerBotEntity robot){
@@ -145,6 +146,43 @@ public class MeepMeepTesting {
     }
     public static Action redObservationZoneToRedSubmersibleEdge(RoadRunnerBotEntity robot){
         return robot.getDrive().actionBuilder(new Pose2d(GameMap.ObservationRedCorner.minus(new Vector2d(36, -24)), -1*PI/4))
+                .strafeToSplineHeading(GameMap.SubmersibleRedEdge.plus(new Vector2d(0, -12)), PI/2)
+                .build();
+    }
+    public static Action redNetZoneToRightNeutralSpikeMarksBlocked(RoadRunnerBotEntity robot){
+        return robot.getDrive().actionBuilder(new Pose2d(GameMap.NetRedCorner.times(0.666), -3*PI/4))
+                .strafeToSplineHeading(GameMap.NetRedCorner.times(0.666).minus(new Vector2d(-40, 0)), PI/4)
+                .splineTo(GameMap.SpikeMarkNeutralRightCenter.minus(new Vector2d(1, 12)), PI/4)
+                .build();
+    }
+    public static Action redSpikeMarksToRightNeutralSpikeMarksBlocked(RoadRunnerBotEntity robot){
+        return robot.getDrive().actionBuilder(new Pose2d(GameMap.SpikeMarkRedCenter.minus(new Vector2d(1, 11)), PI/2))
+                .strafeToSplineHeading(GameMap.SpikeMarkRedCenter.minus(new Vector2d(36, 11)), PI/4+0.15)
+                .strafeToSplineHeading(GameMap.SpikeMarkNeutralRightCenter.minus(new Vector2d(1, 13)), PI/2)
+                .build();
+    }
+    public static Action leftNeutralSpikeMarksToRedAscentZoneBlocked(RoadRunnerBotEntity robot){
+        return robot.getDrive().actionBuilder(new Pose2d(GameMap.SpikeMarkNeutralLeftCenter.minus(new Vector2d(-2, 11)), PI/2))
+                .strafeToSplineHeading(GameMap.SpikeMarkNeutralLeftCenter.minus(new Vector2d(-22, 11)), PI/2)
+                .strafeToSplineHeading(GameMap.AscentZoneEdgeRed.minus(new Vector2d(12, 0)), 0)
+                .build();
+    }
+    public static Action rightNeutralSpikeMarksToRedAscentZoneBlocked(RoadRunnerBotEntity robot){
+        return robot.getDrive().actionBuilder(new Pose2d(GameMap.SpikeMarkNeutralRightCenter.minus(new Vector2d(1, 13)), PI/2))
+                .strafeToSplineHeading(new Vector2d(25, -37), -PI)
+                .strafeToSplineHeading(new Vector2d(-10, -37), -PI)
+                .splineTo(GameMap.AscentZoneEdgeRed.minus(new Vector2d(12, 0)), 0)
+                .build();
+    }
+    public static Action rightNeutralSpikeMarksToRedObservationZoneBlocked(RoadRunnerBotEntity robot){
+        return robot.getDrive().actionBuilder(new Pose2d(GameMap.SpikeMarkNeutralRightCenter.minus(new Vector2d(1, 13)), PI/2))
+                .strafeToSplineHeading(new Vector2d(30, -24), PI/2)
+                .strafeToSplineHeading(GameMap.ObservationRedCorner.minus(new Vector2d(36, -24)), -1*PI/4)
+                .build();
+    }
+    public static Action rightNeutralSpikeMarksToRedSubmersibleEdgeBlocked(RoadRunnerBotEntity robot){
+        return robot.getDrive().actionBuilder(new Pose2d(GameMap.SpikeMarkNeutralRightCenter.minus(new Vector2d(1, 13)), PI/2))
+                .strafeToSplineHeading(new Vector2d(25, -40), -PI)
                 .strafeToSplineHeading(GameMap.SubmersibleRedEdge.plus(new Vector2d(0, -12)), PI/2)
                 .build();
     }
