@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.Auto;
 
 import com.acmerobotics.roadrunner.*;
 
@@ -13,22 +13,24 @@ import java.lang.Math;
 public class AutoTest extends LinearOpMode {
 
     @Override
-    public void runOpMode() {
+    public void runOpMode(){
 
-        Pose2d startPose = new Pose2d(-37.35, -71.30, Math.toRadians(90.00));
+        Pose2d startPose = new Pose2d(13.15, -71.48, Math.toRadians(90.00));
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
-        Action diagonal;
-        diagonal = drive.actionBuilder(drive.pose) // RRPathGen is still on RR 0.5, make sure to update this stuff when pasting
-                .splineTo(new Vector2d(-37.00, -12.28), Math.toRadians(90.00))
-                .splineTo(new Vector2d(12.28, -11.58), Math.toRadians(0.81))
-                .splineTo(new Vector2d(47.80, -37.87), Math.toRadians(180))
+
+        Action mainPath;
+
+        mainPath = drive.actionBuilder(startPose)
+                .splineTo(new Vector2d(-0.09, -35.96), Math.toRadians(90))
+                .waitSeconds(5)
+                .splineTo(new Vector2d(-53.19, -53.54), Math.toRadians(235))
                 .build();
 
         waitForStart();
 
         if (isStopRequested()) return;
 
-        Actions.runBlocking(new SequentialAction(diagonal));
+        Actions.runBlocking(new SequentialAction(mainPath));
 
     }
 }
