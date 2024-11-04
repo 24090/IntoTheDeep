@@ -1,35 +1,68 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
-
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class Intake {
-    public DcMotor arm_motor;
-    public Servo arm_servo;
     double initial_motor_ticks;
-    public Intake(Servo arm_servo, DcMotor arm_motor){
-        this.arm_motor = arm_motor;
-        this.arm_servo = arm_servo;
-        initial_motor_ticks = arm_motor.getCurrentPosition();
-        arm_motor.setTargetPosition((int) initial_motor_ticks);
-        arm_motor.setMode(RUN_USING_ENCODER);
+    Servo intake_servo_a1;
+    Servo intake_servo_a2;
+    Servo intake_servo_b;
+    DcMotor intake_slide_motor;
+    public Intake(Servo intake_servo_a1, Servo intake_servo_a2, Servo intake_servo_b, DcMotor intake_slide_motor){
+        this.intake_servo_a1 = intake_servo_a1;
+        this.intake_servo_a2 = intake_servo_a2;
+        this.intake_servo_b  = intake_servo_b;
+        this.intake_slide_motor = intake_slide_motor;
+        initial_motor_ticks = intake_slide_motor.getCurrentPosition();
     }
     public void moveUp(){
-        arm_motor.setTargetPosition((int) initial_motor_ticks + 5000);
+        intake_servo_a1.setPosition(0.77);
+        intake_servo_a2.setPosition(0.77);
     }
     public void moveDown(){
-        arm_motor.setTargetPosition(0);
+        intake_servo_a1.setPosition(0.03);
+        intake_servo_a2.setPosition(0.03);
     }
     public void grab(){
-        arm_servo.setPosition(180);
+        intake_servo_b.setPosition(0);
+    }
+    public void hold(){
+        intake_servo_b.setPosition(0.45);
+    }
+    public void stop(){
+        intake_servo_b.setPosition(0.5);
     }
     public void release(){
-        arm_servo.setPosition(0);
+        intake_servo_b.setPosition(0.6);
+    }
+    public void slideOut(){
+        intake_slide_motor.setPower(1);
+        while (intake_slide_motor.getCurrentPosition() <= initial_motor_ticks + 1000) {}
+        slideStop();
+    }
+    public void slideTo(){
+        intake_slide_motor.setPower(1);
+        while (intake_slide_motor.getCurrentPosition() <= initial_motor_ticks + 1000) {}
+        slideStop();
+    }
+    public void slideIn(){
+        intake_slide_motor.setPower(-1);
+        while (intake_slide_motor.getCurrentPosition() >= initial_motor_ticks) {}
+        slideStop();
+    }
+    public Thread slideInAsync(){
+        Thread thread = new Thread(this::slideIn);
+        thread.start();
+        return thread;
+    }
+    public Thread slideOutAsync(){
+        Thread thread = new Thread(this::slideOut);
+        thread.start();
+        return thread;
+    }
+    public void slideStop(){
+        intake_slide_motor.setPower(0);
     }
 }
