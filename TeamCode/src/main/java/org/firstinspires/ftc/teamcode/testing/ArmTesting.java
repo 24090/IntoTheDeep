@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.Intake;
 @TeleOp(group = "testing", name = "Arm Testing")
 public class ArmTesting extends LinearOpMode {
     Intake intake;
-    public void runOpMode(){
+    public void runOpMode() throws InterruptedException {
         intake = new Intake(
                 hardwareMap.get(Servo.class, "intake_servo_a1"),
                 hardwareMap.get(Servo.class, "intake_servo_a2"),
@@ -33,27 +33,33 @@ public class ArmTesting extends LinearOpMode {
 //            sleep((long) 1000);
 //            intake_servo_b.setPosition(1);
 //            sleep((long) 1000);
-            if (gamepad2.dpad_left){
+            if (gamepad1.dpad_left){
                 intake.moveDown();
-            } else if (gamepad2.dpad_right){
+            } else if (gamepad1.dpad_right){
                 intake.moveUp();
             }
-            if (gamepad2.y){
+            if (gamepad1.y){
                 intake.grab();
-            } else if (gamepad2.x){
+            } else if (gamepad1.x){
                 intake.hold();
-            } else if (gamepad2.a){
+            } else if (gamepad1.a){
                 intake.release();
-            } else {
-                intake.stop();
             }
             if (gamepad1.right_bumper){
-                intake.slideIn();
+                intake.transferProcess();
             } else if (gamepad1.left_bumper){
                 intake.slideOut();
             } else {
                 intake.slideStop();
             }
+            if (gamepad1.dpad_up){
+                intake.power(0.4);
+            }
+            if (gamepad1.dpad_down){
+                intake.power(-0.4);
+            }
+            telemetry.addData("pos", intake.intake_slide_motor.getCurrentPosition());
+            telemetry.update();
         }
     }
 

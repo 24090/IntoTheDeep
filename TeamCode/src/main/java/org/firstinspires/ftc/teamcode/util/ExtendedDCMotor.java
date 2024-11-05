@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class ExtendedDCMotor {
     DcMotorEx motor;
     HardwareMap hardwareMap;
-    Conversions converter;
     PIDMotorcontrol pidController;
     double minBoundPos;
     double maxBoundPos;
