@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.testing;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,8 +7,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.util.Intake;
 
-@TeleOp(group = "testing", name = "Arm Testing")
-public class ArmTesting extends LinearOpMode {
+@TeleOp(group = "testing", name = "Intake Testing")
+public class IntakeTesting extends LinearOpMode {
     Intake intake;
     public void runOpMode() throws InterruptedException {
         intake = new Intake(
@@ -51,12 +49,6 @@ public class ArmTesting extends LinearOpMode {
                 intake.slideOut();
             } else {
                 intake.slideStop();
-            }
-            if (gamepad1.dpad_up){
-                intake.slideOut();
-            }
-            if (gamepad1.dpad_down){
-                intake.slideIn();
             }
             telemetry.addData("pos", intake.linear_slide.motor.getCurrentPosition());
             telemetry.update();

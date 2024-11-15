@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.util.ColorDistance;
+//import org.firstinspires.ftc.teamcode.util.ColorDistance;
 import org.firstinspires.ftc.teamcode.util.Mechanisms;
 
 @TeleOp(name = "linear")
@@ -27,7 +27,7 @@ public class Linearslidetest extends LinearOpMode{
         servo4 = hardwareMap.get(Servo.class, "servo4");
         linear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         linear1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        ColorDistance colorDistance = new ColorDistance(hardwareMap);
+        //ColorDistance colorDistance = new ColorDistance(hardwareMap);
         double midPos = 500;
         double power =0 ;
         waitForStart();
@@ -47,8 +47,8 @@ public class Linearslidetest extends LinearOpMode{
             }
             telemetry.addData("currentPos", linear.getCurrentPosition());
             telemetry.addData("currentPow", power);
-            telemetry.addData("distance", colorDistance.getDistance(DistanceUnit.CM));
-            telemetry.addData("RGB", colorDistance.getRGB().toString());
+//            telemetry.addData("distance", colorDistance.getDistance(DistanceUnit.CM));
+//            telemetry.addData("RGB", colorDistance.getRGB().toString());
             telemetry.update();
         }
 
