@@ -26,13 +26,16 @@ public class OuttakeSlide extends LinearSlide {
         return Math.abs(distance) < max_error;
     }
     @Override
-    public void stop(){
+    public void stop(){if (motor.getCurrentPosition() > 2000) {
         motor.setPower(0.1);
+    } else {
+        motor.setPower(0.0);
     }
-    public Thread moveUp(){
-        return extendToAsync(4550, 250);
     }
-    public Thread moveDown(){
-        return extendToAsync(0, 50);
+    public void moveUp(){
+        this.extendToBreaking(4600, 50);
+    }
+    public void moveDown(){
+        this.extendToBreaking(0, 50);
     }
 }

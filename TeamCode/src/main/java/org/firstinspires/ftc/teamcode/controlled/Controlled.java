@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.util.Outtake;
 @TeleOp(name = "Controller")
 public class Controlled extends LinearOpMode{
     public void runOpMode(){
-        //MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0.0, 0.0, 0.0));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0.0, 0.0, 0.0));
         Intake intake = new Intake(
                 hardwareMap.get(Servo.class, "intake_servo_a1"),
                 hardwareMap.get(Servo.class, "intake_servo_a2"),
@@ -39,15 +39,14 @@ public class Controlled extends LinearOpMode{
         );
         waitForStart();
         while (opModeIsActive()){
-            //noinspection SuspiciousNameCombination
-            //drive.setDrivePowers(new PoseVelocity2d(new Vector2d(gamepad1.left_stick_y, gamepad1.left_stick_x), -gamepad1.right_stick_x));
+            drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x));
             if (gamepad1.left_bumper){
                 intake.stop();
                 intake.moveDown();
                 intake.linear_slide.extendToBreaking(gamepad1.left_trigger * 1100, 50);
             } else if (gamepad1.right_bumper){
                 outtake.close();
-                Thread t = outtake.down();
+                Thread t = new Thread(() -> outtake.down());
                 while (t.isAlive()){}
                 intake.transferSample();
             }

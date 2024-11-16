@@ -19,6 +19,7 @@ public class LinearSlide {
      */
     public LinearSlide(DcMotor motor, double max_extend, double min_extend, double minimum_power) {
         this.motor = motor;
+        this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.min_extend = min_extend;
         this.max_extend = max_extend;
         this.minimum_power = minimum_power;

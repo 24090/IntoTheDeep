@@ -8,6 +8,10 @@ import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 public class Outtake {
     Servo outtake_servo;
     public OuttakeSlide linear_slide;
+    boolean check = false;
+    public void release(){
+        check = true;
+    }
     public enum state {
         READY_TRANSFER,
         READY_RELEASE,
@@ -53,20 +57,17 @@ public class Outtake {
     public void close(){
         outtake_servo.setPosition(180);
     }
-    public Thread up(){
-        return linear_slide.moveUp();
+    public void up(){linear_slide.moveUp();
     }
-    public Thread down(){
-        return linear_slide.moveDown();
+    public void down(){
+        linear_slide.moveDown();
     }
     public void readyTransfer(){
         close();
         down();
     }
     public void scoreProcess() throws InterruptedException {
-        up();
         open();
-        Thread.sleep(1000);
         readyTransfer();
     }
 }
