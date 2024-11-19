@@ -11,25 +11,28 @@ public class CameraInfo {
     public static Scalar red_max ;
     public static Scalar blue_min = new Scalar(105,105,0);
     public static Scalar blue_max = new Scalar(125,255, 225);
-    public static Scalar yellow_min;
-    public static Scalar yellow_max;
+    public static Scalar yellow_min = new Scalar(10, 185, 0);
+    public static Scalar yellow_max = new Scalar(30, 255, 255);
     public enum Colors {
         RED,
         BLUE,
         YELLOW,
     }
     public static Mat getRotationMatrix() {
+//  [       1.0000000,  0.0000000,  0.0000000;
+//          0.0000000,  0.7071068, -0.7071068;
+//          0.0000000,  0.7071068,  0.7071068 ]
         Mat mat = new Mat(3,3,6);
-        mat.put(0,0,1); mat.put(0,1,0); mat.put(0,2,0);
-        mat.put(1,0,0); mat.put(1,1,1); mat.put(1,2,0);
-        mat.put(2,0,0); mat.put(2,1,0); mat.put(2,2,1);
+        mat.put(0,0,1); mat.put(0,1,0);          mat.put(0,2,0);
+        mat.put(1,0,0); mat.put(1,1,0.7071068);  mat.put(1,2,0.7071068);
+        mat.put(2,0,0); mat.put(2,1,-0.7071068); mat.put(2,2,0.7071068);
         return mat;
     }
     public static Mat getTranslationMatrix() {
         Mat mat = new Mat(3,1,6);
         mat.put(0,0,0);
-        mat.put(1,0,10);
-        mat.put(2,0,0);
+        mat.put(1,0,0);
+        mat.put(2,0,31);
         return mat;
     }
     public static Mat getCameraMatrix() {

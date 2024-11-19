@@ -25,7 +25,7 @@ public class OpenCVTesting extends LinearOpMode {
         webcamName.getCameraCharacteristics();
         webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
         webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
-        pipeline = new ObjectLocationPipeline(CameraInfo.Colors.BLUE);
+        pipeline = new ObjectLocationPipeline(telemetry);
         webcam.setPipeline(pipeline);
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -49,6 +49,9 @@ public class OpenCVTesting extends LinearOpMode {
         while (opModeIsActive()) {
             telemetry.addData("Image Analysis:", pipeline.getAnalysis());
             telemetry.update();
+            if (gamepad1.a){
+                pipeline.stage = (pipeline.stage + 1)%5;
+            }
         }
     }
 }
