@@ -178,7 +178,7 @@ public class Intake {
     public void slideOut(){
         linear_slide.extendToBreaking(1000, 50);
     }
-    public void slideIn(){linear_slide.extendToBreaking(0, 50);}
+    public void slideIn(){linear_slide.extendToBreaking(-50, 50);}
 
     public Thread slideInAsync(){
         return linear_slide.extendToAsync(0, 50);

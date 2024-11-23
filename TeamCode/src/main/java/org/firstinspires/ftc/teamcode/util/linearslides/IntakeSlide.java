@@ -9,7 +9,7 @@ public class IntakeSlide extends LinearSlide {
      * Class for using Intake Slide
      */
     public IntakeSlide(DcMotor motor) {
-        super(motor, 1100, 0, 0.15);
+        super(motor, 1100, -50, 0.15);
     }
     public Thread moveIn(){
         return extendToAsync(0, 50);

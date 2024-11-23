@@ -60,11 +60,16 @@ public class Controlled extends LinearOpMode{
             if (gamepad1.y){
                 outtake.up();
             } else if (gamepad1.a){
-                outtake.close();
                 outtake.down();
+                sleep(500);
+                outtake.close();
             } else if (gamepad1.b){
                 outtake.open();
+            } else {
+                outtake.linear_slide.stop();
             }
+            telemetry.addData("pos", outtake.linear_slide.getPos());
+            telemetry.update();
         }
     }
 }
