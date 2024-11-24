@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.util.Outtake;
  */
 @TeleOp(name = "Controller")
 public class Controlled extends LinearOpMode{
+    Thread transfer_thread;
     public void runOpMode(){
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0.0, 0.0, 0.0));
         Intake intake = new Intake(
@@ -39,23 +40,28 @@ public class Controlled extends LinearOpMode{
         );
         waitForStart();
         while (opModeIsActive()){
-            drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x));
+            drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y/ (gamepad1.left_stick_button ? 3 : 1), -gamepad1.left_stick_x/ (gamepad1.left_stick_button ? 3 : 1)), -gamepad1.right_stick_x/ (gamepad1.right_stick_button ? 3 : 1)));
             if (gamepad1.left_bumper){
                 intake.stop();
                 intake.moveDown();
-                intake.linear_slide.extendToBreaking(gamepad1.left_trigger * 1100, 50);
+                intake.linear_slide.extendToAsync(gamepad1.left_trigger * 1100, 50);
             } else if (gamepad1.right_bumper){
-                outtake.close();
-                Thread t = new Thread(() -> outtake.down());
-                while (t.isAlive()){}
-                intake.transferSample();
+                if (transfer_thread == null || !transfer_thread.isAlive()){
+                    transfer_thread = new Thread(()->{
+                        outtake.close();
+                        outtake.down();
+                        intake.transferSample();
+                    });
+                    transfer_thread.run();
+                }
             }
             if (gamepad1.dpad_up){
-                intake.grab();
-            } else if (gamepad1.dpad_down){
                 intake.release();
-            } else {
-                intake.stop();
+            } else if (gamepad1.dpad_down){
+                    intake.grab();
+                } else {
+                    intake.stop();
+                }
             }
             if (gamepad1.y){
                 outtake.up();
@@ -72,4 +78,4 @@ public class Controlled extends LinearOpMode{
             telemetry.update();
         }
     }
-}
+

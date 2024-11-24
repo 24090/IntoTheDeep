@@ -9,7 +9,7 @@ public class OuttakeSlide extends LinearSlide {
      * Class for using the Outtake slide
      */
     public OuttakeSlide(DcMotor motor) {
-        super(motor, 50, -4650, 0);
+        super(motor, 50, -4900, 0);
     }
 
     @Override
@@ -26,8 +26,8 @@ public class OuttakeSlide extends LinearSlide {
         return Math.abs(distance) < max_error;
     }
     @Override
-    public void stop(){if (motor.getCurrentPosition() > 2000) {
-        motor.setPower(0.1);
+    public void stop(){if (motor.getCurrentPosition() < -2000) {
+        motor.setPower(-0.1);
     } else {
         motor.setPower(0.0);
     }
@@ -36,7 +36,7 @@ public class OuttakeSlide extends LinearSlide {
         this.extendToBreaking(0, 50);
     }
     public void moveUp(){
-        this.extendToBreaking(-4600, 50);
+        this.extendToBreaking(-4850, 50);
     }
     public int getPos(){
         return motor.getCurrentPosition();

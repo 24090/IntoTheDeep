@@ -160,8 +160,8 @@ public class Intake {
         intake_servo_a2.setPosition(1 - 0.75);
     }
     public void moveDown(){
-        intake_servo_a1.setPosition(0.03);
-        intake_servo_a2.setPosition(1 - 0.03);
+        intake_servo_a1.setPosition(0.025);
+        intake_servo_a2.setPosition(1 - 0.025);
     }
     public void grab(){
         intake_servo_b.setPosition(0);
