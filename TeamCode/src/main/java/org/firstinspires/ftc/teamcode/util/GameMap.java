@@ -55,4 +55,10 @@ public class GameMap {
     public static final int AprilTagRedCenterID = 15;
     public static final int AprilTagRedLeftID = 16;
     public static final int AprilTagRedRightID = 14;
+
+    //------ROBOT CONSTANTS-------------
+    public static final double OuttakeDistance = 0;
+    public static final double MaxIntakeDistance = 0;
+    public static final double RobatWidth = 0;
+    public static final double RobatLength = 0;
 }

@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.util;
 
 import static java.lang.Thread.sleep;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -155,13 +159,15 @@ public class Intake {
         this.linear_slide = new IntakeSlide(motor);
         intake_servo_a1.setPosition(0.77);
     }
-    public void moveUp(){
+    public double moveUp(){
         intake_servo_a1.setPosition(0.75);
         intake_servo_a2.setPosition(1 - 0.75);
+        return Math.abs((0.75 - intake_servo_a1.getPosition())) - Math.abs(((1 - 0.75) - intake_servo_a1.getPosition()));
     }
-    public void moveDown(){
+    public double moveDown(){
         intake_servo_a1.setPosition(0.03);
         intake_servo_a2.setPosition(1 - 0.03);
+        return Math.abs((0.03 - intake_servo_a1.getPosition())) - Math.abs(((1 - 0.03) - intake_servo_a1.getPosition()));
     }
     public void grab(){
         intake_servo_b.setPosition(0);
