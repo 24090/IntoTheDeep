@@ -361,7 +361,6 @@ public final class MecanumDrive {
             c.strokePolyline(xPoints, yPoints);
         }
     }
-
     public final class TurnAction implements Action {
         private final TimeTurn turn;
 

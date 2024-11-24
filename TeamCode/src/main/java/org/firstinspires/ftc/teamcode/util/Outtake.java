@@ -51,11 +51,13 @@ public class Outtake {
         }
         return false;
     }
-    public void open(){
+    public double open(){
         outtake_servo.setPosition(0);
+        return outtake_servo.getPosition();
     }
-    public void close(){
+    public double close(){
         outtake_servo.setPosition(180);
+        return 180.0-outtake_servo.getPosition();
     }
     public void up(){linear_slide.moveUp();
     }
