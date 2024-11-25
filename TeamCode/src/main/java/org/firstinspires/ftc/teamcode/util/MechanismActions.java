@@ -19,19 +19,19 @@ public class MechanismActions {
         this.outtake = outtake;
         this.opMode = opMode;
     }
-    class OuttakeSlideUpAction implements Action{
+    public class OuttakeSlideUpAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             return !(outtake.linear_slide.extendToIter(-4850,50));
         }
     }
-    class OuttakeSlideDownAction implements Action{
+    public class OuttakeSlideDownAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             return !(outtake.linear_slide.extendToIter(0, 50));
         }
     }
-    class OpenGateAction implements Action{
+    public class OpenGateAction implements Action{
         double start_time = -1;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -42,7 +42,7 @@ public class MechanismActions {
             return ((System.currentTimeMillis() - start_time) < 1000);
         }
     }
-    class CloseGateAction implements Action{
+    public class CloseGateAction implements Action{
         double start_time = -1;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -56,7 +56,7 @@ public class MechanismActions {
     public Action ReadyGrabAction(double to){
         return new ParallelAction(new HSlideToAction(to), new IntakeDownAction());
     }
-    class IntakeReleaseAction implements Action{
+    public class IntakeReleaseAction implements Action{
         double start_time = -1;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -68,7 +68,7 @@ public class MechanismActions {
         }
     }
 
-    class HSlideToAction implements Action{
+    public class HSlideToAction implements Action{
         double to;
         public HSlideToAction(double to){
             super();
@@ -79,12 +79,12 @@ public class MechanismActions {
             return !(intake.linear_slide.extendToIter(to, 50));
         }
     }
-    class HSlideInAction implements Action{
+    public class HSlideInAction implements Action{
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             return !(intake.linear_slide.extendToIter(0, 50));
         }
     }
-    class IntakeDownAction implements Action{
+    public class IntakeDownAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             boolean out = (intake.moveDown() < 0.01);
@@ -93,13 +93,13 @@ public class MechanismActions {
             return !out;
         }
     }
-    class IntakeUpAction implements Action{
+    public class IntakeUpAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             return !(intake.moveUp() < 0.01);
         }
     }
-    class IntakeGrabAction implements Action{
+    public class IntakeGrabAction implements Action{
         double start_time = -1;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -110,7 +110,7 @@ public class MechanismActions {
             return ((System.currentTimeMillis() - start_time) < 1000);
         }
     }
-    class IntakeHoldAction implements Action{
+    public class IntakeHoldAction implements Action{
         double start_time;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -119,7 +119,7 @@ public class MechanismActions {
         }
     }
     public Action ReadyTransferAction(){
-        return new ParallelAction(new CloseGateAction(), new HSlideInAction(), new IntakeUpAction(), new IntakeHoldAction());
+        return new ParallelAction(new OuttakeSlideDownAction(), new CloseGateAction(), new HSlideInAction(), new IntakeUpAction(), new IntakeHoldAction());
     }
     public Action FullTransferAction(){
         return new SequentialAction(ReadyTransferAction(), new IntakeReleaseAction());
@@ -128,6 +128,12 @@ public class MechanismActions {
         return new SequentialAction(ReadyGrabAction(1000), new IntakeGrabAction());
     }
     public Action FullScoreAction(){
-        return new SequentialAction( new OpenGateAction(), new CloseGateAction());
+        return new SequentialAction( new OuttakeSlideUpAction(),new OpenGateAction(), new CloseGateAction(), new OuttakeSlideDownAction());
+    }
+    public Action OuttakeSlideUpAction(){
+        return new OuttakeSlideUpAction();
+    }
+    public Action EndScoring(){
+        return new SequentialAction(new OuttakeSlideDownAction(), new CloseGateAction());
     }
 }

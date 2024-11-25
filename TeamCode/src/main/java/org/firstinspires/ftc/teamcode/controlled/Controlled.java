@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.controlled;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
 
+import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.ftc.Actions;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -38,18 +42,19 @@ public class Controlled extends LinearOpMode{
                 hardwareMap.get(Servo.class, "outtake_servo"),
                 hardwareMap.get(DcMotor.class, "outtake_slide_motor")
         );
+        MechanismActions actions = new MechanismActions(intake,outtake,this);
+        Thread t = new Thread(() -> {
+            while (opModeIsActive()){
+                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x));
+            }
+        });
         waitForStart();
+        t.start();
         while (opModeIsActive()){
-            drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x));
             if (gamepad1.left_bumper){
-                intake.stop();
-                intake.moveDown();
-                intake.linear_slide.extendToBreaking(gamepad1.left_trigger * 1100, 50);
+                Actions.runBlocking(actions.ReadyGrabAction(gamepad1.left_trigger*1000));
             } else if (gamepad1.right_bumper){
-                outtake.close();
-                Thread t = new Thread(() -> outtake.down());
-                while (t.isAlive()){}
-                intake.transferSample();
+                Actions.runBlocking(actions.FullTransferAction());
             }
             if (gamepad1.dpad_up){
                 intake.grab();
@@ -59,10 +64,9 @@ public class Controlled extends LinearOpMode{
                 intake.stop();
             }
             if (gamepad1.y){
-                outtake.up();
+                Actions.runBlocking(actions.OuttakeSlideUpAction());
             } else if (gamepad1.a){
-                outtake.close();
-                outtake.down();
+                Actions.runBlocking(actions.EndScoring());
             } else if (gamepad1.b){
                 outtake.open();
             }
