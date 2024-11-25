@@ -6,36 +6,51 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 public class MechanismActions {
     Intake intake;
     Outtake outtake;
-    public MechanismActions(Intake intake, Outtake outtake){
+    LinearOpMode opMode;
+    public MechanismActions(Intake intake, Outtake outtake, LinearOpMode opMode){
         this.intake = intake;
         this.outtake = outtake;
+        this.opMode = opMode;
     }
     class OuttakeSlideUpAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return outtake.linear_slide.extendToIter(4500,50);
+            return !(outtake.linear_slide.extendToIter(-4850,50));
         }
     }
     class OuttakeSlideDownAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return outtake.linear_slide.extendToIter(0, 50);
+            return !(outtake.linear_slide.extendToIter(0, 50));
         }
     }
     class OpenGateAction implements Action{
+        double start_time = -1;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return Math.abs(outtake.open()) < 0.01;
+            if (start_time == -1){
+                start_time = System.currentTimeMillis();
+            }
+            outtake.open();
+            return ((System.currentTimeMillis() - start_time) < 1000);
         }
     }
     class CloseGateAction implements Action{
+        double start_time = -1;
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return Math.abs(outtake.close()) < 0.01;
+            if (start_time == -1){
+                start_time = System.currentTimeMillis();
+            }
+            outtake.close();
+            return ((System.currentTimeMillis() - start_time) < 1000);
         }
     }
     public Action ReadyGrabAction(double to){
@@ -61,28 +76,27 @@ public class MechanismActions {
         }
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return intake.linear_slide.extendToIter(to, 50);
+            return !(intake.linear_slide.extendToIter(to, 50));
         }
     }
     class HSlideInAction implements Action{
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return intake.linear_slide.extendToIter(0, 50);
+            return !(intake.linear_slide.extendToIter(0, 50));
         }
     }
     class IntakeDownAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.intake_servo_a1.setPosition(0.75);
-            intake.intake_servo_a2.setPosition(1 - 0.75);
-            return intake.moveDown() < 0.01;
+            boolean out = (intake.moveDown() < 0.01);
+            opMode.telemetry.addData("intake servo finished",out );
+            opMode.telemetry.update();
+            return !out;
         }
     }
     class IntakeUpAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.intake_servo_a1.setPosition(0.75);
-            intake.intake_servo_a2.setPosition(1 - 0.75);
-            return intake.moveUp() < 0.01;
+            return !(intake.moveUp() < 0.01);
         }
     }
     class IntakeGrabAction implements Action{
@@ -93,7 +107,7 @@ public class MechanismActions {
                 start_time = System.currentTimeMillis();
             }
             intake.grab();
-            return (System.currentTimeMillis() - start_time) < 1000;
+            return ((System.currentTimeMillis() - start_time) < 1000);
         }
     }
     class IntakeHoldAction implements Action{
@@ -101,11 +115,11 @@ public class MechanismActions {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.hold();
-            return true;
+            return false;
         }
     }
     public Action ReadyTransferAction(){
-        return new ParallelAction(new OuttakeSlideDownAction(), new CloseGateAction(), new HSlideInAction(), new IntakeUpAction(), new IntakeHoldAction());
+        return new ParallelAction(new CloseGateAction(), new HSlideInAction(), new IntakeUpAction(), new IntakeHoldAction());
     }
     public Action FullTransferAction(){
         return new SequentialAction(ReadyTransferAction(), new IntakeReleaseAction());
@@ -114,6 +128,6 @@ public class MechanismActions {
         return new SequentialAction(ReadyGrabAction(1000), new IntakeGrabAction());
     }
     public Action FullScoreAction(){
-        return new SequentialAction(new OuttakeSlideUpAction(), new OpenGateAction(), new CloseGateAction(), new OuttakeSlideDownAction());
+        return new SequentialAction( new OpenGateAction(), new CloseGateAction());
     }
 }

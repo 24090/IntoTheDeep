@@ -56,8 +56,8 @@ public class Outtake {
         return outtake_servo.getPosition();
     }
     public double close(){
-        outtake_servo.setPosition(180);
-        return 180.0-outtake_servo.getPosition();
+        outtake_servo.setPosition(1);
+        return 1-outtake_servo.getPosition();
     }
     public void up(){linear_slide.moveUp();
     }

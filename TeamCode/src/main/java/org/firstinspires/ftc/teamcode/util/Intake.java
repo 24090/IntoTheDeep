@@ -153,17 +153,18 @@ public class Intake {
         this.intake_servo_a2 = intake_servo_a2;
         this.intake_servo_b  = intake_servo_b;
         this.linear_slide = new IntakeSlide(motor);
-        intake_servo_a1.setPosition(0.77);
+        intake_servo_a1.setPosition(0.79);
+        intake_servo_a2.setPosition(1.0-0.79);
     }
     public double moveUp(){
-        intake_servo_a1.setPosition(0.75);
-        intake_servo_a2.setPosition(1 - 0.75);
-        return Math.abs((0.75 - intake_servo_a1.getPosition())) + Math.abs((1-0.75 - intake_servo_a1.getPosition()));
+        intake_servo_a1.setPosition(0.79);
+        intake_servo_a2.setPosition(1 - 0.79);
+        return Math.abs((0.79 - intake_servo_a1.getPosition())) + Math.abs((1-0.79 - intake_servo_a2.getPosition()));
     }
     public double moveDown(){
-        intake_servo_a1.setPosition(0.025);
-        intake_servo_a2.setPosition(1 - 0.025);
-        return Math.abs((0.025 - intake_servo_a1.getPosition())) + Math.abs((1-0.025 - intake_servo_a1.getPosition()));
+        intake_servo_a1.setPosition(0.026);
+        intake_servo_a2.setPosition(1 - 0.026);
+        return Math.abs((0.026 - intake_servo_a1.getPosition())) + Math.abs((1-0.026 - intake_servo_a2.getPosition()));
     }
     public void grab(){
         intake_servo_b.setPosition(0);
