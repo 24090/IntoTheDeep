@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
@@ -22,13 +23,21 @@ public class MechanismActions {
     public class OuttakeSlideUpAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return !(outtake.linear_slide.extendToIter(-4850,50));
+            boolean finished = (outtake.linear_slide.extendToIter(4850,50));
+            if (finished){
+                outtake.linear_slide.stop();
+            }
+            return !finished;
         }
     }
     public class OuttakeSlideDownAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return !(outtake.linear_slide.extendToIter(0, 50));
+            boolean finished = (outtake.linear_slide.extendToIter(0, 50));
+            if (finished) {
+                outtake.linear_slide.stop();
+            }
+            return !finished;
         }
     }
     public class OpenGateAction implements Action{
@@ -76,20 +85,26 @@ public class MechanismActions {
         }
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return !(intake.linear_slide.extendToIter(to, 50));
+            boolean finished = (intake.linear_slide.extendToIter(to, 50));
+            if (finished){
+                intake.linear_slide.stop();
+            }
+            return !finished;
         }
     }
     public class HSlideInAction implements Action{
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return !(intake.linear_slide.extendToIter(0, 50));
+           boolean finished = (intake.linear_slide.extendToIter(0, 10));
+           if (finished){
+               intake.linear_slide.stop();
+           }
+           return !finished;
         }
     }
     public class IntakeDownAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             boolean out = (intake.moveDown() < 0.01);
-            opMode.telemetry.addData("intake servo finished",out );
-            opMode.telemetry.update();
             return !out;
         }
     }
@@ -134,6 +149,6 @@ public class MechanismActions {
         return new OuttakeSlideUpAction();
     }
     public Action EndScoring(){
-        return new SequentialAction(new OuttakeSlideDownAction(), new CloseGateAction());
+        return new ParallelAction(new OuttakeSlideDownAction(), new SequentialAction(new SleepAction(0.3), new CloseGateAction()));
     }
 }

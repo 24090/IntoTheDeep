@@ -1,24 +1,17 @@
 package org.firstinspires.ftc.teamcode.controlled;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
 
-import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.ftc.Actions;
-import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
-//import org.firstinspires.ftc.teamcode.util.ColorDistance;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.MechanismActions;
-import org.firstinspires.ftc.teamcode.util.Mechanisms;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 
 /**
@@ -27,8 +20,8 @@ import org.firstinspires.ftc.teamcode.util.Outtake;
  *  assisted aim if necessary
  *  dpad mode if necessary
  */
-@TeleOp(name = "Controller")
-public class Controlled extends LinearOpMode{
+@TeleOp(name = "Two Controller")
+public class TwoControlled extends LinearOpMode{
     public void runOpMode(){
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0.0, 0.0, 0.0));
         Intake intake = new Intake(
@@ -45,7 +38,7 @@ public class Controlled extends LinearOpMode{
         MechanismActions actions = new MechanismActions(intake,outtake,this);
         Thread t = new Thread(() -> {
             while (opModeIsActive()){
-                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, gamepad1.left_stick_x), -gamepad1.right_stick_x));
+                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad2.left_stick_y, gamepad2.left_stick_x), -gamepad2.right_stick_x));
             }
         });
         waitForStart();

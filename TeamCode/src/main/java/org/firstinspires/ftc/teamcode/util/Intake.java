@@ -170,13 +170,13 @@ public class Intake {
         intake_servo_b.setPosition(0);
     }
     public void hold(){
-        intake_servo_b.setPosition(0.46);
+        intake_servo_b.setPosition(0.44);
     }
     public void stop(){
         intake_servo_b.setPosition(0.5);
     }
     public void release(){
-        intake_servo_b.setPosition(0.7);
+        intake_servo_b.setPosition(0.6);
     }
     public void slideOut(){
         linear_slide.extendToBreaking(1000, 50);
