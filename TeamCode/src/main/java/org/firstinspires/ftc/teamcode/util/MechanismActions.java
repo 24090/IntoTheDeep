@@ -142,6 +142,9 @@ public class MechanismActions {
     public Action FullGrabAction(){
         return new SequentialAction(ReadyGrabAction(1000), new IntakeGrabAction());
     }
+    public Action FullGrabAction(double to){
+        return new SequentialAction(ReadyGrabAction(to), new IntakeGrabAction());
+    }
     public Action FullScoreAction(){
         return new SequentialAction( new OuttakeSlideUpAction(),new OpenGateAction(), new CloseGateAction(), new OuttakeSlideDownAction());
     }

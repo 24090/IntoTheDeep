@@ -21,12 +21,12 @@ import javax.imageio.ImageIO;
 public class MeepMeepTesting {
     public static void main(String[] args) {
         Vector2d score_position =
-                GameMap.NetRedCorner.plus(new Vector2d(9.5,9.5)).plus(
+                GameMap.NetRedCorner.plus(new Vector2d(9,9)).plus(
                         Rotation2d.fromDouble(PI/4).times(new Vector2d(GameMap.OuttakeDistance, 0))
                 );
         Pose2d start_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(24 + GameMap.RobotWidth/2,GameMap.RobotLength/2)), PI/2);
         Pose2d score_pose = new Pose2d(score_position, PI/4);
-        Vector2d park_position = GameMap.ObservationRedCorner.plus(new Vector2d(-11.25, GameMap.RobotLength/2 + 1));
+        Vector2d park_position = GameMap.ObservationRedCorner.plus(new Vector2d(-12, GameMap.RobotLength/2 + 1));
         Vector2d neutral_spike_mark_position = GameMap.SpikeMarkNeutralLeftInner.plus(new Vector2d(GameMap.RobotWidth, 0));
         Vector2d red_spike_mark_position = GameMap.SpikeMarkRedCenter.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 4));
         double rotation = GameMap.SpikeMarkNeutralLeftInner.minus(neutral_spike_mark_position).angleCast().toDouble() - PI/2;
@@ -38,23 +38,32 @@ public class MeepMeepTesting {
                 .setDimensions(GameMap.RobotWidth, GameMap.RobotLength)
                 .build();
         Action action = robot.getDrive().actionBuilder(start_pose)
+                .setTangent(0)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
+//                .stopAndAdd(ma.FullScoreAction())
                 //SCORE #1
                 // red net zone to LN spike marks * 3
+                .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, PI )
-                //.stopAndAdd(ma.FullGrabAction())
-                //.stopAndAdd(ma.FullTransferAction())
+//                .stopAndAdd(ma.FullGrabAction(0))
+//                .stopAndAdd(ma.FullTransferAction())
+                .setTangent(0)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                //.stopAndAdd(ma.FullScoreAction())
+//                .stopAndAdd(ma.FullScoreAction())
+                .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position.minus(new Vector2d(10,0)), PI)
-                //.stopAndAdd(ma.FullGrabAction())
-                //.stopAndAdd(ma.FullTransferAction())
+//                .stopAndAdd(ma.FullGrabAction(0))
+//                .stopAndAdd(ma.FullTransferAction())
+                .setTangent(0)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                //.stopAndAdd(ma.FullScoreAction())
+//                .stopAndAdd(ma.FullScoreAction())
+                .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position.minus(new Vector2d(20,0)), PI)
-                //.stopAndAdd(ma.FullGrabAction())
-                //.stopAndAdd(ma.FullTransferAction())
+//                .stopAndAdd(ma.FullGrabAction(0))
+//                .stopAndAdd(ma.FullTransferAction())
+                .setTangent(0)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                .setTangent(0)
                 .strafeToSplineHeading(park_position, PI/2)
                 .build();
         robot.runAction(action);
