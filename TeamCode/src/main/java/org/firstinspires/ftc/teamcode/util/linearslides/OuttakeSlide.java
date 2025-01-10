@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.util.linearslides;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
+
+import org.firstinspires.ftc.teamcode.util.GameMap;
 
 public class OuttakeSlide extends LinearSlide {
     /**
@@ -22,7 +25,7 @@ public class OuttakeSlide extends LinearSlide {
             added_power = 0.6;
         }
         double distance = pos - motor.getCurrentPosition();
-        motor.setPower((distance / (max_extend - min_extend)) + added_power);
+        motor.setPower(4 * ((distance / (max_extend - min_extend)) + added_power));
         return Math.abs(distance) < max_error;
     }
     @Override

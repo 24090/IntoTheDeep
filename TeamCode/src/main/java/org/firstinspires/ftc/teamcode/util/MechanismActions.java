@@ -7,10 +7,15 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
+import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
+
 public class MechanismActions {
     Intake intake;
     Outtake outtake;
@@ -62,8 +67,8 @@ public class MechanismActions {
             return ((System.currentTimeMillis() - start_time) < 1000);
         }
     }
-    public Action ReadyGrabAction(double to){
-        return new ParallelAction(new HSlideToAction(to), new IntakeDownAction());
+    public Action ReadyGrabAction(double distance_in){
+        return new ParallelAction(new HSlideToAction(distance_in), new IntakeDownAction());
     }
     public class IntakeReleaseAction implements Action{
         double start_time = -1;
@@ -78,14 +83,14 @@ public class MechanismActions {
     }
 
     public class HSlideToAction implements Action{
-        double to;
-        public HSlideToAction(double to){
+        double distance_in;
+        public HSlideToAction(double distance_in){
             super();
-            this.to = to;
+            this.distance_in = distance_in;
         }
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            boolean finished = (intake.linear_slide.extendToIter(to, 50));
+            boolean finished = (intake.linear_slide.extendToIter(intake.linear_slide.inToTicks(distance_in), 50));
             if (finished){
                 intake.linear_slide.stop();
             }
@@ -140,13 +145,13 @@ public class MechanismActions {
         return new SequentialAction(ReadyTransferAction(), new IntakeReleaseAction());
     }
     public Action FullGrabAction(){
-        return new SequentialAction(ReadyGrabAction(1000), new IntakeGrabAction());
+        return new SequentialAction(ReadyGrabAction(0), new IntakeGrabAction());
     }
-    public Action FullGrabAction(double to){
-        return new SequentialAction(ReadyGrabAction(to), new IntakeGrabAction());
+    public Action FullGrabAction(double distance_in){
+        return new SequentialAction(ReadyGrabAction(distance_in), new ParallelAction(new IntakeGrabAction()));
     }
     public Action FullScoreAction(){
-        return new SequentialAction( new OuttakeSlideUpAction(),new OpenGateAction(), new CloseGateAction(), new OuttakeSlideDownAction());
+        return new SequentialAction( new OuttakeSlideUpAction(),new OpenGateAction(), new ParallelAction(new SequentialAction(new SleepAction(0.5), new CloseGateAction()) , new OuttakeSlideDownAction()) );
     }
     public Action OuttakeSlideUpAction(){
         return new OuttakeSlideUpAction();

@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.util.GameMap;
+
 public class IntakeSlide extends LinearSlide {
     /**
      * Class for using Intake Slide
@@ -16,5 +18,8 @@ public class IntakeSlide extends LinearSlide {
     }
     public Thread fullOut(){
         return extendToAsync(1000, 50);
+    }
+    public double inToTicks(double extension_from_center_in){
+        return (extension_from_center_in - GameMap.MinIntakeDistance)/(GameMap.MaxIntakeDistance-GameMap.MinIntakeDistance) * (1100 - -50) + -50;
     }
 }
