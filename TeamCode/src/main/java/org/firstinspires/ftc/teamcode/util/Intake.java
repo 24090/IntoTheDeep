@@ -176,7 +176,7 @@ public class Intake {
         intake_servo_b.setPosition(0.5);
     }
     public void release(){
-        intake_servo_b.setPosition(0.6);
+        intake_servo_b.setPosition(0.7);
     }
     public void slideOut(){
         linear_slide.extendToBreaking(1000, 50);

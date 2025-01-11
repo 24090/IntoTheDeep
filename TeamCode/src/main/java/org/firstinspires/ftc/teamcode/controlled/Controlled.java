@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 //import org.firstinspires.ftc.teamcode.util.ColorDistance;
+import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.MechanismActions;
 import org.firstinspires.ftc.teamcode.util.Mechanisms;
@@ -52,7 +53,7 @@ public class Controlled extends LinearOpMode{
         t.start();
         while (opModeIsActive()){
             if (gamepad1.left_bumper){
-                Actions.runBlocking(actions.ReadyGrabAction(gamepad1.left_trigger*1000));
+                Actions.runBlocking(actions.ReadyGrabAction(gamepad1.left_trigger * (GameMap.MaxIntakeDistance - GameMap.MinIntakeDistance) + GameMap.MinIntakeDistance));
             } else if (gamepad1.right_bumper){
                 Actions.runBlocking(actions.FullTransferAction());
             }
