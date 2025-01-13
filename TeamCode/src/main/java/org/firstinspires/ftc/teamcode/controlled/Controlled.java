@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.controlled;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
 
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
-import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -12,14 +8,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 //import org.firstinspires.ftc.teamcode.util.ColorDistance;
 import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.MechanismActions;
-import org.firstinspires.ftc.teamcode.util.Mechanisms;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 
 /**

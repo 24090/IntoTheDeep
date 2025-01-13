@@ -1,16 +1,10 @@
 package org.firstinspires.ftc.teamcode.controlled;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 //import org.firstinspires.ftc.teamcode.util.ColorDistance;
-import org.firstinspires.ftc.teamcode.util.Mechanisms;
+
 
 @TeleOp(name = "linear")
 public class Linearslidetest extends LinearOpMode{
@@ -20,7 +14,6 @@ public class Linearslidetest extends LinearOpMode{
         Servo servo3;
         Servo servo4;
         double servopos = 0.4;
-        Mechanisms mech = new Mechanisms(hardwareMap);
         linear = hardwareMap.get(DcMotor.class, "linear");
         linear1 = hardwareMap.get(DcMotor.class, "armMotor");
         servo3 = hardwareMap.get(Servo.class, "servo3");
