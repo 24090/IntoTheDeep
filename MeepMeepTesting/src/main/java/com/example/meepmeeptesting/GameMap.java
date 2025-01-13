@@ -22,21 +22,21 @@ public class GameMap {
     // -------SPIKE MARKS----------------
     // The center of the spike mark
     // RED
-    public static final Vector2d SpikeMarkRedInner = new Vector2d(48 + 0.5 + 1.5/2, -24.5-3.5/2);
+    public static final Vector2d SpikeMarkRedInner = new Vector2d(48, -24);
     public static final Vector2d SpikeMarkRedCenter = SpikeMarkRedInner.plus(new Vector2d(10,0));
     public static final Vector2d SpikeMarkRedOuter = SpikeMarkRedInner.plus(new Vector2d(20,0));
     // BLUE
-    public static final Vector2d SpikeMarkBlueInner = new Vector2d(-48 - 0.5 - 1.5/2, 24.5+3.5/2);
+    public static final Vector2d SpikeMarkBlueInner = new Vector2d(-48, 24);
     public static final Vector2d SpikeMarkBlueCenter = SpikeMarkBlueInner.plus(new Vector2d(-10,0));
     public static final Vector2d SpikeMarkBlueOuter = SpikeMarkBlueInner.plus(new Vector2d(-20,0));
     // NEUTRAL RIGHT
     // right = +x
-    public static final Vector2d SpikeMarkNeutralRightInner = new Vector2d(48 + 0.5 + 1.5/2, 24.5+3.5/2);
+    public static final Vector2d SpikeMarkNeutralRightInner = new Vector2d(48, 24);
     public static final Vector2d SpikeMarkNeutralRightCenter = SpikeMarkNeutralRightInner.plus(new Vector2d(10,0));
     public static final Vector2d SpikeMarkNeutralRightOuter =SpikeMarkNeutralRightInner.plus(new Vector2d(20,0));
     // NEUTRAL LEFT
     // left = -x
-    public static final Vector2d SpikeMarkNeutralLeftInner = new Vector2d(-48 - 0.5 - 1.5/2, -24.5-3.5/2);
+    public static final Vector2d SpikeMarkNeutralLeftInner = new Vector2d(-48, -24);
     public static final Vector2d SpikeMarkNeutralLeftCenter = SpikeMarkNeutralLeftInner.plus(new Vector2d(-10,0));
     public static final Vector2d SpikeMarkNeutralLeftOuter = SpikeMarkNeutralLeftInner.plus(new Vector2d(-20,0));
     // -------APRIL TAGS-----------------

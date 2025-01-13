@@ -5,6 +5,7 @@ import static java.lang.Math.PI;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.InstantFunction;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -24,10 +25,13 @@ public class MeepMeepTesting {
                 GameMap.NetRedCorner.plus(new Vector2d(9.5,9.5)).plus(
                         Rotation2d.fromDouble(PI/4).times(new Vector2d(GameMap.OuttakeDistance, 0))
                 );
-        final Pose2d start_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(24.5 + GameMap.RobotWidth/2,GameMap.RobotLength/2)), PI/2);
-        final Pose2d score_pose = new Pose2d(score_position, PI/4);
-        final Vector2d park_position = GameMap.ObservationRedCorner.plus(new Vector2d(-11.25, GameMap.RobotLength/2 + 1));
-        final Vector2d neutral_spike_mark_position = GameMap.SpikeMarkNeutralLeftInner.plus(new Vector2d(0, -GameMap.MinIntakeDistance));
+        final Pose2d start_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(24.5 + GameMap.RobotWidth / 2, GameMap.RobotLength / 2)), PI / 2);
+        final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(17.5, 17.5)), PI / 4);
+        final Vector2d park_position = GameMap.ObservationRedCorner.plus(new Vector2d(-11.25, GameMap.RobotLength / 2 + 1));
+        final Vector2d neutral_spike_mark_position = GameMap.SpikeMarkNeutralLeftInner.minus(new Vector2d(0, GameMap.MinIntakeDistance + 1));
+        final Vector2d InnerDistance = GameMap.SpikeMarkNeutralLeftInner.minus(neutral_spike_mark_position);
+        final Vector2d CenterDistance = GameMap.SpikeMarkNeutralLeftCenter.minus(neutral_spike_mark_position);
+        final Vector2d OuterDistance = GameMap.SpikeMarkNeutralLeftOuter.minus(neutral_spike_mark_position);
         MeepMeep meepMeep = new MeepMeep(800);
 
         RoadRunnerBotEntity robot = new DefaultBotBuilder(meepMeep)
@@ -36,31 +40,35 @@ public class MeepMeepTesting {
                 .setDimensions(GameMap.RobotWidth, GameMap.RobotLength)
                 .build();
         Action action = robot.getDrive().actionBuilder(start_pose)
+                .strafeToSplineHeading(score_pose.position, score_pose.heading)
+//                .stopAndAdd(new ParallelAction(ma.FullScoreAction(), ma.ReadyGrabAction(InnerDistance.norm())))
+                .setTangent(0)
+                .strafeToSplineHeading(neutral_spike_mark_position, InnerDistance.angleCast().toDouble())
+//                .stopAndAdd(ma.GrabSpinAction())
+                .setTangent(0)
+                .strafeTo(neutral_spike_mark_position.plus(InnerDistance.div(InnerDistance.norm()).angleCast().times(new Vector2d(4, 0))))
+//                .stopAndAdd(ma.FullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
-//                .stopAndAdd(ma.FullScoreAction())
-                //SCORE #1
-                // red net zone to LN spike marks * 3
+//                .stopAndAdd(new ParallelAction(ma.FullScoreAction(), ma.ReadyGrabAction(CenterDistance.norm() - 2)))
                 .setTangent(0)
-                .strafeToSplineHeading(neutral_spike_mark_position, GameMap.SpikeMarkNeutralLeftInner.minus(neutral_spike_mark_position).angleCast().toDouble())
-//                .stopAndAdd(ma.FullGrabAction(GameMap.SpikeMarkNeutralLeftInner.minus(neutral_spike_mark_position).norm()))
+                .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble())
+//                .stopAndAdd(ma.GrabSpinAction())
+                .setTangent(0)
+                .strafeTo(neutral_spike_mark_position.plus(CenterDistance.div(CenterDistance.norm()).angleCast().times(new Vector2d(4, 0))))
+//                .stopAndAdd(ma.FullTransferAction())
+                .setTangent(0)
+                .strafeToSplineHeading(score_pose.position, score_pose.heading)
+//                .stopAndAdd(new ParallelAction(ma.FullScoreAction(), ma.ReadyGrabAction(OuterDistance.norm() - 2)))
+                .setTangent(0)
+                .strafeToSplineHeading(neutral_spike_mark_position, OuterDistance.angleCast().toDouble())
+//                .stopAndAdd(ma.GrabSpinAction())
+                .setTangent(0)
+                .strafeTo(neutral_spike_mark_position.plus(OuterDistance.div(OuterDistance.norm()).angleCast().times(new Vector2d(4, 0))))
 //                .stopAndAdd(ma.FullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
 //                .stopAndAdd(ma.FullScoreAction())
-                .setTangent(0)
-                .strafeToSplineHeading(neutral_spike_mark_position, GameMap.SpikeMarkNeutralLeftCenter.minus(neutral_spike_mark_position).angleCast().toDouble())
-//                .stopAndAdd(ma.FullGrabAction(GameMap.SpikeMarkNeutralLeftCenter.minus(neutral_spike_mark_position).norm()))
-//                .stopAndAdd(ma.FullTransferAction())
-                .setTangent(0)
-                .strafeToSplineHeading(score_pose.position, score_pose.heading)
-//                .stopAndAdd(ma.FullScoreAction())
-                .setTangent(0)
-                .strafeToSplineHeading(neutral_spike_mark_position, GameMap.SpikeMarkNeutralLeftOuter.minus(neutral_spike_mark_position).angleCast().toDouble())
-//                .stopAndAdd(ma.FullGrabAction(GameMap.SpikeMarkNeutralLeftOuter.minus(neutral_spike_mark_position).norm()))
-//                .stopAndAdd(ma.FullTransferAction())
-                .setTangent(0)
-                .strafeToSplineHeading(score_pose.position, score_pose.heading)
                 .setTangent(0)
                 .strafeToSplineHeading(park_position, PI/2)
                 .build();

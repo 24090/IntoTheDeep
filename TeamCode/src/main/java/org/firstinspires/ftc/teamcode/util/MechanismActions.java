@@ -159,4 +159,7 @@ public class MechanismActions {
     public Action EndScoring(){
         return new ParallelAction(new OuttakeSlideDownAction(), new SequentialAction(new SleepAction(0.3), new CloseGateAction()));
     }
+    public Action GrabSpinAction() {
+        return new IntakeGrabAction();
+    }
 }

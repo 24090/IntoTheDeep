@@ -47,6 +47,7 @@ public class TwoControlled extends LinearOpMode{
         while (opModeIsActive()){
             if (gamepad1.left_bumper){
                 Actions.runBlocking(actions.ReadyGrabAction(gamepad1.left_trigger * (GameMap.MaxIntakeDistance - GameMap.MinIntakeDistance) + GameMap.MinIntakeDistance));
+                intake.grab();
             } else if (gamepad1.right_bumper){
                 Actions.runBlocking(actions.FullTransferAction());
             }
@@ -54,7 +55,7 @@ public class TwoControlled extends LinearOpMode{
                 intake.grab();
             } else if (gamepad1.dpad_down){
                 intake.release();
-            } else {
+            } else if (gamepad1.dpad_left) {
                 intake.stop();
             }
             if (gamepad1.y){
