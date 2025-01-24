@@ -41,7 +41,7 @@ public class LinearSlide {
             throw new Error("Requested slide extension out of bounds.");
         }
         double distance = pos - motor.getCurrentPosition();
-        motor.setPower((distance / (max_extend - min_extend)) + (minimum_power * Math.signum(distance)));
+        motor.setPower(6 * (distance / (max_extend - min_extend)) + (minimum_power * Math.signum(distance)));
         return Math.abs(distance) < max_error;
     }
 

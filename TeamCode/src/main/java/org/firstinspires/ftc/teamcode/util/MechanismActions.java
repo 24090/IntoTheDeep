@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -119,16 +121,13 @@ public class MechanismActions {
             return !(intake.moveUp() < 0.01);
         }
     }
-    public class IntakeGrabAction implements Action{
-        double start_time = -1;
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (start_time == -1){
-                start_time = System.currentTimeMillis();
+    public Action IntakeGrabAction(){
+        return new InstantAction(new InstantFunction() {
+            @Override
+            public void run() {
+                intake.grab();
             }
-            intake.grab();
-            return ((System.currentTimeMillis() - start_time) < 1000);
-        }
+        });
     }
     public class IntakeHoldAction implements Action{
         double start_time;
@@ -145,10 +144,10 @@ public class MechanismActions {
         return new SequentialAction(ReadyTransferAction(), new IntakeReleaseAction());
     }
     public Action FullGrabAction(){
-        return new SequentialAction(ReadyGrabAction(0), new IntakeGrabAction());
+        return new SequentialAction(ReadyGrabAction(0), IntakeGrabAction());
     }
     public Action FullGrabAction(double distance_in){
-        return new SequentialAction(ReadyGrabAction(distance_in), new ParallelAction(new IntakeGrabAction()));
+        return new SequentialAction(ReadyGrabAction(distance_in), new ParallelAction(IntakeGrabAction()));
     }
     public Action FullScoreAction(){
         return new SequentialAction( new OuttakeSlideUpAction(),new OpenGateAction(), new ParallelAction(new SequentialAction(new SleepAction(0.5), new CloseGateAction()) , new OuttakeSlideDownAction()) );
@@ -160,6 +159,6 @@ public class MechanismActions {
         return new ParallelAction(new OuttakeSlideDownAction(), new SequentialAction(new SleepAction(0.3), new CloseGateAction()));
     }
     public Action GrabSpinAction() {
-        return new IntakeGrabAction();
+        return IntakeGrabAction();
     }
 }

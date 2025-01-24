@@ -20,12 +20,8 @@ public class OuttakeSlide extends LinearSlide {
         if ((pos < min_extend) || (pos > max_extend)){
             throw new Error("Requested slide extension out of bounds.");
         }
-        double added_power = -0.6;
-        if (pos > motor.getCurrentPosition()) {
-            added_power = 0.6;
-        }
+        motor.setPower(Math.signum(pos -motor.getCurrentPosition()));
         double distance = pos - motor.getCurrentPosition();
-        motor.setPower(4 * ((distance / (max_extend - min_extend)) + added_power));
         return Math.abs(distance) < max_error;
     }
     @Override

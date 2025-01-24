@@ -39,7 +39,7 @@ public class TwoControlled extends LinearOpMode{
         MechanismActions actions = new MechanismActions(intake,outtake,this);
         Thread t = new Thread(() -> {
             while (opModeIsActive()){
-                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad2.left_stick_y, gamepad2.left_stick_x), -gamepad2.right_stick_x));
+                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad2.left_stick_y, -gamepad2.left_stick_x), -gamepad2.right_stick_x));
             }
         });
         waitForStart();

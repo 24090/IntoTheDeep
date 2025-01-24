@@ -18,18 +18,18 @@ public class Intake {
         this.intake_servo_a2 = intake_servo_a2;
         this.intake_servo_b  = intake_servo_b;
         this.linear_slide = new IntakeSlide(motor);
-        intake_servo_a1.setPosition(0.79);
-        intake_servo_a2.setPosition(1.0-0.79);
+        intake_servo_a1.setPosition(0.83);
+        intake_servo_a2.setPosition(1-0.83);
     }
     public double moveUp(){
-        intake_servo_a1.setPosition(0.79);
-        intake_servo_a2.setPosition(1 - 0.79);
-        return Math.abs((0.79 - intake_servo_a1.getPosition())) + Math.abs((1-0.79 - intake_servo_a2.getPosition()));
+        intake_servo_a1.setPosition(0.83);
+        intake_servo_a2.setPosition(1-0.83);
+        return Math.abs((0.83 - intake_servo_a1.getPosition())) + Math.abs((1-0.83 - intake_servo_a2.getPosition()));
     }
     public double moveDown(){
-        intake_servo_a1.setPosition(0.026);
-        intake_servo_a2.setPosition(1 - 0.026);
-        return Math.abs((0.026 - intake_servo_a1.getPosition())) + Math.abs((1-0.026 - intake_servo_a2.getPosition()));
+        intake_servo_a1.setPosition(0.05);
+        intake_servo_a2.setPosition(1 - 0.05);
+        return Math.abs((0.05 - intake_servo_a1.getPosition())) + Math.abs((1-0.05 - intake_servo_a2.getPosition()));
     }
     public void grab(){
         intake_servo_b.setPosition(0);
@@ -56,7 +56,7 @@ public class Intake {
         this.hold();
         this.moveUp();
         this.slideIn();
-        while (intake_servo_a1.getPosition() < 0.75 && intake_servo_a2.getPosition() > 1-0.75){}
+        while (intake_servo_a1.getPosition() < 0.83 && intake_servo_a2.getPosition() > 1-0.83){}
         this.release();
         try {Thread.sleep(1000);} catch(InterruptedException e) {
             e.printStackTrace();
@@ -66,7 +66,7 @@ public class Intake {
     public void readyIntake(){
         this.moveDown();
         this.slideOut();
-        while (intake_servo_a1.getPosition() > 0.03){}
+        while (intake_servo_a1.getPosition() > 0.05){}
         this.grab();
     }
     public Thread slideOutAsync(){
