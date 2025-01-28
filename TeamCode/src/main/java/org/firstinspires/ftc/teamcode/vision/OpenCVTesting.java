@@ -4,9 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfDouble;
-import org.opencv.core.Scalar;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -18,14 +15,14 @@ public class OpenCVTesting extends LinearOpMode {
     static final int STREAM_WIDTH = 640; // modify for your camera
     static final int STREAM_HEIGHT = 480; // modify for your camera
     OpenCvWebcam webcam;
-    ObjectLocationPipeline pipeline;
+    SampleLocationPipeline pipeline;
     @Override
     public void runOpMode() {
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam");
         webcamName.getCameraCharacteristics();
         webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
         webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
-        pipeline = new ObjectLocationPipeline(telemetry);
+        pipeline = new SampleLocationPipeline(telemetry);
         webcam.setPipeline(pipeline);
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {

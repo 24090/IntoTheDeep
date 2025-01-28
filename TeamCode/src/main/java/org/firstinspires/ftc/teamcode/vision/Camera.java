@@ -31,12 +31,13 @@ public class Camera {
         mat.put(2,0,0); mat.put(2,1,0.7071068); mat.put(2,2, 0.7071068);
         return mat;
     }
-    public static Mat getTranslationVector() {
+    public static Mat getTranslationVector(boolean top) {
         // measurements in millimeters
         Mat mat = new Mat(3,1,6);
         mat.put(0,0,0);
         mat.put(1,0,0);
-        mat.put(2,0,295);
+        if (!top) {mat.put(2,0,300);}
+        else {mat.put(2,0,300 - 15);}
         return mat;
     }
     public static Mat getCameraMatrix() {
@@ -62,11 +63,11 @@ public class Camera {
         mat.put(0, 7, 0);
         return mat;
     }
-    public static Mat getExtrinsicsMatrix(){
+    public static Mat getExtrinsicsMatrix(boolean top){
         Mat extrinsics_matrix = new Mat();
         List<Mat> mats = new ArrayList<>();
             mats.add(getRotationMatrix());
-            mats.add(getTranslationVector());
+            mats.add(getTranslationVector(top));
         Core.hconcat(mats, extrinsics_matrix);
         Mat bottom_row = new Mat(1, 4, 6);
             bottom_row.put(0, 0, 0);
@@ -80,8 +81,8 @@ public class Camera {
         extrinsics_matrix = extrinsics_matrix.inv();
         return extrinsics_matrix.rowRange(0, 3);
     }
-    public static Mat getReprojectionMatrix(){
-        Mat extrinsics_matrix = getExtrinsicsMatrix();
+    public static Mat getReprojectionMatrix(boolean top){
+        Mat extrinsics_matrix = getExtrinsicsMatrix(top);
         List<Mat> mats = new ArrayList<>();
         mats.add(extrinsics_matrix.col(0));
         mats.add(extrinsics_matrix.col(1));
