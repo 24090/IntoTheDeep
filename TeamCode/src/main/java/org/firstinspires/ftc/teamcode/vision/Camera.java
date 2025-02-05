@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.vision;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ public class Camera {
     public static Scalar red_min;
     public static Scalar red_max ;
     public static Scalar blue_min = new Scalar(105,105,0);
-    public static Scalar blue_max = new Scalar(125,255, 225);
+    public static Scalar blue_max = new Scalar(125,255, 255);
     public static Scalar yellow_min = new Scalar(10, 145, 0);
     public static Scalar yellow_max = new Scalar(30, 255, 255);
     public enum Colors {
@@ -22,13 +23,12 @@ public class Camera {
     }
     public static Mat getRotationMatrix() {
         //  [  1.0000000,  0.0000000,  0.0000000;
-        //   0.0000000, 0.7071068, -0.7071068;
-        //   0.0000000,  0.7071068, 0.7071068 ]
-        // 60º X rotation
+        //   0.0000000,  0.4539905, -0.8910065;
+        //   0.0000000,  0.8910065,  0.4539905 ]
         Mat mat = new Mat(3,3,6);
-        mat.put(0,0,1); mat.put(0,1,0); mat.put(0,2,0);
-        mat.put(1,0,0); mat.put(1,1,0.7071068); mat.put(1,2,-0.7071068);
-        mat.put(2,0,0); mat.put(2,1,0.7071068); mat.put(2,2, 0.7071068);
+        mat.put(0,0,1); mat.put(0,1,0        ); mat.put(0,2,0);
+        mat.put(1,0,0); mat.put(1,1,0.4539905); mat.put(1,2,-0.8910065);
+        mat.put(2,0,0); mat.put(2,1,0.8910065); mat.put(2,2, 0.4539905);
         return mat;
     }
     public static Mat getTranslationVector(boolean top) {
@@ -36,15 +36,15 @@ public class Camera {
         Mat mat = new Mat(3,1,6);
         mat.put(0,0,0);
         mat.put(1,0,0);
-        if (!top) {mat.put(2,0,300);}
-        else {mat.put(2,0,300 - 15);}
+        if (!top) { mat.put(2,0,298 - 1.5 * 25.4); }
+        else      { mat.put(2,0,298);              }
         return mat;
     }
     public static Mat getCameraMatrix() {
-        double focal_length_x = 822.317;
-        double focal_length_y = 822.317;
-        double principal_point_x = 319.495;
-        double principal_point_y = 242.502;
+        double focal_length_x = 822.317 / 2;
+        double focal_length_y = 822.317 / 2;
+        double principal_point_x = 319.495/2;
+        double principal_point_y = 242.502/2;//;
         Mat mat = new Mat(3,3,6);
         mat.put(0,0,focal_length_x); mat.put(0,1,0);       mat.put(0,2,principal_point_x);
         mat.put(1,0,0);       mat.put(1,1,focal_length_y); mat.put(1,2,principal_point_y);
@@ -83,11 +83,21 @@ public class Camera {
     }
     public static Mat getReprojectionMatrix(boolean top){
         Mat extrinsics_matrix = getExtrinsicsMatrix(top);
-        List<Mat> mats = new ArrayList<>();
-        mats.add(extrinsics_matrix.col(0));
-        mats.add(extrinsics_matrix.col(1));
-        mats.add(extrinsics_matrix.col(3));
-        Core.hconcat(mats, extrinsics_matrix);
+            List<Mat> mats = new ArrayList<>();
+            mats.add(extrinsics_matrix.col(0));
+            mats.add(extrinsics_matrix.col(1));
+            mats.add(extrinsics_matrix.col(3));
+            Core.hconcat(mats, extrinsics_matrix);
         return (Camera.getCameraMatrix().matMul(extrinsics_matrix)).inv();
+    }
+    public static Point uvToWorld(Point screen_point, boolean top){
+        Mat screen_coords = new Mat(3, 1, 6);
+        screen_coords.put(0,0, screen_point.x);
+        screen_coords.put(1,0, screen_point.y);
+        screen_coords.put(2,0, 1);
+        // screen_coords = [u, v, 1]
+        Mat result = getReprojectionMatrix(top).matMul(screen_coords);
+        double scale = 1.0/result.get(2,0)[0];
+        return new Point(result.get(0,0)[0] * scale, result.get(1,0)[0] * scale);
     }
 }
