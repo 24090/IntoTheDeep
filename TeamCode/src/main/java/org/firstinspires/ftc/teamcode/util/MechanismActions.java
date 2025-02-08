@@ -47,42 +47,19 @@ public class MechanismActions {
             return !finished;
         }
     }
-    public class OpenGateAction implements Action{
-        double start_time = -1;
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (start_time == -1){
-                start_time = System.currentTimeMillis();
-            }
-            outtake.open();
-            return ((System.currentTimeMillis() - start_time) < 1000);
-        }
+    public Action OpenGateAction(){
+        return new ParallelAction(new SleepAction(1), new InstantAction(() -> outtake.open()));
     }
-    public class CloseGateAction implements Action{
-        double start_time = -1;
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (start_time == -1){
-                start_time = System.currentTimeMillis();
-            }
-            outtake.close();
-            return ((System.currentTimeMillis() - start_time) < 1000);
-        }
+    public Action CloseGateAction(){
+        return new ParallelAction(new SleepAction(1), new InstantAction(() -> outtake.close()));
     }
     public Action ReadyGrabAction(double distance_in){
         return new ParallelAction(new HSlideToAction(distance_in), new IntakeDownAction());
     }
-    public class IntakeReleaseAction implements Action{
-        double start_time = -1;
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (start_time == -1){
-                start_time = System.currentTimeMillis();
-            }
-            intake.release();
-            return (System.currentTimeMillis() - start_time) < 1000;
-        }
+    public Action IntakeReleaseAction(){
+        return new ParallelAction(new SleepAction(1), new InstantAction(() -> intake.release()));
     }
+
 
     public class HSlideToAction implements Action{
         double distance_in;
@@ -122,26 +99,16 @@ public class MechanismActions {
         }
     }
     public Action IntakeGrabAction(){
-        return new InstantAction(new InstantFunction() {
-            @Override
-            public void run() {
-                intake.grab();
-            }
-        });
+        return new InstantAction(() -> intake.grab());
     }
-    public class IntakeHoldAction implements Action{
-        double start_time;
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.hold();
-            return false;
-        }
+    public Action IntakeHoldAction(){
+        return new InstantAction(() -> intake.hold());
     }
     public Action ReadyTransferAction(){
-        return new ParallelAction(new OuttakeSlideDownAction(), new CloseGateAction(), new HSlideInAction(), new IntakeUpAction(), new IntakeHoldAction());
+        return new ParallelAction(new OuttakeSlideDownAction(), CloseGateAction(), new HSlideInAction(), new IntakeUpAction(), IntakeHoldAction());
     }
     public Action FullTransferAction(){
-        return new SequentialAction(ReadyTransferAction(), new IntakeReleaseAction());
+        return new SequentialAction(ReadyTransferAction(), IntakeReleaseAction());
     }
     public Action FullGrabAction(){
         return new SequentialAction(ReadyGrabAction(0), IntakeGrabAction());
@@ -150,13 +117,19 @@ public class MechanismActions {
         return new SequentialAction(ReadyGrabAction(distance_in), new ParallelAction(IntakeGrabAction()));
     }
     public Action FullScoreAction(){
-        return new SequentialAction( new OuttakeSlideUpAction(),new OpenGateAction(), new ParallelAction(new SequentialAction(new SleepAction(0.5), new CloseGateAction()) , new OuttakeSlideDownAction()) );
+        return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), new ParallelAction(new SequentialAction(new SleepAction(0.5), CloseGateAction()) , new OuttakeSlideDownAction()) );
     }
     public Action OuttakeSlideUpAction(){
         return new OuttakeSlideUpAction();
     }
+    public Action OuttakeSlideDownAction(){
+        return new ParallelAction(
+                new SequentialAction(new SleepAction(0.5), CloseGateAction()) ,
+                new OuttakeSlideDownAction()
+        );
+    }
     public Action EndScoring(){
-        return new ParallelAction(new OuttakeSlideDownAction(), new SequentialAction(new SleepAction(0.3), new CloseGateAction()));
+        return new ParallelAction(new OuttakeSlideDownAction(), new SequentialAction(new SleepAction(0.3), CloseGateAction()));
     }
     public Action GrabSpinAction() {
         return IntakeGrabAction();
