@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class ExtendedDCMotor {
     DcMotorEx motor;
-    Conversions converter;
+    HardwareMap hardwareMap;
     PIDMotorcontrol pidController;
     double minBoundPos;
     double maxBoundPos;
@@ -27,7 +27,8 @@ public class ExtendedDCMotor {
         kI = integral;
         ticksPerRev = tickPerRot;
         motor = motorEx;
-        motor = hwMap.get(DcMotorEx.class, deviceName);
+        hardwareMap = hwMap;
+        motor = hardwareMap.get(DcMotorEx.class, deviceName);
         if (RUN_USING_ENCODER){
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         } else {
