@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.MechanismActions;
 import org.firstinspires.ftc.teamcode.util.Outtake;
+import org.firstinspires.ftc.teamcode.util.PoseStorer;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -38,7 +39,7 @@ public class AutoRed extends LinearOpMode {
         MechanismActions ma = new MechanismActions(intake, outtake, this);
         // same as meepmeep
         final Pose2d start_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(24.5 + GameMap.RobotWidth / 2, GameMap.RobotLength / 2)), PI / 2);
-        final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(17.5, 17.5)), PI / 4);
+        final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(17, 17)), PI / 4);
         final Vector2d park_position = GameMap.ObservationRedCorner.plus(new Vector2d(-11.25, GameMap.RobotLength / 2 + 1));
         final Vector2d neutral_spike_mark_position = GameMap.SpikeMarkNeutralLeftInner.minus(new Vector2d(0, GameMap.MinIntakeDistance + 1));
         final Vector2d InnerDistance = GameMap.SpikeMarkNeutralLeftInner.minus(neutral_spike_mark_position);
@@ -49,7 +50,7 @@ public class AutoRed extends LinearOpMode {
         // this line ≠ meepmeep
         Action path = drive.actionBuilder(start_pose)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                .stopAndAdd(new ParallelAction(ma.FullScoreAction(), ma.ReadyGrabAction(InnerDistance.norm())))
+                .stopAndAdd(new ParallelAction(ma.ScoreAction(), ma.ReadyGrabAction(InnerDistance.norm())))
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, InnerDistance.angleCast().toDouble())
                 .stopAndAdd(ma.GrabSpinAction())
@@ -57,8 +58,8 @@ public class AutoRed extends LinearOpMode {
                 .strafeTo(neutral_spike_mark_position.plus(InnerDistance.div(InnerDistance.norm()).angleCast().times(new Vector2d(4, 0))))
                 .stopAndAdd(ma.FullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                .stopAndAdd(new ParallelAction(ma.FullScoreAction(), ma.ReadyGrabAction(CenterDistance.norm() - 2)))
+                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
+                .stopAndAdd(new ParallelAction(ma.ScoreAction(), ma.ReadyGrabAction(CenterDistance.norm() - 2)))
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble())
                 .stopAndAdd(ma.GrabSpinAction())
@@ -66,8 +67,8 @@ public class AutoRed extends LinearOpMode {
                 .strafeTo(neutral_spike_mark_position.plus(CenterDistance.div(CenterDistance.norm()).angleCast().times(new Vector2d(4, 0))))
                 .stopAndAdd(ma.FullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                .stopAndAdd(new ParallelAction(ma.FullScoreAction(), ma.ReadyGrabAction(OuterDistance.norm() - 2)))
+                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
+                .stopAndAdd(new ParallelAction(ma.ScoreAction(), ma.ReadyGrabAction(OuterDistance.norm() - 2)))
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, OuterDistance.angleCast().toDouble())
                 .stopAndAdd(ma.GrabSpinAction())
@@ -75,13 +76,12 @@ public class AutoRed extends LinearOpMode {
                 .strafeTo(neutral_spike_mark_position.plus(OuterDistance.div(OuterDistance.norm()).angleCast().times(new Vector2d(4, 0))))
                 .stopAndAdd(ma.FullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                .strafeToSplineHeading(score_pose.position, PI/4 + 0.1)
                 .stopAndAdd(ma.FullScoreAction())
-                .setTangent(0)
-                .strafeToSplineHeading(park_position, PI/2)
                 .build();
         // these lines ≠ meepmeep
         waitForStart();
         Actions.runBlocking(path);
+        PoseStorer.pose = drive.pose;
     }
 }

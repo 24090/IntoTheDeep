@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
+import static java.lang.Math.PI;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
@@ -15,6 +20,7 @@ import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.MechanismActions;
 import org.firstinspires.ftc.teamcode.util.Outtake;
+import org.firstinspires.ftc.teamcode.util.PoseStorer;
 
 /**
  * TODO:
@@ -24,8 +30,11 @@ import org.firstinspires.ftc.teamcode.util.Outtake;
  */
 @TeleOp(name = "Controller")
 public class Controlled extends LinearOpMode{
+    FtcDashboard dash = FtcDashboard.getInstance();
+    int next_auto_action = 0;
     public void runOpMode(){
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0.0, 0.0, 0.0));
+        final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(17.5, 17.5)), PI / 4);
+        MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
         Intake intake = new Intake(
                 hardwareMap.get(Servo.class, "intake_servo_a1"),
                 hardwareMap.get(Servo.class, "intake_servo_a2"),
@@ -41,11 +50,43 @@ public class Controlled extends LinearOpMode{
         Thread t = new Thread(() -> {
             while (opModeIsActive()){
                 drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x));
+                drive.updatePoseEstimate();
             }
         });
         waitForStart();
         t.start();
         while (opModeIsActive()){
+            if (gamepad1.right_trigger > 0.6) {
+                t.interrupt();
+                Action auto_action = null;
+                if (next_auto_action == 1){
+                    auto_action = drive.actionBuilder(drive.pose)
+                            .stopAndAdd(actions.FullTransferAction())
+                            .setTangent(0)
+                            .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                            .stopAndAdd(actions.FullScoreAction())
+                            .build();
+                } else if (next_auto_action == 0){
+                    auto_action = drive.actionBuilder(drive.pose)
+                            .stopAndAdd(actions.ReadyTransferAction())
+                            .setTangent(0)
+                            .strafeToSplineHeading(GameMap.SubmersibleRedEdge.minus(new Vector2d(GameMap.RobotLength + 28,-24)), 0)
+                            .setTangent(0)
+                            .strafeToSplineHeading(GameMap.SubmersibleRedEdge.minus(new Vector2d(GameMap.RobotLength + 4,-24)), 0)
+                            .build();
+                }
+                next_auto_action = (next_auto_action + 1)%2;
+                TelemetryPacket packet = new TelemetryPacket();
+                while (gamepad1.right_trigger > 0.6) {
+                    assert auto_action != null;
+                    if (!auto_action.run(packet)) break;
+                    drive.updatePoseEstimate();
+                    auto_action.preview(packet.fieldOverlay());
+                    dash.sendTelemetryPacket(packet);
+                }
+                t.start();
+
+            }
             if (gamepad1.left_bumper){
                 Actions.runBlocking(actions.ReadyGrabAction(gamepad1.left_trigger * (GameMap.MaxIntakeDistance - GameMap.MinIntakeDistance) + GameMap.MinIntakeDistance));
             } else if (gamepad1.right_bumper){

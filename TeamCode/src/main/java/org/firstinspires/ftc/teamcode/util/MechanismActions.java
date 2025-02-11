@@ -47,6 +47,7 @@ public class MechanismActions {
             return !finished;
         }
     }
+    public Action AsyncOuttakeSlideDownAction(){return new InstantAction(() -> outtake.linear_slide.moveDownAsync());}
     public Action OpenGateAction(){
         return new ParallelAction(new SleepAction(1), new InstantAction(() -> outtake.open()));
     }
@@ -54,7 +55,7 @@ public class MechanismActions {
         return new ParallelAction(new SleepAction(1), new InstantAction(() -> outtake.close()));
     }
     public Action ReadyGrabAction(double distance_in){
-        return new ParallelAction(new HSlideToAction(distance_in), new IntakeDownAction());
+        return new SequentialAction( new ParallelAction( new HSlideToAction(distance_in), new IntakeDownAction()), GrabSpinAction());
     }
     public Action IntakeReleaseAction(){
         return new ParallelAction(new SleepAction(1), new InstantAction(() -> intake.release()));
@@ -115,6 +116,9 @@ public class MechanismActions {
     }
     public Action FullGrabAction(double distance_in){
         return new SequentialAction(ReadyGrabAction(distance_in), new ParallelAction(IntakeGrabAction()));
+    }
+    public Action ScoreAction(){
+        return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), CloseGateAction(), AsyncOuttakeSlideDownAction());
     }
     public Action FullScoreAction(){
         return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), new ParallelAction(new SequentialAction(new SleepAction(0.5), CloseGateAction()) , new OuttakeSlideDownAction()) );

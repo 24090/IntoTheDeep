@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util.linearslides;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.util.GameMap;
@@ -13,6 +14,7 @@ public class OuttakeSlide extends LinearSlide {
      */
     public OuttakeSlide(DcMotor motor) {
         super(motor, 4900, 0, 0);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
@@ -33,6 +35,9 @@ public class OuttakeSlide extends LinearSlide {
     }
     public void moveDown(){
         this.extendToBreaking(0, 50);
+    }
+    public void moveDownAsync(){
+        this.extendToAsync(0, 50);
     }
     public void moveUp(){
         this.extendToBreaking(4850, 50);
