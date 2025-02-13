@@ -59,6 +59,18 @@ public class Intake {
         closeArm();
     }
 
+    public void moveWristRight() {
+        if (Objects.equals(intake_state, "open")) {
+            servo1.setPosition(servo1.getPosition()+0.03);
+        }
+    }
+
+    public void moveWristLeft() {
+        if (Objects.equals(intake_state, "open")) {
+            servo1.setPosition(servo1.getPosition()-0.03);
+        }
+    }
+
     private void openArm() {
         if (Objects.equals(intake_state, "open")) {
             servo0.setPosition(0);

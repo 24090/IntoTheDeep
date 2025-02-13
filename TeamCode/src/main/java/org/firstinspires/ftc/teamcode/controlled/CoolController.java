@@ -61,6 +61,12 @@ public class CoolController extends LinearOpMode {
             if (gamepad1.b) {
                 outtake.score();
             }
+            if (gamepad1.dpad_right) {
+                intake.moveWristRight();
+            }
+            if (gamepad1.dpad_left) {
+                intake.moveWristLeft();
+            }
         }
     }
 }
