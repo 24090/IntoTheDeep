@@ -26,9 +26,9 @@ public class CoolController extends LinearOpMode {
         );
 
         Outtake outtake = new Outtake(
+                hardwareMap.get(Servo.class, "es0"),
                 hardwareMap.get(Servo.class, "cs4"),
                 hardwareMap.get(Servo.class, "cs5"),
-                hardwareMap.get(Servo.class, "es0"),
                 hardwareMap.get(DcMotor.class, "cm1"),
                 hardwareMap.get(DcMotor.class, "cm2")
         );
