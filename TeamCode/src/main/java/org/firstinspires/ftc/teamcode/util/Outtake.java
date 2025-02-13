@@ -5,30 +5,74 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 
+import java.util.Objects;
+
 public class Outtake {
-    Servo outtake_servo;
-    public OuttakeSlide linear_slide;
-    public Outtake(Servo outtake_servo, DcMotor motor) {
-        this.outtake_servo = outtake_servo;
-        this.linear_slide = new OuttakeSlide(motor);
+    MechanismActions actions;
+    Servo servo0;
+    //left arm (looking from the back)
+    Servo servo1;
+    Servo servo2;
+    DcMotor motor0;
+    DcMotor motor1;
+
+    public String outtake_state = "closed";
+
+    public Outtake(Servo servo0, Servo servo1, Servo servo2, DcMotor motor0, DcMotor motor1) {
+        this.servo0 = servo0;
+        this.servo1 = servo1;
+        this.servo2 = servo2;
+        this.motor0 = motor0;
+        this.motor1 = motor1;
     }
-    public void open(){
-        outtake_servo.setPosition(0);
+
+    public void open() {
+        if(Objects.equals(outtake_state, "closed") || Objects.equals(outtake_state, "scoring")) {
+            outtake_state = "grabbing";
+
+            actions.setSlidePosition(motor0, 100);
+            actions.setSlidePosition(motor1, -100);
+
+            servo0.setPosition(1);
+            servo1.setPosition(0.66);
+            servo2.setPosition(-0.66);
+        } else if(Objects.equals(outtake_state, "grabbing")) {
+            outtake_state = "scoring";
+
+            actions.setSlidePosition(motor0, 100);
+            actions.setSlidePosition(motor1, -100);
+
+            servo0.setPosition(0);
+            servo1.setPosition(0);
+            servo2.setPosition(0);
+        }
     }
-    public void close(){
-        outtake_servo.setPosition(1);
+
+    public void close() {
+        outtake_state = "closed";
+
+        actions.setSlidePosition(motor0, 0);
+        actions.setSlidePosition(motor1, 0);
+
+        servo0.setPosition(0);
+        servo1.setPosition(1);
+        servo2.setPosition(-1);
     }
-    public void up(){linear_slide.moveUp();
+
+    public void grab() {
+        if (Objects.equals(outtake_state, "grabbing") || Objects.equals(outtake_state, "scoring")) {
+            if (servo0.getPosition() == 0) {
+                servo0.setPosition(1);
+            } else {
+                servo0.setPosition(0);
+            }
+        }
     }
-    public void down(){
-        linear_slide.moveDown();
-    }
-    public void readyTransfer(){
-        close();
-        down();
-    }
-    public void scoreProcess() throws InterruptedException {
-        open();
-        readyTransfer();
+
+    public void score() {
+        if (Objects.equals(outtake_state, "scoring")) {
+            actions.setSlidePosition(motor0, 100);
+            actions.setSlidePosition(motor0, -100);
+        }
     }
 }

@@ -2,79 +2,85 @@ package org.firstinspires.ftc.teamcode.util;
 
 import static java.lang.Thread.sleep;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.util.linearslides.IntakeSlide;
 
+import java.util.Objects;
+
 public class Intake {
-    Servo intake_servo_a1;
-    Servo intake_servo_b;
-    Servo intake_servo_a2;
-    public IntakeSlide linear_slide;
-    public Intake(Servo intake_servo_a1, Servo intake_servo_a2, Servo intake_servo_b, DcMotor motor){
-        this.intake_servo_a1 = intake_servo_a1;
-        this.intake_servo_a2 = intake_servo_a2;
-        this.intake_servo_b  = intake_servo_b;
-        this.linear_slide = new IntakeSlide(motor);
-        intake_servo_a1.setPosition(0.83);
-        intake_servo_a2.setPosition(1-0.83);
-    }
-    public double moveUp(){
-        intake_servo_a1.setPosition(0.83);
-        intake_servo_a2.setPosition(1-0.83);
-        return Math.abs((0.83 - intake_servo_a1.getPosition())) + Math.abs((1-0.83 - intake_servo_a2.getPosition()));
-    }
-    public double moveDown(){
-        intake_servo_a1.setPosition(0.05);
-        intake_servo_a2.setPosition(1 - 0.05);
-        return Math.abs((0.05 - intake_servo_a1.getPosition())) + Math.abs((1-0.05 - intake_servo_a2.getPosition()));
-    }
-    public void grab(){
-        intake_servo_b.setPosition(0);
-    }
-    public void hold(){
-        intake_servo_b.setPosition(0.44);
-    }
-    public void stop(){
-        intake_servo_b.setPosition(0.5);
-    }
-    public void release(){
-        intake_servo_b.setPosition(0.7);
-    }
-    public void slideOut(){
-        linear_slide.extendToBreaking(1000, 50);
-    }
-    public void slideIn(){linear_slide.extendToBreaking(-50, 50);}
+    MechanismActions actions;
+    Servo servo0;
+    Servo servo1;
+    Servo servo2;
+    Servo servo3;
+    DcMotor motor0;
 
-    public Thread slideInAsync(){
-        return linear_slide.extendToAsync(0, 50);
+    public String intake_state = "closed";
+
+    public Intake(Servo servo0, Servo servo1, Servo servo2, Servo servo3, DcMotor motor0){
+        this.servo0 = servo0;
+        this.servo1 = servo1;
+        this.servo2 = servo2;
+        this.servo3 = servo3;
     }
 
-    public void transferSample(){
-        this.hold();
-        this.moveUp();
-        this.slideIn();
-        while (intake_servo_a1.getPosition() < 0.83 && intake_servo_a2.getPosition() > 1-0.83){}
-        this.release();
-        try {Thread.sleep(1000);} catch(InterruptedException e) {
-            e.printStackTrace();
+    public void grab() {
+        if (Objects.equals(intake_state, "open")) {
+            if (servo0.getPosition() == 0) {
+                servo0.setPosition(1);
+            } else {
+                servo0.setPosition(0);
+            }
         }
-        this.stop();
     }
-    public void readyIntake(){
-        this.moveDown();
-        this.slideOut();
-        while (intake_servo_a1.getPosition() > 0.05){}
-        this.grab();
+
+    public void longIntake() {
+        intake_state = "open";
+
+        extendSlide();
+        openArm();
     }
-    public Thread slideOutAsync(){
-        Thread thread = new Thread(this::slideOut);
-        thread.start();
-        return thread;
+
+    public void shortIntake() {
+        intake_state = "open";
+
+        retractSlide();
+        openArm();
     }
-    public void slideStop(){
-        linear_slide.stop();
+
+    public void close() {
+        intake_state = "closed";
+
+        retractSlide();
+        closeArm();
+    }
+
+    private void openArm() {
+        if (Objects.equals(intake_state, "open")) {
+            servo0.setPosition(0);
+        } else {
+            servo0.setPosition(1);
+        }
+        servo1.setPosition(0.57);
+        servo2.setPosition(0.6);
+        servo3.setPosition(0.8);
+    }
+
+    private void closeArm() {
+        servo0.setPosition(0);
+        servo1.setPosition(0);
+        servo2.setPosition(0);
+        servo3.setPosition(0);
+    }
+
+    private void retractSlide() {
+        actions.setSlidePosition(motor0, 1300);
+    }
+    private void extendSlide() {
+        actions.setSlidePosition(motor0, 0);
     }
 }
