@@ -22,15 +22,15 @@ public class CoolController extends LinearOpMode {
                 hardwareMap.get(Servo.class, "cs1"),
                 hardwareMap.get(Servo.class, "cs2"),
                 hardwareMap.get(Servo.class, "cs3"),
-                hardwareMap.get(DcMotor.class, "cm0")
+                hardwareMap.get(DcMotor.class, "cm1")
         );
 
         Outtake outtake = new Outtake(
                 hardwareMap.get(Servo.class, "es0"),
                 hardwareMap.get(Servo.class, "cs4"),
                 hardwareMap.get(Servo.class, "cs5"),
-                hardwareMap.get(DcMotor.class, "cm1"),
-                hardwareMap.get(DcMotor.class, "cm2")
+                hardwareMap.get(DcMotor.class, "cm2"),
+                hardwareMap.get(DcMotor.class, "cm3")
         );
 
         Thread t = new Thread(() -> {

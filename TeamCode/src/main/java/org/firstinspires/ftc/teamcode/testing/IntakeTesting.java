@@ -10,14 +10,17 @@ import org.firstinspires.ftc.teamcode.util.MechanismActions;
 
 @TeleOp(group = "testing", name = "Intake Testing")
 public class IntakeTesting extends LinearOpMode {
-    MechanismActions actions;
-    Servo s0 = hardwareMap.get(Servo.class, "cs0");
-    Servo s1 = hardwareMap.get(Servo.class, "cs1");
-    Servo s2 = hardwareMap.get(Servo.class, "cs2");
-    Servo s3 = hardwareMap.get(Servo.class, "cs3");
-    DcMotor m0 = hardwareMap.get(DcMotor.class, "cm0");
 
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
+
+        MechanismActions actions = new MechanismActions();
+
+        Servo s0 = hardwareMap.get(Servo.class, "cs0");
+        Servo s1 = hardwareMap.get(Servo.class, "cs1");
+        Servo s2 = hardwareMap.get(Servo.class, "cs2");
+        Servo s3 = hardwareMap.get(Servo.class, "cs3");
+        DcMotor m0 = hardwareMap.get(DcMotor.class, "cm0");
+
         waitForStart();
         while (opModeIsActive()){
             if (gamepad1.a) {
@@ -33,10 +36,10 @@ public class IntakeTesting extends LinearOpMode {
                 s2.setPosition(s2.getPosition()-0.01);
             }
             if (gamepad1.dpad_right) {
-                s3.setPosition(s3.getPosition()+0.01);
+                s3.setPosition(s3.getPosition()+0.001);
             }
             if (gamepad1.dpad_left) {
-                s3.setPosition(s3.getPosition()-0.01);
+                s3.setPosition(s3.getPosition()-0.001);
             }
             if (gamepad1.b) {
                 actions.setSlidePosition(m0, m0.getCurrentPosition()+10);
