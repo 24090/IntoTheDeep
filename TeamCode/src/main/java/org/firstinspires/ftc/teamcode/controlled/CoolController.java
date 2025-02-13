@@ -39,6 +39,7 @@ public class CoolController extends LinearOpMode {
                 drive.updatePoseEstimate();
             }
         });
+
         waitForStart();
         t.start();
         while (opModeIsActive()) {
