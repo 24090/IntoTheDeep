@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.Auto;
 
 import static java.lang.Math.PI;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.roadrunner.*;
 
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -52,31 +54,44 @@ public class AutoRed extends LinearOpMode {
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
                 .stopAndAdd(new ParallelAction(ma.ScoreAction(), ma.ReadyGrabAction(InnerDistance.norm())))
                 .setTangent(0)
-                .strafeToSplineHeading(neutral_spike_mark_position, InnerDistance.angleCast().toDouble())
+                .strafeToSplineHeading(neutral_spike_mark_position, InnerDistance.angleCast().toDouble(), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 20;
+                    }})
                 .stopAndAdd(ma.GrabSpinAction())
                 .setTangent(0)
-                .strafeTo(neutral_spike_mark_position.plus(InnerDistance.div(InnerDistance.norm()).angleCast().times(new Vector2d(4, 0))))
+                .strafeTo(neutral_spike_mark_position.plus(InnerDistance.div(InnerDistance.norm()).angleCast().times(new Vector2d(7, 0))))
                 .stopAndAdd(ma.FullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
                 .stopAndAdd(new ParallelAction(ma.ScoreAction(), ma.ReadyGrabAction(CenterDistance.norm() - 2)))
                 .setTangent(0)
-                .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble())
+                .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble(), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 10;
+                    }})
                 .stopAndAdd(ma.GrabSpinAction())
                 .setTangent(0)
-                .strafeTo(neutral_spike_mark_position.plus(CenterDistance.div(CenterDistance.norm()).angleCast().times(new Vector2d(4, 0))))
+                .strafeTo(neutral_spike_mark_position.plus(CenterDistance.div(CenterDistance.norm()).angleCast().times(new Vector2d(7, 0))))
                 .stopAndAdd(ma.FullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
+                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1.5, 1.5)), PI/4 + 0.1)
                 .stopAndAdd(new ParallelAction(ma.ScoreAction(), ma.ReadyGrabAction(OuterDistance.norm() - 2)))
                 .setTangent(0)
-                .strafeToSplineHeading(neutral_spike_mark_position, OuterDistance.angleCast().toDouble())
+                .strafeToSplineHeading(neutral_spike_mark_position, OuterDistance.angleCast().toDouble(), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 20;
+                    }}
+                )
                 .stopAndAdd(ma.GrabSpinAction())
                 .setTangent(0)
-                .strafeTo(neutral_spike_mark_position.plus(OuterDistance.div(OuterDistance.norm()).angleCast().times(new Vector2d(4, 0))))
+                .strafeTo(neutral_spike_mark_position.plus(OuterDistance.div(OuterDistance.norm()).angleCast().times(new Vector2d(7, 0))))
                 .stopAndAdd(ma.FullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position, PI/4 + 0.1)
+                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1, 1)), PI/4 + 0.1)
                 .stopAndAdd(ma.FullScoreAction())
                 .build();
         // these lines ≠ meepmeep

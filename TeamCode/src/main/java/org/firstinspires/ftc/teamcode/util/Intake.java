@@ -35,7 +35,7 @@ public class Intake {
         intake_servo_b.setPosition(0);
     }
     public void hold(){
-        intake_servo_b.setPosition(0.44);
+        intake_servo_b.setPosition(0.3);
     }
     public void stop(){
         intake_servo_b.setPosition(0.5);

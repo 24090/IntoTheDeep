@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util.linearslides;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.util.GameMap;
 
@@ -11,7 +12,8 @@ public class IntakeSlide extends LinearSlide {
      * Class for using Intake Slide
      */
     public IntakeSlide(DcMotor motor) {
-        super(motor, 1100, 0, 0.15);
+        super(motor, 1200, 0, 0.15);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public Thread moveIn(){
         return extendToAsync(0, 50);

@@ -1,22 +1,14 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import androidx.annotation.NonNull;
-
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
-import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 
 public class MechanismActions {
     Intake intake;
@@ -30,7 +22,7 @@ public class MechanismActions {
     public class OuttakeSlideUpAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            boolean finished = (outtake.linear_slide.extendToIter(4850,50));
+            boolean finished = (outtake.linear_slide.extendToIter(5000,50));
             if (finished){
                 outtake.linear_slide.stop();
             }
@@ -47,12 +39,26 @@ public class MechanismActions {
             return !finished;
         }
     }
-    public Action AsyncOuttakeSlideDownAction(){return new InstantAction(() -> outtake.linear_slide.moveDownAsync());}
+    public Action AsyncOuttakeSlideDownAction(){
+        return new InstantAction(
+                () -> {
+                    Thread t = new Thread(() -> {
+                        FtcDashboard dash = FtcDashboard.getInstance();
+                        Action a = OuttakeSlideDownAction();
+                        TelemetryPacket packet = new TelemetryPacket();
+                        while (a.run(packet)){
+                            dash.sendTelemetryPacket(packet);
+                        }
+                    });
+                    t.start();
+                }
+        );
+    }
     public Action OpenGateAction(){
         return new ParallelAction(new SleepAction(1), new InstantAction(() -> outtake.open()));
     }
     public Action CloseGateAction(){
-        return new ParallelAction(new SleepAction(1), new InstantAction(() -> outtake.close()));
+        return new InstantAction(() -> outtake.close());
     }
     public Action ReadyGrabAction(double distance_in){
         return new SequentialAction( new ParallelAction( new HSlideToAction(distance_in), new IntakeDownAction()), GrabSpinAction());
@@ -60,7 +66,6 @@ public class MechanismActions {
     public Action IntakeReleaseAction(){
         return new ParallelAction(new SleepAction(1), new InstantAction(() -> intake.release()));
     }
-
 
     public class HSlideToAction implements Action{
         double distance_in;
@@ -77,7 +82,7 @@ public class MechanismActions {
             return !finished;
         }
     }
-    public class HSlideInAction implements Action{
+    public class HSlideInAction implements Action {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
            boolean finished = (intake.linear_slide.extendToIter(0, 10));
            if (finished){
@@ -93,11 +98,8 @@ public class MechanismActions {
             return !out;
         }
     }
-    public class IntakeUpAction implements Action{
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return !(intake.moveUp() < 0.01);
-        }
+    public Action IntakeUpAction(){
+        return new ParallelAction(new SleepAction(1.2), new InstantAction(() -> intake.moveUp()));
     }
     public Action IntakeGrabAction(){
         return new InstantAction(() -> intake.grab());
@@ -106,7 +108,7 @@ public class MechanismActions {
         return new InstantAction(() -> intake.hold());
     }
     public Action ReadyTransferAction(){
-        return new ParallelAction(new OuttakeSlideDownAction(), CloseGateAction(), new HSlideInAction(), new IntakeUpAction(), IntakeHoldAction());
+        return new ParallelAction(new OuttakeSlideDownAction(), new HSlideInAction(), IntakeHoldAction(), IntakeUpAction());
     }
     public Action FullTransferAction(){
         return new SequentialAction(ReadyTransferAction(), IntakeReleaseAction());
@@ -118,21 +120,15 @@ public class MechanismActions {
         return new SequentialAction(ReadyGrabAction(distance_in), new ParallelAction(IntakeGrabAction()));
     }
     public Action ScoreAction(){
-        return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), CloseGateAction(), AsyncOuttakeSlideDownAction());
+        return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), AsyncOuttakeSlideDownAction());
     }
     public Action FullScoreAction(){
-        return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), new ParallelAction(new SequentialAction(new SleepAction(0.5), CloseGateAction()) , new OuttakeSlideDownAction()) );
+        return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), OuttakeSlideDownAction());
     }
     public Action OuttakeSlideUpAction(){
         return new OuttakeSlideUpAction();
     }
     public Action OuttakeSlideDownAction(){
-        return new ParallelAction(
-                new SequentialAction(new SleepAction(0.5), CloseGateAction()) ,
-                new OuttakeSlideDownAction()
-        );
-    }
-    public Action EndScoring(){
         return new ParallelAction(new OuttakeSlideDownAction(), new SequentialAction(new SleepAction(0.3), CloseGateAction()));
     }
     public Action GrabSpinAction() {

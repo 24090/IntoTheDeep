@@ -61,7 +61,7 @@ public class TwoControlled extends LinearOpMode{
             if (gamepad1.y){
                 Actions.runBlocking(actions.OuttakeSlideUpAction());
             } else if (gamepad1.a){
-                Actions.runBlocking(actions.EndScoring());
+                Actions.runBlocking(actions.OuttakeSlideDownAction());
             } else if (gamepad1.b){
                 outtake.open();
             }

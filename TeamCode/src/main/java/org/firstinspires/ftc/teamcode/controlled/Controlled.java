@@ -2,9 +2,15 @@ package org.firstinspires.ftc.teamcode.controlled;
 
 import static java.lang.Math.PI;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Arclength;
+import com.acmerobotics.roadrunner.Pose2dDual;
+import com.acmerobotics.roadrunner.PosePath;
+import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
@@ -21,6 +27,7 @@ import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.MechanismActions;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
+import org.firstinspires.ftc.teamcode.vision.Vision;
 
 /**
  * TODO:
@@ -33,7 +40,7 @@ public class Controlled extends LinearOpMode{
     FtcDashboard dash = FtcDashboard.getInstance();
     int next_auto_action = 0;
     public void runOpMode(){
-        final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(17.5, 17.5)), PI / 4);
+        final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(16.5, 16.5)), PI / 4);
         MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
         Intake intake = new Intake(
                 hardwareMap.get(Servo.class, "intake_servo_a1"),
@@ -49,23 +56,37 @@ public class Controlled extends LinearOpMode{
         MechanismActions actions = new MechanismActions(intake,outtake,this);
         Thread t = new Thread(() -> {
             while (opModeIsActive()){
-                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x));
+                if (intake.linear_slide.motor.getCurrentPosition() > 100){
+                    drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x/3));
+                } else {
+                    drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x));
+                }
+
                 drive.updatePoseEstimate();
             }
         });
+        Vision vision = new Vision(drive, intake, telemetry, hardwareMap);
         waitForStart();
         t.start();
         while (opModeIsActive()){
             if (gamepad1.right_trigger > 0.6) {
                 t.interrupt();
                 Action auto_action = null;
-                if (next_auto_action == 1){
+                if (next_auto_action == 2) {
                     auto_action = drive.actionBuilder(drive.pose)
                             .stopAndAdd(actions.FullTransferAction())
                             .setTangent(0)
-                            .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                            .stopAndAdd(actions.FullScoreAction())
+                            .strafeToSplineHeading(score_pose.position, score_pose.heading, new VelConstraint() {
+                                @Override
+                                public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                                    return pose2dDual.value().position.minus(score_pose.position).norm() < 24 ? 30 : 100;
+                                }
+                            })
+                            .afterDisp(score_pose.position.minus(drive.pose.position).norm() - 12, actions.OuttakeSlideUpAction())
+                            .stopAndAdd(actions.ScoreAction())
                             .build();
+                }else if (next_auto_action == 1){
+                    auto_action = vision.LookAtSample();
                 } else if (next_auto_action == 0){
                     auto_action = drive.actionBuilder(drive.pose)
                             .stopAndAdd(actions.ReadyTransferAction())
@@ -102,9 +123,11 @@ public class Controlled extends LinearOpMode{
             if (gamepad1.y){
                 Actions.runBlocking(actions.OuttakeSlideUpAction());
             } else if (gamepad1.a){
-                Actions.runBlocking(actions.EndScoring());
+                Actions.runBlocking(actions.OuttakeSlideDownAction());
             } else if (gamepad1.b){
                 outtake.open();
+            } else if (gamepad1.x){
+                outtake.close();
             }
         }
     }

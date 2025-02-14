@@ -13,7 +13,7 @@ public class OuttakeSlide extends LinearSlide {
      * Class for using the Outtake slide
      */
     public OuttakeSlide(DcMotor motor) {
-        super(motor, 4900, 0, 0);
+        super(motor, 5050, 0, 0);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
@@ -40,7 +40,7 @@ public class OuttakeSlide extends LinearSlide {
         this.extendToAsync(0, 50);
     }
     public void moveUp(){
-        this.extendToBreaking(4850, 50);
+        this.extendToBreaking(5000, 50);
     }
     public int getPos(){
         return motor.getCurrentPosition();

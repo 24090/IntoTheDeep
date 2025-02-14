@@ -10,19 +10,20 @@ public class Camera {
 	public static Scalar red_max;
 	public static Scalar blue_min = new Scalar(105, 85, 0);
 	public static Scalar blue_max = new Scalar(125, 255, 255);
-	public static Scalar yellow_min = new Scalar(10, 145, 0);
-	public static Scalar yellow_max = new Scalar(30, 255, 255);
+	public static Scalar yellow_min = new Scalar(10, 115, 0);
+	public static Scalar yellow_max = new Scalar(40, 255, 255);
     public static Mat reprojection_matrix = new Mat();
     public static Mat camera_matrix = new Mat();
     public static Mat distortion_coefficients = new Mat();
 
     public static void init(){
+        // Matrix Creation
         Mat m1 = new Mat(3, 3, 6 );
 
-        // generated with ReprojectionMatrixCalculator.py
-        m1.put(0, 0,  2.083333e-03); m1.put(0, 1,  1.140589e-19); m1.put(0, 2, -5.000000e-01);
-        m1.put(1, 0,  0.000000e+00); m1.put(1, 1,  1.339141e-03); m1.put(1, 2, -1.007090e+00);
-        m1.put(2, 0, -0.000000e+00); m1.put(2, 1, -1.312728e-04); m1.put(2, 2, -2.924336e-02);
+        // generated with ReprojectionMatrixCalculator.py 1739548080.499108
+        m1.put(0, 0,  1.216076e-03); m1.put(0, 1,  6.948339e-20); m1.put(0, 2, -3.885302e-01);
+        m1.put(1, 0,  0.000000e+00); m1.put(1, 1,  7.088603e-04); m1.put(1, 2, -9.844383e-01);
+        m1.put(2, 0, -0.000000e+00); m1.put(2, 1, -8.592246e-05); m1.put(2, 2, -2.985127e-02);
         m1.copyTo(reprojection_matrix);
 
         double focal_length_x = 822.317;

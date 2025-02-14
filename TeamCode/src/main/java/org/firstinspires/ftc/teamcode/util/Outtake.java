@@ -16,9 +16,10 @@ public class Outtake {
         outtake_servo.setPosition(0);
     }
     public void close(){
-        outtake_servo.setPosition(1);
+        outtake_servo.setPosition(0.66);
     }
-    public void up(){linear_slide.moveUp();
+    public void up(){
+        linear_slide.moveUp();
     }
     public void down(){
         linear_slide.moveDown();
