@@ -42,21 +42,13 @@ public class Controlled extends LinearOpMode{
     public void runOpMode(){
         final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(16.5, 16.5)), PI / 4);
         MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
-        Intake intake = new Intake(
-                hardwareMap.get(Servo.class, "intake_servo_a1"),
-                hardwareMap.get(Servo.class, "intake_servo_a2"),
-                hardwareMap.get(Servo.class, "intake_servo_b"),
-                hardwareMap.get(DcMotor.class, "intake_motor")
-        );
+        Intake intake = new Intake(hardwareMap);
         Outtake outtake;
-        outtake = new Outtake(
-                hardwareMap.get(Servo.class, "outtake_servo"),
-                hardwareMap.get(DcMotor.class, "outtake_slide_motor")
-        );
+        outtake = new Outtake(hardwareMap);
         MechanismActions actions = new MechanismActions(intake,outtake,this);
         Thread t = new Thread(() -> {
             while (opModeIsActive()){
-                if (intake.linear_slide.motor.getCurrentPosition() > 100){
+                if (intake.linear_slide.getPosition() > 100){
                     drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x/3));
                 } else {
                     drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x));

@@ -13,10 +13,7 @@ import org.firstinspires.ftc.teamcode.util.Outtake;
 public class OuttakeTesting extends LinearOpMode {
     Outtake outtake;
     public void runOpMode() throws InterruptedException {
-        outtake = new Outtake(
-                hardwareMap.get(Servo.class, "outtake_servo"),
-                hardwareMap.get(DcMotor.class, "outtake_slide_motor")
-        );
+        outtake = new Outtake(hardwareMap);
         waitForStart();
         while (opModeIsActive()){
             if (gamepad1.dpad_left){
@@ -30,12 +27,15 @@ public class OuttakeTesting extends LinearOpMode {
                 outtake.down();
             }
             if (gamepad1.left_bumper){
-                outtake.readyTransfer();
+                outtake.close();
+                wait(300);
+                outtake.down();
             }
             if (gamepad1.right_bumper){
-                outtake.scoreProcess();
+                outtake.up();
+                outtake.open();
             }
-            telemetry.addData("pos", outtake.linear_slide.motor.getCurrentPosition());
+            telemetry.addData("pos", outtake.linear_slide.getPosition());
             telemetry.update();
         }
     }

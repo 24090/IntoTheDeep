@@ -19,11 +19,11 @@ public class Camera {
     public static void init(){
         // Matrix Creation
         Mat m1 = new Mat(3, 3, 6 );
-
-        // generated with ReprojectionMatrixCalculator.py 1739548080.499108
-        m1.put(0, 0,  1.216076e-03); m1.put(0, 1,  6.948339e-20); m1.put(0, 2, -3.885302e-01);
-        m1.put(1, 0,  0.000000e+00); m1.put(1, 1,  7.088603e-04); m1.put(1, 2, -9.844383e-01);
-        m1.put(2, 0, -0.000000e+00); m1.put(2, 1, -8.592246e-05); m1.put(2, 2, -2.985127e-02);
+		
+		// generated with ReprojectionMatrixCalculator.py
+		m1.put(0, 0,  1.216076e-03); m1.put(0, 1,  6.948339e-20); m1.put(0, 2, -3.885302e-01);
+		m1.put(1, 0,  0.000000e+00); m1.put(1, 1,  7.088603e-04); m1.put(1, 2, -9.844383e-01);
+		m1.put(2, 0, -0.000000e+00); m1.put(2, 1, -8.592246e-05); m1.put(2, 2, -2.985127e-02);
         m1.copyTo(reprojection_matrix);
 
         double focal_length_x = 822.317;

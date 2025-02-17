@@ -12,12 +12,7 @@ import org.firstinspires.ftc.teamcode.util.MechanismActions;
 public class IntakeTesting extends LinearOpMode {
     Intake intake;
     public void runOpMode() throws InterruptedException {
-        intake = new Intake(
-                hardwareMap.get(Servo.class, "intake_servo_a1"),
-                hardwareMap.get(Servo.class, "intake_servo_a2"),
-                hardwareMap.get(Servo.class, "intake_servo_b"),
-                hardwareMap.get(DcMotor.class, "intake_motor")
-        );
+        intake = new Intake(hardwareMap);
         waitForStart();
         while (opModeIsActive()){
 //            intake_servo_b.setPosition(0.5);
@@ -51,7 +46,7 @@ public class IntakeTesting extends LinearOpMode {
             } else {
                 intake.slideStop();
             }
-            telemetry.addData("pos", intake.linear_slide.motor.getCurrentPosition());
+            telemetry.addData("pos", intake.linear_slide.getPosition());
             telemetry.update();
         }
     }

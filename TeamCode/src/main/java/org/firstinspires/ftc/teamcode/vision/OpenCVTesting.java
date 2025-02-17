@@ -31,12 +31,7 @@ public class OpenCVTesting extends LinearOpMode {
 	@Override
 	public void runOpMode() {
 		drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
-		intake = new Intake(
-				hardwareMap.get(Servo.class, "intake_servo_a1"),
-				hardwareMap.get(Servo.class, "intake_servo_a2"),
-				hardwareMap.get(Servo.class, "intake_servo_b"),
-				hardwareMap.get(DcMotor.class, "intake_motor")
-		);
+		intake = new Intake(hardwareMap);
 		WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam");
 		webcamName.getCameraCharacteristics();
 		webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
@@ -74,7 +69,8 @@ public class OpenCVTesting extends LinearOpMode {
 			Pose2d sample = pipeline.getAnalysis().get(0);
 			intake.moveDown();
 			Actions.runBlocking(drive.actionBuilder(drive.pose).turn(new Rotation2d(sample.position.y, sample.position.x).toDouble()).build());
-			intake.linear_slide.extendToBreaking(intake.linear_slide.inToTicks(Math.max(Math.min(sample.position.norm() - 4, GameMap.MinIntakeDistance), GameMap.MaxIntakeDistance)), 50);
+			intake.slideTo(intake.linear_slide.inToTicks(Math.max(Math.min(sample.position.norm() - 4, GameMap.MinIntakeDistance), GameMap.MaxIntakeDistance)));
+			intake.linear_slide.waitForMovement();
 			while (opModeIsActive()) {
 				telemetry.addData("Image Analysis:", pipeline.getAnalysis());
 				telemetry.update();

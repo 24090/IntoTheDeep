@@ -27,17 +27,9 @@ public class AutoRed extends LinearOpMode {
     public void runOpMode() {
 
         // HW stuff
-        Intake intake = new Intake(
-                hardwareMap.get(Servo.class, "intake_servo_a1"),
-                hardwareMap.get(Servo.class, "intake_servo_a2"),
-                hardwareMap.get(Servo.class, "intake_servo_b"),
-                hardwareMap.get(DcMotor.class, "intake_motor")
-        );
+        Intake intake = new Intake(hardwareMap);
         Outtake outtake;
-        outtake = new Outtake(
-                hardwareMap.get(Servo.class, "outtake_servo"),
-                hardwareMap.get(DcMotor.class, "outtake_slide_motor")
-        );
+        outtake = new Outtake(hardwareMap);
         MechanismActions ma = new MechanismActions(intake, outtake, this);
         // same as meepmeep
         final Pose2d start_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(24.5 + GameMap.RobotWidth / 2, GameMap.RobotLength / 2)), PI / 2);

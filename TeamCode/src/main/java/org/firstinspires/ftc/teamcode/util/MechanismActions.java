@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.DashboardCore;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -22,38 +24,18 @@ public class MechanismActions {
     public class OuttakeSlideUpAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            boolean finished = (outtake.linear_slide.extendToIter(5000,50));
-            if (finished){
-                outtake.linear_slide.stop();
-            }
-            return !finished;
+            outtake.up();
+            return !outtake.linear_slide.within_error;
         }
     }
     public class OuttakeSlideDownAction implements Action{
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            boolean finished = (outtake.linear_slide.extendToIter(0, 50));
-            if (finished) {
-                outtake.linear_slide.stop();
-            }
-            return !finished;
+            outtake.down();
+            return !outtake.linear_slide.within_error;
         }
     }
-    public Action AsyncOuttakeSlideDownAction(){
-        return new InstantAction(
-                () -> {
-                    Thread t = new Thread(() -> {
-                        FtcDashboard dash = FtcDashboard.getInstance();
-                        Action a = OuttakeSlideDownAction();
-                        TelemetryPacket packet = new TelemetryPacket();
-                        while (a.run(packet)){
-                            dash.sendTelemetryPacket(packet);
-                        }
-                    });
-                    t.start();
-                }
-        );
-    }
+
     public Action OpenGateAction(){
         return new ParallelAction(new SleepAction(1), new InstantAction(() -> outtake.open()));
     }
@@ -75,20 +57,14 @@ public class MechanismActions {
         }
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            boolean finished = (intake.linear_slide.extendToIter(intake.linear_slide.inToTicks(distance_in), 50));
-            if (finished){
-                intake.linear_slide.stop();
-            }
-            return !finished;
+            intake.slideTo(intake.linear_slide.inToTicks(distance_in));
+            return !intake.linear_slide.within_error;
         }
     }
     public class HSlideInAction implements Action {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-           boolean finished = (intake.linear_slide.extendToIter(0, 10));
-           if (finished){
-               intake.linear_slide.stop();
-           }
-           return !finished;
+            intake.slideIn();
+            return !intake.linear_slide.within_error;
         }
     }
     public class IntakeDownAction implements Action{
@@ -97,6 +73,20 @@ public class MechanismActions {
             boolean out = (intake.moveDown() < 0.01);
             return !out;
         }
+    }
+    public Action AsyncAction(Action action){
+        return new InstantAction(
+                () -> {
+                    Thread t = new Thread(()->{
+                        FtcDashboard dash = FtcDashboard.getInstance();
+                        while (true){
+                            TelemetryPacket packet = new TelemetryPacket();
+                            action.run(packet);
+                            dash.sendTelemetryPacket(packet);
+                        }
+                    });
+                }
+        );
     }
     public Action IntakeUpAction(){
         return new ParallelAction(new SleepAction(1.2), new InstantAction(() -> intake.moveUp()));
@@ -120,7 +110,7 @@ public class MechanismActions {
         return new SequentialAction(ReadyGrabAction(distance_in), new ParallelAction(IntakeGrabAction()));
     }
     public Action ScoreAction(){
-        return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), AsyncOuttakeSlideDownAction());
+        return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), AsyncAction(OuttakeSlideDownAction()));
     }
     public Action FullScoreAction(){
         return new SequentialAction( new OuttakeSlideUpAction(), OpenGateAction(), OuttakeSlideDownAction());
