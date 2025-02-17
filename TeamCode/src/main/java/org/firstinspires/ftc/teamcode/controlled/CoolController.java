@@ -43,21 +43,9 @@ public class CoolController extends LinearOpMode {
     public void runOpMode() {
         MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
 
-        Intake intake = new Intake(
-                hardwareMap.get(Servo.class, "cs0"),
-                hardwareMap.get(Servo.class, "cs2"),
-                hardwareMap.get(Servo.class, "es5"),
-                hardwareMap.get(Servo.class, "es0"),
-                hardwareMap.get(DcMotor.class, "cm1")
-        );
+        Intake intake = new Intake(hardwareMap);
 
-        Outtake outtake = new Outtake(
-                hardwareMap.get(Servo.class, "es2"),
-                hardwareMap.get(Servo.class, "es4"),
-                hardwareMap.get(Servo.class, "cs5"),
-                hardwareMap.get(DcMotor.class, "cm2"),
-                hardwareMap.get(DcMotor.class, "cm3")
-        );
+        Outtake outtake = new Outtake(hardwareMap);
 
         Thread t = new Thread(() -> {
             while (opModeIsActive()){

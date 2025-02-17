@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.util;
 
 import static java.lang.Thread.sleep;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.util.linearslides.IntakeSlide;
 import org.firstinspires.ftc.teamcode.util.linearslides.LinearSlide;
 
 import java.util.Objects;
@@ -17,16 +19,16 @@ public class Intake {
     Servo servo1;
     Servo servo2;
     Servo servo3;
-    DcMotor motor0;
+    public IntakeSlide linear_slide;
 
     public String intake_state = "closed";
 
-    public Intake(Servo servo0, Servo servo1, Servo servo2, Servo servo3, DcMotor motor0){
-        this.servo0 = servo0;
-        this.servo1 = servo1;
-        this.servo2 = servo2;
-        this.servo3 = servo3;
-        this.motor0 = motor0;
+    public Intake(HardwareMap hwmap){
+        this.servo0 = hwmap.get(Servo.class, "cs0");
+        this.servo1 = hwmap.get(Servo.class, "cs1");
+        this.servo2 = hwmap.get(Servo.class, "cs2");
+        this.servo3 = hwmap.get(Servo.class, "cs3");
+        this.linear_slide = new IntakeSlide(hwmap.get(DcMotor.class, "cm0"));
     }
 
     public void grab() {
@@ -93,7 +95,7 @@ public class Intake {
     public void transferPos() {
         intake_state = "transfer";
 
-        actions.setSlidePosition(motor0, -500);
+        linear_slide.goTo(500, 50);
         servo0.setPosition(0);
         servo1.setPosition(0.57);
         servo2.setPosition(0.2);
@@ -109,9 +111,9 @@ public class Intake {
     }
 
     private void retractSlide() {
-        actions.setSlidePosition(motor0, 0);
+        linear_slide.goTo(0, 50);
     }
     private void extendSlide() {
-        actions.setSlidePosition(motor0, -1300);
+        linear_slide.goTo(1100, 50);
     }
 }

@@ -1,63 +1,105 @@
 package org.firstinspires.ftc.teamcode.util.linearslides;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-public class LinearSlide {
+public abstract class LinearSlide {
     public DcMotor motor;
-    double min_extend;
-    double max_extend;
-    double minimum_power;
-    double inherent_power;
-    Thread current_action = null;
+    private double min_extend;
+    private double max_extend;
+    private double zero_pos;
+    public double max_error;
+    public double target_pos;
+    public Boolean within_error;
+    Thread movement_thread;
 
     /**
-     * Class for using linear slides\
+     * Class for using linear slides
      * @param motor the motor attached to the slide
      * @param max_extend the furthest value the slide can extend to
      * @param min_extend the lowest value the slide extends to
-     * @param minimum_power the minimum power required to move
      */
-    public LinearSlide(DcMotor motor, double max_extend, double min_extend, double minimum_power) {
+    public LinearSlide(DcMotor motor, double max_extend, double min_extend, double target_pos, double max_error) {
         this.motor = motor;
         this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.min_extend = min_extend;
         this.max_extend = max_extend;
-        this.minimum_power = minimum_power;
-    }
-
-    public void stop(){
-        motor.setPower(0);
+        this.target_pos = target_pos;
+        this.max_error = max_error;
+        movement_thread = new Thread(this::movementLoop);
     }
 
     /**
-     * Sets the slide speed to move towards a certain point.
-     * Should be used while iterating in a while loop. Make sure to power off motor at end.
-     * @param pos desired position, in ticks
-     * @param max_error max acceptable distance from position, in ticks
-     * @return whether or not the  position is within the error
+     * Stops any movement. Only use this function while the movement thread is paused.
      */
-    public boolean extendToIter(double pos, double max_error){
-        if ((pos < min_extend) || (pos > max_extend)){
-            throw new Error("Requested slide extension out of bounds.");
-        }
-        double distance = pos - motor.getCurrentPosition();
-        motor.setPower(6 * (distance / (max_extend - min_extend)) + (minimum_power * Math.signum(distance)));
-        return Math.abs(distance) < max_error;
+    public void stop(){
+        motor.setPower(0);
+    }
+    /**
+     * Starts the movement thread. To actually stop the motor, make sure to call stop() after this.
+     */
+    public void stopThread(){
+        movement_thread.interrupt();
     }
 
-    public void extendToBreaking(double pos, double max_error){
-        while (!extendToIter(pos, max_error)){}
-        stop();
+    /**
+     * Starts the movement thread. You don't need to use this function on initialization
+     */
+    public void startThread(){
+        movement_thread.start();
     }
 
-    public Thread extendToAsync(double pos, double max_error){
-        if (current_action != null && current_action.isAlive()){
-            current_action.interrupt();
-            current_action = null;
+    /**
+     * Determines the power given to the motor at a given moment. The function may do this in a variety of ways
+     * @return The power given to the motor
+     */
+    abstract double powerFunction();
+
+    /**
+     * This method controls the linear slide throughout the program.
+     */
+    private void movementLoop(){
+        while (true) {
+            if ((target_pos < min_extend) || (target_pos > max_extend)){
+                Log.w("Linear Slide Error", String.format("Requested slide extension ( %.0f ticks)out of bounds.", target_pos));
+            }
+            within_error = (Math.abs(target_pos - zero_pos) < max_error);
+            if (within_error) {
+                this.stop();
+            } else {
+                motor.setPower(powerFunction());
+            }
         }
-        Thread thread = new Thread(() -> extendToBreaking(pos, max_error));
-        thread.start();
-        current_action = thread;
-        return thread;
+
+    }
+
+    /**
+     * Sets the slide to be zero at this position
+     */
+    public void setZero(){
+        zero_pos = motor.getCurrentPosition();
+    }
+    /**
+     * Gets the position of the slide, adjusted based on runtime-set zero position
+     * @return the position of the slide
+     */
+    public double getPosition(){
+        return (motor.getCurrentPosition() - zero_pos);
+    }
+    /**
+     * Sets the slide to run towards a certain position asynchronously
+     * @param pos the position to run to, in ticks
+     * @param err the acceptable error, in ticks.
+     */
+    public void goTo(double pos, double err){
+        target_pos = pos;
+        max_error = err;
+    }
+    /**
+     * Waits for movement. This is breaking, so avoid using this when possible
+     */
+    public void waitForMovement(){
+        while (!within_error){}
     }
 }

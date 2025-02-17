@@ -11,15 +11,19 @@ public class IntakeSlide extends LinearSlide {
      * Class for using Intake Slide
      */
     public IntakeSlide(DcMotor motor) {
-        super(motor, 1100, 0, 0.15);
+        super(motor, 1100, 0, 0, 50);
     }
-    public Thread moveIn(){
-        return extendToAsync(0, 50);
+    public void moveIn(){
+        goTo(0, 50);
     }
-    public Thread fullOut(){
-        return extendToAsync(1000, 50);
+    public void moveOut(){
+        goTo(1000, 50);
     }
 
+    public double powerFunction(){
+        double distance = target_pos - getPosition();
+        return Math.signum(distance) * 0.3 + distance * 6;
+    }
     /**
      * Converts
      * @param extension_from_center_in extension distance from the center of the robot, measured in inches

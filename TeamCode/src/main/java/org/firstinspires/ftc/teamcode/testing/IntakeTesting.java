@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(group = "testing", name = "Intake Testing")
 public class IntakeTesting extends LinearOpMode {
-
     public void runOpMode() {
 
         //MechanismActions actions = new MechanismActions();
@@ -17,7 +16,6 @@ public class IntakeTesting extends LinearOpMode {
         Servo s2 = hardwareMap.get(Servo.class, "cs2");
         Servo s3 = hardwareMap.get(Servo.class, "cs3");
         DcMotor m0 = hardwareMap.get(DcMotor.class, "cm0");
-
         waitForStart();
         while (opModeIsActive()){
             if (gamepad1.a) {
@@ -39,10 +37,10 @@ public class IntakeTesting extends LinearOpMode {
                 s3.setPosition(s3.getPosition()-0.001);
             }
             if (gamepad1.b) {
-                actions.setSlidePosition(m0, m0.getCurrentPosition()+10);
+                //actions.setSlidePosition(m0, m0.getCurrentPosition()+10);
             }
             if (gamepad1.x) {
-                actions.setSlidePosition(m0, m0.getCurrentPosition()-10);
+                //actions.setSlidePosition(m0, m0.getCurrentPosition()-10);
             }
             telemetry.addData("s0", s0.getPosition());
             telemetry.addData("s1", s1.getPosition());

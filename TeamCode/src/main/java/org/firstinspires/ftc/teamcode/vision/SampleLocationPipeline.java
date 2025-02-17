@@ -26,7 +26,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     final Mat empty_mat = new Mat();
     Mat hierarchy = new Mat();
     Mat greyscale = new Mat();
-    public List<Vector<Double>> object_field_coords = new ArrayList<>();
+    public List<double[]> object_field_coords = new ArrayList<>();
     final double top_distance_weight = 1/10;
     final double top2_distance_weight = 3;
     public SampleLocationPipeline(Camera.Colors color, Telemetry telemetry) {
@@ -146,11 +146,8 @@ public class SampleLocationPipeline extends OpenCvPipeline {
             double world_y = (top_world_point.y + top2_world_point.y)/2 - (top_world_point.x - top2_world_point.x)/distance * multiplier;
             Imgproc.putText(color_filtered_image, (short_side? "short": "long"), new Point((top_point.x + top2_point.x)/2, (top_point.y + top2_point.y)/2), Imgproc.FONT_HERSHEY_PLAIN, 1, new Scalar(80,255,20), 1);
             Imgproc.putText(color_filtered_image, String.format("%.1f", distance), top_point, Imgproc.FONT_HERSHEY_PLAIN, 1, new Scalar(80,255,20), 1);
-            Vector<Double> v = new Vector<>(3,0);
-                v.add(0, (world_x));
-                v.add(1, (world_y));
-                v.add(angle);
-            object_field_coords.add(v);
+            double[] pose = {world_x, world_y, angle};
+            object_field_coords.add(pose);
             telemetry.addData("x, y, θ", String.format("%.1f, %.1f, %.2f", world_x, world_y, angle));
 
         }
@@ -178,7 +175,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         return output;
     }
 
-    public List<Vector<Double>> getAnalysis(){
+    public List<double[]> getAnalysis(){
         return object_field_coords;
     };
 }
