@@ -2,17 +2,17 @@ package org.firstinspires.ftc.teamcode.util;
 
 import static java.lang.Thread.sleep;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.util.linearslides.IntakeSlide;
+import org.firstinspires.ftc.teamcode.util.linearslides.LinearSlide;
 
 import java.util.Objects;
 
 public class Intake {
-    MechanismActions actions;
+
+    MechanismActions actions = new MechanismActions();
     Servo servo0;
     Servo servo1;
     Servo servo2;
@@ -26,6 +26,7 @@ public class Intake {
         this.servo1 = servo1;
         this.servo2 = servo2;
         this.servo3 = servo3;
+        this.motor0 = motor0;
     }
 
     public void grab() {
@@ -78,8 +79,8 @@ public class Intake {
             servo0.setPosition(1);
         }
         servo1.setPosition(0.57);
-        servo2.setPosition(0.6);
-        servo3.setPosition(0.8);
+        servo2.setPosition(0.87);
+        servo3.setPosition(0.6);
     }
 
     private void closeArm() {
@@ -90,9 +91,9 @@ public class Intake {
     }
 
     private void retractSlide() {
-        actions.setSlidePosition(motor0, 1300);
+        actions.setSlidePosition(motor0, 0);
     }
     private void extendSlide() {
-        actions.setSlidePosition(motor0, 0);
+        actions.setSlidePosition(motor0, -1300);
     }
 }

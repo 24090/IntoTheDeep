@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.util.linearslides.LinearSlide;
 import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 
 import java.util.Objects;
 
 public class Outtake {
-    MechanismActions actions;
+
+    MechanismActions actions = new MechanismActions();
     Servo servo0;
     //left arm (looking from the back)
     Servo servo1;
@@ -17,7 +19,6 @@ public class Outtake {
     DcMotor motor1;
 
     public String outtake_state = "closed";
-
     public Outtake(Servo servo0, Servo servo1, Servo servo2, DcMotor motor0, DcMotor motor1) {
         this.servo0 = servo0;
         this.servo1 = servo1;
@@ -30,8 +31,8 @@ public class Outtake {
         if(Objects.equals(outtake_state, "closed") || Objects.equals(outtake_state, "scoring")) {
             outtake_state = "grabbing";
 
-            actions.setSlidePosition(motor0, 100);
-            actions.setSlidePosition(motor1, -100);
+            actions.setSlidePosition(motor0, 2300);
+            actions.setSlidePosition(motor1, -2300);
 
             servo0.setPosition(1);
             servo1.setPosition(0.66);
@@ -39,8 +40,8 @@ public class Outtake {
         } else if(Objects.equals(outtake_state, "grabbing")) {
             outtake_state = "scoring";
 
-            actions.setSlidePosition(motor0, 100);
-            actions.setSlidePosition(motor1, -100);
+            actions.setSlidePosition(motor0, 2300);
+            actions.setSlidePosition(motor1, -2300);
 
             servo0.setPosition(0);
             servo1.setPosition(0);
@@ -71,8 +72,8 @@ public class Outtake {
 
     public void score() {
         if (Objects.equals(outtake_state, "scoring")) {
-            actions.setSlidePosition(motor0, 100);
-            actions.setSlidePosition(motor0, -100);
+            actions.setSlidePosition(motor0, 200);
+            actions.setSlidePosition(motor1, -200);
         }
     }
 }
