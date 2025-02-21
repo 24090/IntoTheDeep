@@ -62,13 +62,13 @@ public class Intake {
 
     public void moveWristRight() {
         if (Objects.equals(intake_state, "open")) {
-            servo1.setPosition(servo1.getPosition()+0.03);
+            servo1.setPosition(servo1.getPosition()+0.003);
         }
     }
 
     public void moveWristLeft() {
         if (Objects.equals(intake_state, "open")) {
-            servo1.setPosition(servo1.getPosition()-0.03);
+            servo1.setPosition(servo1.getPosition()-0.003);
         }
     }
 
@@ -93,7 +93,7 @@ public class Intake {
     public void transferPos() {
         intake_state = "transfer";
 
-        actions.setSlidePosition(motor0, 400);
+        actions.setSlidePosition(motor0, -500);
         servo0.setPosition(0);
         servo1.setPosition(0.57);
         servo2.setPosition(0.2);

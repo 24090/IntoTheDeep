@@ -52,7 +52,7 @@ public class CoolController extends LinearOpMode {
         );
 
         Outtake outtake = new Outtake(
-                hardwareMap.get(Servo.class, "es0"),
+                hardwareMap.get(Servo.class, "es2"),
                 hardwareMap.get(Servo.class, "cs4"),
                 hardwareMap.get(Servo.class, "cs5"),
                 hardwareMap.get(DcMotor.class, "cm2"),
@@ -78,10 +78,11 @@ public class CoolController extends LinearOpMode {
                 sleep(1000);
                 outtake.close();
             }
-            if(gamepad1.right_bumper && gamepad1.right_trigger < 0) {
+            if(gamepad1.right_bumper && gamepad1.right_trigger == 0) {
                 outtake.open();
                 sleep(1000);
                 intake.close();
+                while (gamepad1.right_bumper) {}
             } else if (gamepad1.right_bumper && gamepad1.right_trigger > 0) {
                 intake.transferPos();
                 outtake.transferPos();
@@ -92,6 +93,7 @@ public class CoolController extends LinearOpMode {
                 intake.close();
                 sleep(300);
                 outtake.open();
+                while (gamepad1.right_bumper) {}
             }
             if (gamepad1.a) {
                 outtake.grab();

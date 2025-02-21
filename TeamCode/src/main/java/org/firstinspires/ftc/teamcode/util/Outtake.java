@@ -52,8 +52,8 @@ public class Outtake {
     public void close() {
         outtake_state = "closed";
 
-        actions.setSlidePosition(motor0, 0);
-        actions.setSlidePosition(motor1, 0);
+        actions.setSlidePosition(motor0, 100);
+        actions.setSlidePosition(motor1, 100);
 
         servo0.setPosition(0);
         servo1.setPosition(1);
