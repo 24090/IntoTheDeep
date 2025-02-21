@@ -28,7 +28,7 @@ public class Outtake {
     }
 
     public void open() {
-        if(Objects.equals(outtake_state, "closed") || Objects.equals(outtake_state, "scoring")) {
+        if(Objects.equals(outtake_state, "closed") || Objects.equals(outtake_state, "scoring") || Objects.equals(outtake_state, "transfer")) {
             outtake_state = "grabbing";
 
             actions.setSlidePosition(motor0, 200);
@@ -67,6 +67,25 @@ public class Outtake {
             } else {
                 servo0.setPosition(0);
             }
+        }
+    }
+
+    public void transferPos() {
+        outtake_state = "transfer";
+
+        actions.setSlidePosition(motor0, 100);
+        actions.setSlidePosition(motor1, -100);
+
+        servo0.setPosition(1);
+        servo1.setPosition(0.8);
+        servo2.setPosition(-0.8);
+    }
+
+    public void activateClaw() {
+        if (servo0.getPosition() == 0) {
+            servo0.setPosition(1);
+        } else {
+            servo0.setPosition(0);
         }
     }
 

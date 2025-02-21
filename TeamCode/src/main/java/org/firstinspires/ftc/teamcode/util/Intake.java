@@ -56,8 +56,8 @@ public class Intake {
     public void close() {
         intake_state = "closed";
 
-        retractSlide();
         closeArm();
+        retractSlide();
     }
 
     public void moveWristRight() {
@@ -86,8 +86,26 @@ public class Intake {
     private void closeArm() {
         servo0.setPosition(0);
         servo1.setPosition(0.57);
-        servo2.setPosition(0.87);
-        servo3.setPosition(0.3);
+        servo2.setPosition(0.2);
+        servo3.setPosition(0);
+    }
+
+    public void transferPos() {
+        intake_state = "transfer";
+
+        actions.setSlidePosition(motor0, 400);
+        servo0.setPosition(0);
+        servo1.setPosition(0.57);
+        servo2.setPosition(0.2);
+        servo3.setPosition(0.15);
+    }
+
+    public void activateClaw() {
+        if (servo0.getPosition() == 0) {
+            servo0.setPosition(1);
+        } else {
+            servo0.setPosition(0);
+        }
     }
 
     private void retractSlide() {

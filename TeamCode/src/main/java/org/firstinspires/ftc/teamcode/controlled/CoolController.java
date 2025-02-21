@@ -75,11 +75,23 @@ public class CoolController extends LinearOpMode {
                 } else {
                     intake.shortIntake();
                 }
+                sleep(1000);
                 outtake.close();
             }
-            if(gamepad1.right_bumper) {
+            if(gamepad1.right_bumper && gamepad1.right_trigger < 0) {
                 outtake.open();
+                sleep(1000);
                 intake.close();
+            } else if (gamepad1.right_bumper && gamepad1.right_trigger > 0) {
+                intake.transferPos();
+                outtake.transferPos();
+                outtake.activateClaw();
+                sleep(100);
+                intake.activateClaw();
+                sleep(300);
+                intake.close();
+                sleep(300);
+                outtake.open();
             }
             if (gamepad1.a) {
                 outtake.grab();
