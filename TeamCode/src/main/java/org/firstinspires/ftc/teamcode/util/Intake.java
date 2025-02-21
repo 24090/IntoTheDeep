@@ -85,9 +85,9 @@ public class Intake {
 
     private void closeArm() {
         servo0.setPosition(0);
-        servo1.setPosition(0);
-        servo2.setPosition(0);
-        servo3.setPosition(0);
+        servo1.setPosition(0.57);
+        servo2.setPosition(0.87);
+        servo3.setPosition(0.3);
     }
 
     private void retractSlide() {

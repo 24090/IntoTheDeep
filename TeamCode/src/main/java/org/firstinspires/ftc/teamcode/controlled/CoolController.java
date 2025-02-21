@@ -32,10 +32,10 @@ es3 -
 es4 -
 es5 -
 
-em0 -  Front Left
-em1 - Front Right
-em2 - Back Right
-em3 - Back Left
+em0 - Front Left Drivetrain Motor (Looking From The Back)
+em1 - Front Right Drivetrain Motor (Looking From The Back)
+em2 - Back Right Drivetrain Motor (Looking From The Back)
+em3 - Back Left Drivetrain Motor (Looking From The Back)
  */
 
 @TeleOp(group="controlled", name="CoolController")
