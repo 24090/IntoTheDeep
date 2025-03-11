@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.util.linearslides.LinearSlide;
@@ -10,29 +11,30 @@ import java.util.Objects;
 
 public class Outtake {
 
-    MechanismActions actions = new MechanismActions();
+    OuttakeSlide outtakeSlideRight;
+    OuttakeSlide outtakeSLideLeft;
     Servo servo0;
     //left arm (looking from the back)
     Servo servo1;
     Servo servo2;
-    DcMotor motor0;
-    DcMotor motor1;
 
     public String outtake_state = "closed";
     public Outtake(Servo servo0, Servo servo1, Servo servo2, DcMotor motor0, DcMotor motor1) {
         this.servo0 = servo0;
         this.servo1 = servo1;
         this.servo2 = servo2;
-        this.motor0 = motor0;
-        this.motor1 = motor1;
+
+        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
+        outtakeSlideRight = new OuttakeSlide(motor0);
+        outtakeSLideLeft = new OuttakeSlide(motor1);
     }
 
     public void open() {
         if(Objects.equals(outtake_state, "closed") || Objects.equals(outtake_state, "scoring") || Objects.equals(outtake_state, "transfer")) {
             outtake_state = "grabbing";
 
-            actions.setSlidePosition(motor0, 200);
-            actions.setSlidePosition(motor1, -200);
+            outtakeSlideRight.extendToBreaking(100, 50);
+            outtakeSLideLeft.extendToBreaking(100, 50);
 
             servo0.setPosition(1);
             servo1.setPosition(0.66);
@@ -40,10 +42,10 @@ public class Outtake {
         } else if(Objects.equals(outtake_state, "grabbing")) {
             outtake_state = "scoring";
 
-            actions.setSlidePosition(motor0, 1500);
-            actions.setSlidePosition(motor1, -1500);
+            outtakeSlideRight.extendToBreaking(1200, 50);
+            outtakeSLideLeft.extendToBreaking(1200, 50);
 
-            servo0.setPosition(0);
+            servo0.setPosition(1);
             servo1.setPosition(0.33);
             servo2.setPosition(-0.33);
         }
@@ -52,8 +54,8 @@ public class Outtake {
     public void close() {
         outtake_state = "closed";
 
-        actions.setSlidePosition(motor0, 100);
-        actions.setSlidePosition(motor1, 100);
+        outtakeSlideRight.moveDown();
+        outtakeSLideLeft.moveDown();
 
         servo0.setPosition(0);
         servo1.setPosition(1);
@@ -73,8 +75,8 @@ public class Outtake {
     public void transferPos() {
         outtake_state = "transfer";
 
-        actions.setSlidePosition(motor0, 100);
-        actions.setSlidePosition(motor1, -100);
+        outtakeSlideRight.moveDown();
+        outtakeSLideLeft.moveDown();
 
         servo0.setPosition(1);
         servo1.setPosition(0.8);
@@ -91,8 +93,8 @@ public class Outtake {
 
     public void score() {
         if (Objects.equals(outtake_state, "scoring")) {
-            actions.setSlidePosition(motor0, 1000);
-            actions.setSlidePosition(motor1, -1000);
+            outtakeSlideRight.extendToBreaking(1000, 50);
+            outtakeSLideLeft.extendToBreaking(1000, 50);
         }
     }
 }
