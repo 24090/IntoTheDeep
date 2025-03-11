@@ -93,8 +93,8 @@ public class Outtake {
 
     public void score() {
         if (Objects.equals(outtake_state, "scoring")) {
-            outtakeSlideRight.extendToBreaking(1000, 50);
-            outtakeSLideLeft.extendToBreaking(1000, 50);
+            outtakeSlideRight.extendToBreaking(800, 50);
+            outtakeSLideLeft.extendToBreaking(800, 50);
         }
     }
 }
