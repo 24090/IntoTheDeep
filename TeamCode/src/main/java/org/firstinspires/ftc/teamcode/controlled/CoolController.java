@@ -80,6 +80,7 @@ public class CoolController extends LinearOpMode {
             }
             if(gamepad1.right_bumper && gamepad1.right_trigger == 0) {
                 outtake.open();
+                sleep(1000);
                 intake.close();
                 while (gamepad1.right_bumper) {}
             } else if (gamepad1.right_bumper && gamepad1.right_trigger > 0) {
