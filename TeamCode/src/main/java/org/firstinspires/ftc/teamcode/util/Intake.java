@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public class Intake {
 
-    MechanismActions actions = new MechanismActions();
+    //MechanismActions actions = new MechanismActions();
     Servo servo0;
     Servo servo1;
     Servo servo2;

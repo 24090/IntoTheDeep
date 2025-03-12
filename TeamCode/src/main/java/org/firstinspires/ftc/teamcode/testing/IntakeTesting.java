@@ -5,15 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.MechanismActions;
-
 @TeleOp(group = "testing", name = "Intake Testing")
 public class IntakeTesting extends LinearOpMode {
 
     public void runOpMode() {
 
-        MechanismActions actions = new MechanismActions();
+        //MechanismActions actions = new MechanismActions();
 
         Servo s0 = hardwareMap.get(Servo.class, "cs0");
         Servo s1 = hardwareMap.get(Servo.class, "cs1");
