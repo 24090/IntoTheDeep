@@ -20,8 +20,12 @@ public class Intake {
     Servo servo2;
     Servo servo3;
     public IntakeSlide linear_slide;
-
-    public String intake_state = "closed";
+    public enum State{
+        OPEN,
+        CLOSED,
+        TRANSFER
+    }
+    public State intake_state = State.OPEN;
 
     public Intake(HardwareMap hwmap){
         this.servo0 = hwmap.get(Servo.class, "cs0");
@@ -32,7 +36,7 @@ public class Intake {
     }
 
     public void grab() {
-        if (Objects.equals(intake_state, "open")) {
+        if (intake_state == State.OPEN) {
             if (servo0.getPosition() == 0) {
                 servo0.setPosition(1);
             } else {
@@ -42,40 +46,40 @@ public class Intake {
     }
 
     public void longIntake() {
-        intake_state = "open";
+        intake_state = State.OPEN;
 
         extendSlide();
         openArm();
     }
 
     public void shortIntake() {
-        intake_state = "open";
+        intake_state = State.OPEN;
 
         retractSlide();
         openArm();
     }
 
     public void close() {
-        intake_state = "closed";
+        intake_state = State.CLOSED;
 
         closeArm();
         retractSlide();
     }
 
     public void moveWristRight() {
-        if (Objects.equals(intake_state, "open")) {
-            servo1.setPosition(servo1.getPosition()+0.003);
+        if (intake_state == State.OPEN) {
+            servo1.setPosition(servo1.getPosition() + 0.003);
         }
     }
 
     public void moveWristLeft() {
-        if (Objects.equals(intake_state, "open")) {
-            servo1.setPosition(servo1.getPosition()-0.003);
+        if (intake_state == State.OPEN) {
+            servo1.setPosition(servo1.getPosition() - 0.003);
         }
     }
 
     private void openArm() {
-        if (Objects.equals(intake_state, "open")) {
+        if (intake_state == State.OPEN) {
             servo0.setPosition(0);
         } else {
             servo0.setPosition(1);
@@ -93,7 +97,7 @@ public class Intake {
     }
 
     public void transferPos() {
-        intake_state = "transfer";
+        intake_state = State.TRANSFER;
 
         linear_slide.goTo(500, 50);
         servo0.setPosition(0);

@@ -18,8 +18,14 @@ public class Outtake {
     //left arm (looking from the back)
     Servo servo1;
     Servo servo2;
+    public enum State{
+        CLOSED,
+        GRABBING,
+        SCORING,
+        TRANSFER
 
-    public String outtake_state = "closed";
+    }
+    public State outtake_state = State.CLOSED;
     public Outtake(HardwareMap hwmap) {
         this.servo0 = hwmap.get(Servo.class, "es0");
         this.servo1 = hwmap.get(Servo.class, "cs4");
@@ -30,19 +36,8 @@ public class Outtake {
     }
 
     public void open() {
-        if(Objects.equals(outtake_state, "closed") || Objects.equals(outtake_state, "scoring") || Objects.equals(outtake_state, "transfer")) {
-            outtake_state = "grabbing";
-
-            outtakeSlideRight.goTo(100, 50);
-            outtakeSLideLeft.goTo(100, 50);
-            outtakeSlideRight.waitForMovement();
-            outtakeSLideLeft.waitForMovement();
-
-            servo0.setPosition(1);
-            servo1.setPosition(0.66);
-            servo2.setPosition(-0.66);
-        } else if(Objects.equals(outtake_state, "grabbing")) {
-            outtake_state = "scoring";
+        if (outtake_state == State.GRABBING) {
+            outtake_state = State.SCORING;
 
             outtakeSlideRight.goTo(1200, 50);
             outtakeSLideLeft.goTo(1200, 50);
@@ -52,11 +47,22 @@ public class Outtake {
             servo0.setPosition(1);
             servo1.setPosition(0.33);
             servo2.setPosition(-0.33);
+        } else {
+            outtake_state = State.GRABBING;
+
+            outtakeSlideRight.goTo(100, 50);
+            outtakeSLideLeft.goTo(100, 50);
+            outtakeSlideRight.waitForMovement();
+            outtakeSLideLeft.waitForMovement();
+
+            servo0.setPosition(1);
+            servo1.setPosition(0.66);
+            servo2.setPosition(-0.66);
         }
     }
 
     public void close() {
-        outtake_state = "closed";
+        outtake_state = State.CLOSED;
 
         outtakeSlideRight.moveDown();
         outtakeSLideLeft.moveDown();
@@ -67,7 +73,7 @@ public class Outtake {
     }
 
     public void grab() {
-        if (Objects.equals(outtake_state, "grabbing") || Objects.equals(outtake_state, "scoring")) {
+        if (Objects.equals(outtake_state, State.GRABBING) || Objects.equals(outtake_state, State.SCORING)) {
             if (servo0.getPosition() == 0) {
                 servo0.setPosition(1);
             } else {
@@ -77,7 +83,7 @@ public class Outtake {
     }
 
     public void transferPos() {
-        outtake_state = "transfer";
+        outtake_state = State.TRANSFER;
 
         outtakeSlideRight.moveDown();
         outtakeSLideLeft.moveDown();
@@ -96,7 +102,7 @@ public class Outtake {
     }
 
     public void score() {
-        if (Objects.equals(outtake_state, "scoring")) {
+        if (outtake_state == State.SCORING) {
             outtakeSlideRight.goTo(800, 50);
             outtakeSLideLeft.goTo(800, 50);
 
