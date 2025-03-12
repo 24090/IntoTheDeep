@@ -10,48 +10,48 @@ import org.firstinspires.ftc.teamcode.util.MechanismActions;
 
 @TeleOp(group = "testing", name = "Intake Testing")
 public class IntakeTesting extends LinearOpMode {
-    Intake intake;
-    public void runOpMode() throws InterruptedException {
-        intake = new Intake(
-                hardwareMap.get(Servo.class, "intake_servo_a1"),
-                hardwareMap.get(Servo.class, "intake_servo_a2"),
-                hardwareMap.get(Servo.class, "intake_servo_b"),
-                hardwareMap.get(DcMotor.class, "intake_motor")
-        );
+
+    public void runOpMode() {
+
+        MechanismActions actions = new MechanismActions();
+
+        Servo s0 = hardwareMap.get(Servo.class, "cs0");
+        Servo s1 = hardwareMap.get(Servo.class, "cs1");
+        Servo s2 = hardwareMap.get(Servo.class, "cs2");
+        Servo s3 = hardwareMap.get(Servo.class, "cs3");
+        DcMotor m0 = hardwareMap.get(DcMotor.class, "cm0");
+
         waitForStart();
         while (opModeIsActive()){
-//            intake_servo_b.setPosition(0.5);
-//            intake_servo_a2.setPosition(0.7);
-//            intake_servo_a1.setPosition(0);
-//            intake_servo_a2.setPosition(0);
-//            sleep((long) 1000);
-//            intake_servo_b.setPosition(0);
-//            sleep((long) 1000);
-//            intake_servo_b.setPosition(0.5);
-//            intake_servo_a1.setPosition(0.7);
-//            sleep((long) 1000);
-//            intake_servo_b.setPosition(1);
-//            sleep((long) 1000);
-            if (gamepad1.dpad_left){
-                intake.moveDown();
-            } else if (gamepad1.dpad_right){
-                intake.moveUp();
+            if (gamepad1.a) {
+                s1.setPosition(s1.getPosition()+0.01);
             }
-            if (gamepad1.y){
-                intake.grab();
-            } else if (gamepad1.x){
-                intake.hold();
-            } else if (gamepad1.a){
-                intake.release();
+            if (gamepad1.y) {
+                s1.setPosition(s1.getPosition()-0.01);
             }
-            if (gamepad1.right_bumper){
-                intake.transferSample();
-            } else if (gamepad1.left_bumper){
-                intake.slideOut();
-            } else {
-                intake.slideStop();
+            if (gamepad1.dpad_up) {
+                s2.setPosition(s2.getPosition()+0.01);
             }
-            telemetry.addData("pos", intake.linear_slide.motor.getCurrentPosition());
+            if (gamepad1.dpad_down) {
+                s2.setPosition(s2.getPosition()-0.01);
+            }
+            if (gamepad1.dpad_right) {
+                s3.setPosition(s3.getPosition()+0.001);
+            }
+            if (gamepad1.dpad_left) {
+                s3.setPosition(s3.getPosition()-0.001);
+            }
+            if (gamepad1.b) {
+                actions.setSlidePosition(m0, m0.getCurrentPosition()+10);
+            }
+            if (gamepad1.x) {
+                actions.setSlidePosition(m0, m0.getCurrentPosition()-10);
+            }
+            telemetry.addData("s0", s0.getPosition());
+            telemetry.addData("s1", s1.getPosition());
+            telemetry.addData("s2", s2.getPosition());
+            telemetry.addData("s3", s3.getPosition());
+            telemetry.addData("m0", m0.getCurrentPosition());
             telemetry.update();
         }
     }

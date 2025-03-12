@@ -217,10 +217,10 @@ public final class MecanumDrive {
 
         // TODO: make sure your config has motors with these names (or change them)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        leftFront = hardwareMap.get(DcMotorEx.class, "motor");
-        leftBack = hardwareMap.get(DcMotorEx.class, "par1");
-        rightBack = hardwareMap.get(DcMotorEx.class, "perp");
-        rightFront = hardwareMap.get(DcMotorEx.class, "par0");
+        leftFront = hardwareMap.get(DcMotorEx.class, "em0");
+        leftBack = hardwareMap.get(DcMotorEx.class, "em3");
+        rightBack = hardwareMap.get(DcMotorEx.class, "em2");
+        rightFront = hardwareMap.get(DcMotorEx.class, "em1");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -252,8 +252,8 @@ public final class MecanumDrive {
 
         leftFront.setPower(wheelVels.leftFront.get(0) / maxPowerMag);
         leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
-        rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
-        rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
+        rightBack.setPower(wheelVels.rightBack.get(0) / -maxPowerMag);
+        rightFront.setPower(wheelVels.rightFront.get(0) / -maxPowerMag);
     }
 
     public final class FollowTrajectoryAction implements Action {
