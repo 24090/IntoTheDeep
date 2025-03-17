@@ -4,8 +4,6 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Intake;
@@ -67,24 +65,24 @@ public class CoolController extends LinearOpMode {
                 outtake.close();
             }
             if(gamepad1.right_bumper && gamepad1.right_trigger == 0) {
-                outtake.open();
+                outtake.grabScoreToggle();
                 sleep(1000);
                 intake.close();
                 while (gamepad1.right_bumper) {}
             } else if (gamepad1.right_bumper && gamepad1.right_trigger > 0) {
                 intake.transferPos();
-                outtake.transferPos();
+                outtake.transferPosition();
                 outtake.activateClaw();
                 sleep(100);
                 intake.activateClaw();
                 sleep(300);
                 intake.close();
                 sleep(300);
-                outtake.open();
+                outtake.grabScoreToggle();
                 while (gamepad1.right_bumper) {}
             }
             if (gamepad1.a) {
-                outtake.grab();
+                outtake.toggleClaw();
                 intake.grab();
                 while (gamepad1.a) {}
             }

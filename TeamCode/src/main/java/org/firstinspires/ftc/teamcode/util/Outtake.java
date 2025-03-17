@@ -5,19 +5,16 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.util.linearslides.LinearSlide;
 import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
-
-import java.util.Objects;
 
 public class Outtake {
 
-    OuttakeSlide outtakeSlideRight;
-    OuttakeSlide outtakeSLideLeft;
-    Servo servo0;
+    OuttakeSlide slide_right;
+    BoundMotor bound_slide_left;
+    Servo claw_servo;
     //left arm (looking from the back)
-    Servo servo1;
-    Servo servo2;
+    Servo arm_left;
+    Servo arm_right;
     public enum State{
         CLOSED,
         GRABBING,
@@ -27,87 +24,88 @@ public class Outtake {
     }
     public State outtake_state = State.CLOSED;
     public Outtake(HardwareMap hwmap) {
-        this.servo0 = hwmap.get(Servo.class, "es0");
-        this.servo1 = hwmap.get(Servo.class, "cs4");
-        this.servo2 = hwmap.get(Servo.class, "cs5");
-        outtakeSlideRight = new OuttakeSlide(hwmap.get(DcMotor.class, "cm1"));
-        outtakeSLideLeft = new OuttakeSlide(hwmap.get(DcMotor.class, "cm2"));
-        outtakeSLideLeft.motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.claw_servo = hwmap.get(Servo.class, "es0");
+        this.arm_left = hwmap.get(Servo.class, "cs4");
+        this.arm_right = hwmap.get(Servo.class, "cs5");
+        slide_right = new OuttakeSlide(hwmap.get(DcMotor.class, "cm1"));
+        bound_slide_left = new BoundMotor(hwmap.get(DcMotor.class, "cm2"), hwmap.get(DcMotor.class, "cm1"));
+        bound_slide_left.motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        bound_slide_left.startThread();
     }
 
-    public void open() {
+    public void score_position(){
+        outtake_state = State.SCORING;
+
+        slide_right.goTo(1200, 50);
+        slide_right.waitForMovement();
+
+        claw_servo.setPosition(1);
+        arm_left.setPosition(0.33);
+        arm_right.setPosition(-0.33);
+    }
+
+    public void grabPosition(){
+        outtake_state = State.GRABBING;
+
+        slide_right.goTo(100, 50);
+        slide_right.waitForMovement();
+
+        claw_servo.setPosition(1);
+        arm_left.setPosition(0.66);
+        arm_right.setPosition(-0.66);
+    }
+
+    public void grabScoreToggle() {
         if (outtake_state == State.GRABBING) {
-            outtake_state = State.SCORING;
-
-            outtakeSlideRight.goTo(1200, 50);
-            outtakeSLideLeft.goTo(1200, 50);
-            outtakeSlideRight.waitForMovement();
-            outtakeSLideLeft.waitForMovement();
-
-            servo0.setPosition(1);
-            servo1.setPosition(0.33);
-            servo2.setPosition(-0.33);
+            score_position();
         } else {
-            outtake_state = State.GRABBING;
-
-            outtakeSlideRight.goTo(100, 50);
-            outtakeSLideLeft.goTo(100, 50);
-            outtakeSlideRight.waitForMovement();
-            outtakeSLideLeft.waitForMovement();
-
-            servo0.setPosition(1);
-            servo1.setPosition(0.66);
-            servo2.setPosition(-0.66);
+            grabPosition();
         }
     }
 
     public void close() {
         outtake_state = State.CLOSED;
 
-        outtakeSlideRight.moveDown();
-        outtakeSLideLeft.moveDown();
+        slide_right.moveDown();
 
-        servo0.setPosition(0);
-        servo1.setPosition(1);
-        servo2.setPosition(-1);
+        claw_servo.setPosition(0);
+        arm_left.setPosition(1);
+        arm_right.setPosition(-1);
     }
 
-    public void grab() {
-        if (Objects.equals(outtake_state, State.GRABBING) || Objects.equals(outtake_state, State.SCORING)) {
-            if (servo0.getPosition() == 0) {
-                servo0.setPosition(1);
+    public void toggleClaw() {
+        if ((outtake_state == State.GRABBING) || (outtake_state == State.SCORING)) {
+            if (claw_servo.getPosition() == 0) {
+                claw_servo.setPosition(1);
             } else {
-                servo0.setPosition(0);
+                claw_servo.setPosition(0);
             }
         }
     }
 
-    public void transferPos() {
+    public void transferPosition() {
         outtake_state = State.TRANSFER;
 
-        outtakeSlideRight.moveDown();
-        outtakeSLideLeft.moveDown();
+        slide_right.moveDown();
 
-        servo0.setPosition(1);
-        servo1.setPosition(0.8);
-        servo2.setPosition(-0.8);
+        claw_servo.setPosition(1);
+        arm_left.setPosition(0.8);
+        arm_right.setPosition(-0.8);
     }
 
     public void activateClaw() {
-        if (servo0.getPosition() == 0) {
-            servo0.setPosition(1);
+        if (claw_servo.getPosition() == 0) {
+            claw_servo.setPosition(1);
         } else {
-            servo0.setPosition(0);
+            claw_servo.setPosition(0);
         }
     }
 
     public void score() {
         if (outtake_state == State.SCORING) {
-            outtakeSlideRight.goTo(800, 50);
-            outtakeSLideLeft.goTo(800, 50);
+            slide_right.goTo(800, 50);
 
-            outtakeSlideRight.waitForMovement();
-            outtakeSLideLeft.waitForMovement();
+            slide_right.waitForMovement();
         }
     }
 }

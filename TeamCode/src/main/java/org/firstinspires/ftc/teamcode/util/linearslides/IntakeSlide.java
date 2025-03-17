@@ -11,7 +11,7 @@ public class IntakeSlide extends LinearSlide {
      * Class for using Intake Slide
      */
     public IntakeSlide(DcMotor motor) {
-        super(motor, 1100, 0, 0, 50);
+        super(motor, 1100, 0, 0);
     }
     public void moveIn(){
         goTo(0, 50);

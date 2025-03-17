@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class OuttakeSlide extends LinearSlide {
     /**
      * Class for using the Outtake slide
-     * @param hwmap the hardware map, used to find the motor
+     * @param motor the motor the slide uses
      */
     public OuttakeSlide(DcMotor motor) {
-        super(motor, 2300, 0, 0, 50);
+        super(motor, 2300, 0, 0);
     }
 
     @Override

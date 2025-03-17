@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public abstract class LinearSlide {
     public DcMotor motor;
-    private double min_extend;
-    private double max_extend;
+    private final double min_extend;
+    private final double max_extend;
     private double zero_pos;
     public double max_error;
     public double target_pos;
@@ -19,14 +19,15 @@ public abstract class LinearSlide {
      * @param motor the motor attached to the slide
      * @param max_extend the furthest value the slide can extend to
      * @param min_extend the lowest value the slide extends to
+     * @param target_pos the initial target position
      */
-    public LinearSlide(DcMotor motor, double max_extend, double min_extend, double target_pos, double max_error) {
+    public LinearSlide(DcMotor motor, double max_extend, double min_extend, double target_pos) {
         this.motor = motor;
         this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.min_extend = min_extend;
         this.max_extend = max_extend;
         this.target_pos = target_pos;
-        this.max_error = max_error;
+        this.max_error = 50;
         movement_thread = new Thread(this::movementLoop);
     }
 
@@ -61,9 +62,8 @@ public abstract class LinearSlide {
      */
     private void movementLoop(){
         while (true) {
-            if ((target_pos < min_extend) || (target_pos > max_extend)){
-                Log.w("Linear Slide Error", String.format("Requested slide extension ( %.0f ticks)out of bounds.", target_pos));
-            }
+            assert target_pos < max_extend: "requested extension too high";
+            assert target_pos > min_extend: "requested extension too low";
             within_error = (Math.abs(target_pos - zero_pos) < max_error);
             if (within_error) {
                 this.stop();
