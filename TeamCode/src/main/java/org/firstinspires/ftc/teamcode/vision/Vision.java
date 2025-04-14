@@ -21,6 +21,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import kotlin.Triple;
+
 public class Vision {
     OpenCvWebcam webcam;
     SampleLocationPipeline pipeline;
@@ -67,7 +69,8 @@ public class Vision {
             if (pipeline.getAnalysis().isEmpty()) {
                 return true;
             } else if (sample == null) {
-                sample = pipeline.getAnalysis().get(0);
+                Triple<Double, Double, Double>  sample_triple = pipeline.getAnalysis().get(0);
+                sample = new Pose2d(sample_triple.getFirst(), sample_triple.getSecond(), sample_triple.getThird());
                 turn_action = drive.actionBuilder(drive.pose).turn(new Rotation2d(sample.position.y, sample.position.x).toDouble()).build();
                 intake.moveDown();
             }

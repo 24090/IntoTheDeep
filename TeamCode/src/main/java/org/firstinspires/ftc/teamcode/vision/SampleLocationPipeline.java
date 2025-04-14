@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode.vision;
-import com.acmerobotics.roadrunner.Pose2d;
+import android.annotation.SuppressLint;
 
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
@@ -10,12 +10,11 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import kotlin.Pair;
+import kotlin.Triple;
 
 public class SampleLocationPipeline extends OpenCvPipeline {
     Telemetry telemetry;
@@ -29,9 +28,10 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     final Mat empty_mat = new Mat();
     Mat hierarchy = new Mat();
     Mat greyscale = new Mat();
-    public List<Pose2d> object_field_coords = new ArrayList<>();
+    public ArrayList<Triple<Double, Double, Double>> object_field_coords = new ArrayList<>();
     final double top_distance_weight  = 0.05;
     final double top2_distance_weight = 2.4;
+
     public SampleLocationPipeline(Camera.Colors color, Telemetry telemetry) {
         Camera.init();
         this.telemetry = telemetry;
@@ -50,17 +50,15 @@ public class SampleLocationPipeline extends OpenCvPipeline {
                 break;
         }
     }
-    
+
     public SampleLocationPipeline(Telemetry telemetry){
         this(Camera.Colors.YELLOW, telemetry);
     }
 
-    public Mat processFrame(Mat input) {
-    	object_field_coords.clear();
+    private void getContours(Mat input, List<MatOfPoint> dst){
         empty_mat.copyTo(color_filtered_image);
         // Undistort
         Calib3d.undistort(input, input_undistort, Camera.camera_matrix, Camera.distortion_coefficients);
-        //input.copyTo(input_undistort);
         // Input RGB -> HSV
         Imgproc.cvtColor(input_undistort, input_undistort, Imgproc.COLOR_RGB2HSV);
         // Gets Colors From Image (Binary)
@@ -78,80 +76,98 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(color_filtered_image,greyscale, Imgproc.COLOR_HSV2RGB);
         Imgproc.cvtColor(greyscale,greyscale, Imgproc.COLOR_RGB2GRAY);
         Core.bitwise_not(greyscale, greyscale);
+
+        Imgproc.findContours(greyscale, dst, hierarchy, Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE );
+    }
+
+    private Pair<Point, Point> getTopPoints(MatOfPoint2f points2f) {
+        double top_x = 0;
+        double max_primary_score = Double.NEGATIVE_INFINITY;
+        double max_secondary_score = Double.NEGATIVE_INFINITY;
+        Point primary_top_point = null;
+        Point secondary_top_point = null;
+        double center_x = 0;
+        for(Point point: points2f.toList()){
+            center_x += point.x;
+        }
+        center_x /= points2f.size().area();
+        for(Point point: points2f.toList()){
+            // bias to be far on the x axis
+            double score = -point.y + Math.abs(center_x - point.x) * top_distance_weight;
+            if (score > max_primary_score){
+                max_primary_score = score;
+                top_x = point.x;
+                primary_top_point = point;
+            }
+        }
+        for(Point point: points2f.toList()){
+            // bias to be far on the x axis
+            double score = -point.y + Math.abs(top_x - point.x) * top2_distance_weight;
+            if (score > max_secondary_score){
+                max_secondary_score = score;
+                secondary_top_point = point;
+            }
+        }
+        return new Pair<>(primary_top_point, secondary_top_point);
+    }
+
+    private Triple<Double, Double, Double> calculateSamplePose(Point world_point_a, Point world_point_b){
+        double distance = Math.sqrt(
+                Math.pow(world_point_b.x - world_point_a.x,2)
+                        + Math.pow(world_point_b.y - world_point_a.y,2)
+        );
+
+        if (Math.abs(distance - 1.5) > 0.5 && Math.abs(distance - 3.5) > 0.5) {
+            telemetry.addData("out of range", distance);
+            return null;
+        }
+        boolean short_side = (distance < 2);
+        double angle = Math.atan((world_point_a.y - world_point_b.y)/(world_point_b.x - world_point_a.x)) + (short_side ? Math.PI/2: 0);
+        double multiplier = (short_side ? 1.5/2: 3.5/2) * (world_point_a.x < world_point_b.x ? 1: -1);
+        double world_x = (world_point_a.x + world_point_b.x)/2 + (world_point_a.y - world_point_b.y)/distance * multiplier;
+        double world_y = (world_point_a.y + world_point_b.y)/2 - (world_point_a.x - world_point_b.x)/distance * multiplier;
+
+        return new Triple<>(world_x, world_y, angle);
+    }
+
+    @SuppressLint("DefaultLocale")
+    public Mat processFrame(Mat input) {
+    	object_field_coords.clear();
         List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(greyscale, contours, hierarchy, Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE );
-        
+        getContours(input, contours);
+
         // Get coords + rotation for each contour
         int n = 0;
-        for (MatOfPoint points:contours){
+        for (MatOfPoint points: contours){
+
             n += 1;
             MatOfPoint2f points2f = new MatOfPoint2f(points.toArray());
             Imgproc.approxPolyDP(points2f, points2f, 2, true);
             List<MatOfPoint > list_points2f = new ArrayList<>();
             list_points2f.add(new MatOfPoint(points2f.toArray()));
-            Imgproc.drawContours(color_filtered_image, list_points2f, -1, new Scalar(60,255,255), 1);
-            double top_x = 0;
-            double max_top_score = Double.NEGATIVE_INFINITY;
-            double max_top2_score = Double.NEGATIVE_INFINITY;
-            Point top_point = null;
-            Point top2_point = null;
-            double center_x = 0;
-            double center_y = 0;
-            for(Point point: points2f.toList()){
-                center_x += point.x;
-                center_y += point.y;
-            };
-            center_x /= points2f.size().area() ;
-            center_y /= points2f.size().area() ;
-            for(Point point: points2f.toList()){
-                // bias to be far on the x axis
-                double score = -point.y + Math.abs(center_x - point.x) * top_distance_weight;
-                if (score > max_top_score){
-                    max_top_score = score;
-                    top_x = point.x;
-                    top_point = point;
-                }
-            };
-            for(Point point: points2f.toList()){
-                // bias to be far on the x axis
-                double score = -point.y + Math.abs(top_x - point.x) * top2_distance_weight;
-                if (score > max_top2_score){
-                    max_top2_score = score;
-                    top2_point = point;
-                }
-            };
-            Point top_world_point = Camera.uvToWorld(top_point);
-            Point top2_world_point = Camera.uvToWorld(top2_point);
-            telemetry.addLine(String.format("w1 %.2f, %.2f", top_world_point.x, top_world_point.y));
-            telemetry.addLine(String.format("c1 %.2f, %.2f", top_point.x, top_point.y));
-            telemetry.addLine(String.format("w2 %.2f, %.2f", top2_world_point.x, top2_world_point.y));
-            telemetry.addLine(String.format("c2 %.2f, %.2f", top2_point.x, top2_point.y));
 
-            double distance = Math.sqrt(
-                    Math.pow(top2_world_point.x - top_world_point.x,2)
-                  + Math.pow(top2_world_point.y - top_world_point.y,2)
-            );
-            
-            Imgproc.drawMarker(color_filtered_image, top_point, new Scalar(0,255,255));
-            Imgproc.drawMarker(color_filtered_image, top2_point, new Scalar(120+5*n,255,255));
-            if (Math.abs(distance - 1.5) > 0.5 && Math.abs(distance - 3.5) > 0.5) {
-                telemetry.addData("out of range", distance);
+            Imgproc.drawContours(color_filtered_image, list_points2f, -1, new Scalar(60,255,255), 1);
+
+            Pair<Point, Point> top_points = getTopPoints(points2f);
+            Point point_a = top_points.component1();
+            Point point_b = top_points.component2();
+            Point world_point_a = Camera.uvToWorld(point_a);
+            Point world_point_b = Camera.uvToWorld(point_b);
+
+            telemetry.addLine(String.format("w1 %.2f, %.2f", world_point_a.x, world_point_a.y));
+            telemetry.addLine(String.format("c1 %.2f, %.2f", point_a.x, point_a.y));
+            telemetry.addLine(String.format("w2 %.2f, %.2f", world_point_b.x, world_point_b.y));
+            telemetry.addLine(String.format("c2 %.2f, %.2f", point_b.x, point_b.y));
+
+            Imgproc.drawMarker(color_filtered_image, point_a, new Scalar(0,255,255));
+            Imgproc.drawMarker(color_filtered_image, point_b, new Scalar(120+5*n,255,255));
+
+            Triple<Double, Double, Double> pose = calculateSamplePose(world_point_a, world_point_b);
+            if (pose == null) {
                 continue;
             }
-            boolean short_side = (distance < 2);
-            double angle = Math.atan((top_world_point.y - top2_world_point.y)/(top2_world_point.x - top_world_point.x)) + (short_side ? Math.PI/2: 0);
-            double multiplier =
-                      (short_side ? 1.5/2: 3.5/2)
-                  * (top_world_point.x < top2_world_point.x ? 1: -1)
-                  * (center_y < (top_point.y-top2_point.y/top_point.x-top2_point.x) * (center_x-top_point.x) + top_point.y ? 1: -1);
-            double world_x = (top_world_point.x + top2_world_point.x)/2 + (top_world_point.y - top2_world_point.y)/distance * multiplier;
-            double world_y = (top_world_point.y + top2_world_point.y)/2 - (top_world_point.x - top2_world_point.x)/distance * multiplier;
-            Imgproc.putText(color_filtered_image, (short_side? "short": "long"), new Point((top_point.x + top2_point.x)/2, (top_point.y + top2_point.y)/2), Imgproc.FONT_HERSHEY_PLAIN, 1, new Scalar(80,255,20), 1);
-            Imgproc.putText(color_filtered_image, String.format("%.1f", distance), top_point, Imgproc.FONT_HERSHEY_PLAIN, 1, new Scalar(80,255,20), 1);
-            Pose2d pose = new Pose2d(world_x, world_y, angle);
             object_field_coords.add(pose);
-            telemetry.addData("x, y, θ", String.format("%.1f, %.1f, %.2f", world_x, world_y, angle));
-
+            telemetry.addData("x, y, θ", String.format("%.1f, %.1f, %.2f", pose.getFirst(), pose.getSecond(), pose.getThird()));
         }
         switch(stage){
             case 4:
@@ -162,9 +178,6 @@ public class SampleLocationPipeline extends OpenCvPipeline {
                 break;
             case 2:
                 color_mask.copyTo(output);
-                break;
-            case 1:
-                input_undistort.copyTo(output);
                 break;
             default:
                 input_undistort.copyTo(output);
@@ -177,7 +190,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         return output;
     }
 
-    public List<Pose2d> getAnalysis(){
+    public ArrayList<Triple<Double, Double, Double>> getAnalysis(){
         return object_field_coords;
-    };
+    }
 }

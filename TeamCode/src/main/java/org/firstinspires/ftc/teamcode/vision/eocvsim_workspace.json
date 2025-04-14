@@ -1,7 +1,7 @@
 {
   "sourcesPath": ".",
   "resourcesPath": ".",
-  "excludedPaths": [],
+  "excludedPaths": ["OpenCVTesting.java", "Vision.java"],
   "excludedFileExtensions": [],
   "eocvSimVersion": "3.7.1"
 }
