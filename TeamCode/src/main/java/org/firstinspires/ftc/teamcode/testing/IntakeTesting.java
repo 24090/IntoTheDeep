@@ -13,24 +13,18 @@ public class IntakeTesting extends LinearOpMode {
     Intake intake;
     public void runOpMode() throws InterruptedException {
         intake = new Intake(hardwareMap);
+        intake.linear_slide.startThread();
         waitForStart();
         while (opModeIsActive()){
-//            intake_servo_b.setPosition(0.5);
-//            intake_servo_a2.setPosition(0.7);
-//            intake_servo_a1.setPosition(0);
-//            intake_servo_a2.setPosition(0);
-//            sleep((long) 1000);
-//            intake_servo_b.setPosition(0);
-//            sleep((long) 1000);
-//            intake_servo_b.setPosition(0.5);
-//            intake_servo_a1.setPosition(0.7);
-//            sleep((long) 1000);
-//            intake_servo_b.setPosition(1);
-//            sleep((long) 1000);
-            if (gamepad1.dpad_left){
+            if (gamepad1.dpad_down){
                 intake.moveDown();
-            } else if (gamepad1.dpad_right){
+            } else if (gamepad1.dpad_up){
                 intake.moveUp();
+            }
+            if (gamepad1.dpad_left) {
+                intake.linear_slide.moveIn();
+            } else if (gamepad1.dpad_right) {
+                intake.linear_slide.moveOut();
             }
             if (gamepad1.y){
                 intake.grab();
@@ -39,17 +33,11 @@ public class IntakeTesting extends LinearOpMode {
             } else if (gamepad1.a){
                 intake.release();
             }
-            if (gamepad1.right_bumper){
-                intake.transferSample();
-            } else if (gamepad1.left_bumper){
-                intake.slideOut();
-            } else {
-                intake.slideStop();
-            }
             telemetry.addData("pos", intake.linear_slide.getPosition());
             telemetry.update();
         }
+        intake.linear_slide.stopThread();
     }
-
+    public void
 
 }

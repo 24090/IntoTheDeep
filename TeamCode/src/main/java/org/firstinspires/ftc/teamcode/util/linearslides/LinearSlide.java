@@ -5,9 +5,10 @@ import android.util.Log;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 public abstract class LinearSlide {
-    public DcMotor motor;
-    private double min_extend;
-    private double max_extend;
+    protected DcMotor motor;
+
+    private final double min_extend;
+    private final double max_extend;
     private double zero_pos;
     public double max_error;
     public double target_pos;
@@ -19,12 +20,15 @@ public abstract class LinearSlide {
      * @param motor the motor attached to the slide
      * @param max_extend the furthest value the slide can extend to
      * @param min_extend the lowest value the slide extends to
+     * @param max_error the initial allowed distance (in ticks) from the target position
+     * @param target_pos target_pos the initial encoder position to target
      */
-    public LinearSlide(DcMotor motor, double max_extend, double min_extend, double target_pos, double max_error) {
+    public LinearSlide(DcMotor motor, double min_extend, double max_extend, double target_pos, double max_error) {
+        assert(max_extend > min_extend);
         this.motor = motor;
-        this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.min_extend = min_extend;
         this.max_extend = max_extend;
+        this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.target_pos = target_pos;
         this.max_error = max_error;
         movement_thread = new Thread(this::movementLoop);
@@ -36,6 +40,7 @@ public abstract class LinearSlide {
     public void stop(){
         motor.setPower(0);
     }
+
     /**
      * Starts the movement thread. To actually stop the motor, make sure to call stop() after this.
      */
@@ -61,10 +66,10 @@ public abstract class LinearSlide {
      */
     private void movementLoop(){
         while (true) {
-            if ((target_pos < min_extend) || (target_pos > max_extend)){
-                Log.w("Linear Slide Error", String.format("Requested slide extension ( %.0f ticks)out of bounds.", target_pos));
-            }
-            within_error = (Math.abs(target_pos - zero_pos) < max_error);
+            assert(target_pos <= max_extend);
+            assert(target_pos >= min_extend);
+
+            this.within_error = (Math.abs(target_pos - getPosition()) < max_error);
             if (within_error) {
                 this.stop();
             } else {
@@ -80,6 +85,7 @@ public abstract class LinearSlide {
     public void setZero(){
         zero_pos = motor.getCurrentPosition();
     }
+
     /**
      * Gets the position of the slide, adjusted based on runtime-set zero position
      * @return the position of the slide
@@ -87,6 +93,7 @@ public abstract class LinearSlide {
     public double getPosition(){
         return (motor.getCurrentPosition() - zero_pos);
     }
+
     /**
      * Sets the slide to run towards a certain position asynchronously
      * @param pos the position to run to, in ticks
@@ -96,6 +103,7 @@ public abstract class LinearSlide {
         target_pos = pos;
         max_error = err;
     }
+
     /**
      * Waits for movement. This is breaking, so avoid using this when possible
      */

@@ -14,6 +14,7 @@ public class OuttakeTesting extends LinearOpMode {
     Outtake outtake;
     public void runOpMode() throws InterruptedException {
         outtake = new Outtake(hardwareMap);
+        outtake.linear_slide.startThread();
         waitForStart();
         while (opModeIsActive()){
             if (gamepad1.dpad_left){
@@ -38,6 +39,7 @@ public class OuttakeTesting extends LinearOpMode {
             telemetry.addData("pos", outtake.linear_slide.getPosition());
             telemetry.update();
         }
+        outtake.linear_slide.stopThread();
     }
 
 

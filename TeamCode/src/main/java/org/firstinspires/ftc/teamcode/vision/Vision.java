@@ -1,8 +1,4 @@
 package org.firstinspires.ftc.teamcode.vision;
-
-import static org.firstinspires.ftc.teamcode.vision.OpenCVTesting.STREAM_HEIGHT;
-import static org.firstinspires.ftc.teamcode.vision.OpenCVTesting.STREAM_WIDTH;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -24,6 +20,8 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import kotlin.Triple;
 
 public class Vision {
+    int STREAM_WIDTH= 640;
+    int STREAM_HEIGHT = 480;
     OpenCvWebcam webcam;
     SampleLocationPipeline pipeline;
     Intake intake;

@@ -45,9 +45,9 @@ public class Intake {
         intake_servo_b.setPosition(0.7);
     }
     public void slideOut(){
-        linear_slide.moveIn();
+        linear_slide.moveOut();
     }
-    public void slideIn(){linear_slide.moveOut();}
+    public void slideIn(){linear_slide.moveIn();}
     public void slideTo(double pos){linear_slide.goTo(pos, linear_slide.max_error);}
     public void transferSample(){
         this.hold();
