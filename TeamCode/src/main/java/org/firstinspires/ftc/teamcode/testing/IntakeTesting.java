@@ -38,6 +38,5 @@ public class IntakeTesting extends LinearOpMode {
         }
         intake.linear_slide.stopThread();
     }
-    public void
 
 }
