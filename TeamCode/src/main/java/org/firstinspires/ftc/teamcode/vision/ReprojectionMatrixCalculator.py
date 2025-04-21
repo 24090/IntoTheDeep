@@ -1,14 +1,12 @@
 import numpy as np, scipy
-import time
-from test.test_pty import write_all
-from test.support.asyncore import write
+
 res_scale = 1
 
-focal_length       = (822.317, 822.317)
-principal_point    = (319.495, 242.502)
-rotation_xyz_euler = [0.9484934556, 0, 0]
-degrees            = False
-position           = [0, 0, 13 - 1.5]
+focal_length       = (949.6227507184656, 957.9661574332396)
+principal_point    = (339.1850436493005, 218.54786213428162)
+rotation_xyz_euler = [50, 0, 0]
+degrees            = True
+position           = [0, 0, 14.77035 - 1.5]
 
 # find intrinsics matrix
 intrinsics_matrix = np.asarray([
@@ -33,10 +31,15 @@ extrinsics_matrix = homogenous_transformation_matrix[:-1]
 projection_matrix = (intrinsics_matrix @ extrinsics_matrix)
 reprojection_matrix = np.linalg.inv(projection_matrix[:, [0,1,3]])
 # generate code to make it
-code = "\t\t// generated with ReprojectionMatrixCalculator.py\n"
+code = "// generated with ReprojectionMatrixCalculator.py\n"
 for row_num in range(3):
 	code += f"\t\tm1.put({row_num}, 0, {reprojection_matrix[row_num][0]: e}); m1.put({row_num}, 1, {reprojection_matrix[row_num][1]: e}); m1.put({row_num}, 2, {reprojection_matrix[row_num][2]: e});\n"
+code += "\n"
+for row_num in range(3):
+	code += f"\t\tm2.put({row_num}, 0, {intrinsics_matrix[row_num][0]: e}); m2.put({row_num}, 1, {intrinsics_matrix[row_num][1]: e}); m2.put({row_num}, 2, {intrinsics_matrix[row_num][2]: e});\n"
+
 print(code)
+
 # test functions
 def project(x, y, z):
 	v = projection_matrix @ [x, y, z, 1]
@@ -51,7 +54,7 @@ def reproject(u, v):
 text = open("Camera.java", "r").read()
 text = text.split("// generated with ReprojectionMatrixCalculator.py")
 text[1] = text[1].split("\n")
-text[1] = text[1][4:]
+text[1] = text[1][9:]
 text[1] = "\n".join(text[1])
 text = code.join(text)
 print(code)

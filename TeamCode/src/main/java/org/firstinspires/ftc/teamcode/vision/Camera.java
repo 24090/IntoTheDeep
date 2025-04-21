@@ -19,33 +19,27 @@ public class Camera {
     public static void init(){
         // Matrix Creation
         Mat m1 = new Mat(3, 3, 6 );
-		
-		// generated with ReprojectionMatrixCalculator.py
-		m1.put(0, 0,  1.216076e-03); m1.put(0, 1,  6.948339e-20); m1.put(0, 2, -3.885302e-01);
-		m1.put(1, 0,  0.000000e+00); m1.put(1, 1,  7.088603e-04); m1.put(1, 2, -9.844383e-01);
-		m1.put(2, 0, -0.000000e+00); m1.put(2, 1, -8.592246e-05); m1.put(2, 2, -2.985127e-02);
-        m1.copyTo(reprojection_matrix);
-
-        double focal_length_x = 822.317;
-        double focal_length_y = 822.317;
-        double principal_point_x = 319.495;
-        double principal_point_y = 242.502;
         Mat m2 = new Mat(3, 3, 6);
-        m2.put(0, 0, focal_length_x); m2.put(0, 1, 0);     m2.put(0, 2, principal_point_x);
-        m2.put(1, 0, 0);     m2.put(1, 1, focal_length_y); m2.put(1, 2, principal_point_y);
-        m2.put(2, 0, 0);     m2.put(2, 1, 0);     m2.put(2, 2, 1);
-        m2.copyTo(camera_matrix);
+		Mat m3 = new Mat(1, 5, 6);
 
-        Mat m3 = new Mat(1, 8, 6);
-        m3.put(0, 0, -0.0449369);
-        m3.put(0, 1, 1.17277);
-        m3.put(0, 2, 0);
-        m3.put(0, 3, 0);
-        m3.put(0, 4, -3.63244);
-        m3.put(0, 5, 0);
-        m3.put(0, 6, 0);
-        m3.put(0, 7, 0);
-        m3.copyTo(distortion_coefficients);
+		// generated with ReprojectionMatrixCalculator.py
+		m1.put(0, 0,  1.053050e-03); m1.put(0, 1,  1.690219e-20); m1.put(0, 2, -3.571787e-01);
+		m1.put(1, 0,  0.000000e+00); m1.put(1, 1,  6.709920e-04); m1.put(1, 2, -9.126883e-01);
+		m1.put(2, 0, -0.000000e+00); m1.put(2, 1, -6.025893e-05); m1.put(2, 2, -3.526842e-02);
+
+		m2.put(0, 0,  9.496228e+02); m2.put(0, 1,  0.000000e+00); m2.put(0, 2,  3.391850e+02);
+		m2.put(1, 0,  0.000000e+00); m2.put(1, 1,  9.579662e+02); m2.put(1, 2,  2.185479e+02);
+		m2.put(2, 0,  0.000000e+00); m2.put(2, 1,  0.000000e+00); m2.put(2, 2,  1.000000e+00);
+
+		m3.put(0, 0, 0.1947389099586247);
+		m3.put(0, 1, -0.4378239199371739);
+		m3.put(0, 2, -0.006919984229621114);
+		m3.put(0, 3, 0.005882513339448832);
+		m3.put(0, 4, -0.8125853302687356);
+
+		m1.copyTo(reprojection_matrix);
+		m2.copyTo(camera_matrix);
+		m3.copyTo(distortion_coefficients);
 
     }
 
