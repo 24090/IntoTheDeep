@@ -8,48 +8,37 @@ import org.firstinspires.ftc.teamcode.util.Claw;
 public class ClawTesting extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Claw claw = new Claw(this, hardwareMap);
-        double i = 0.13;
-        double j = 0.72;
-        claw.elbow1ServoSetPosition(i);
-        claw.elbow2ServoSetPosition(j);
+        Claw claw = new Claw(hardwareMap);
+        double r = 0;
+        claw.rotateClaw(0);
+        claw.toTransferPos();
+        claw.release();
         waitForStart();
+        double last_time = 0.0;
         while(opModeIsActive()){
-            /*if (gamepad1.dpad_up){
-                if (i<1){
-                    i = i+0.01;
-                    sleep(50);
-                }
+            if (gamepad1.dpad_up){
+                r += 2 * (last_time - time);
+                claw.rotateClaw(r);
             }
             if (gamepad1.dpad_down){
-                if (0<i){
-                    i = i-0.01;
-                    sleep(50);
-                }
-            }
-            if (gamepad1.y){
-                if (j<1){
-                    j = j+0.01;
-                    sleep(50);
-                }
+                r -= 2 * (last_time - time);
+                claw.rotateClaw(r);
             }
             if (gamepad1.a){
-                if (0<j){
-                    j = j-0.01;
-                    sleep(50);
-                }
-            }*/
-            if (gamepad1.a){
-                claw.elbow1ServoSetPosition(0.13);
-                claw.elbow2ServoSetPosition(0.72);
+                claw.toGrabPos();
             }
             if (gamepad1.b){
-                claw.elbow1ServoSetPosition(0.9);
-                claw.elbow2ServoSetPosition(0.03);
+                claw.toTransferPos();
             }
-            telemetry.addData("pos1", i);
-            telemetry.addData("pos2", j);
+            if (gamepad1.x){
+                claw.grab();
+            }
+            if (gamepad1.y){
+                claw.release();
+            }
+            telemetry.addData("rotation", r);
             telemetry.update();
+            last_time = time;
         }
     }
 }
