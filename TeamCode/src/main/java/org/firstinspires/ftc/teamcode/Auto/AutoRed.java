@@ -12,24 +12,19 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.MechanismActions;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous(name = "AutoRed", group = "auto")
 public class AutoRed extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
         // HW stuff
         Intake intake = new Intake(hardwareMap);
         Outtake outtake = new Outtake(hardwareMap);
-        MechanismActions ma = new MechanismActions(intake, outtake, this);
         outtake.linear_slide.startThread();
         intake.linear_slide.startThread();
         // same as meepmeep
@@ -45,7 +40,7 @@ public class AutoRed extends LinearOpMode {
         // this line ≠ meepmeep
         Action path = drive.actionBuilder(start_pose)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                .stopAndAdd(new ParallelAction(ma.ScoreAction(), intake.readyGrabAction(InnerDistance.norm(), InnerDistance.angleCast().toDouble())))
+                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(InnerDistance.norm(), InnerDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, InnerDistance.angleCast().toDouble(), new VelConstraint() {
                     @Override
@@ -56,7 +51,7 @@ public class AutoRed extends LinearOpMode {
                 .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
-                .stopAndAdd(new ParallelAction(ma.ScoreAction(), intake.readyGrabAction(CenterDistance.norm() - 2, CenterDistance.angleCast().toDouble())))
+                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm() - 2, CenterDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble(), new VelConstraint() {
                     @Override
@@ -67,7 +62,7 @@ public class AutoRed extends LinearOpMode {
                 .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1.5, 1.5)), PI/4 + 0.1)
-                .stopAndAdd(new ParallelAction(ma.ScoreAction(), intake.readyGrabAction(OuterDistance.norm() - 2, InnerDistance.angleCast().toDouble())))
+                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm() - 2, InnerDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, OuterDistance.angleCast().toDouble(), new VelConstraint() {
                     @Override
@@ -79,7 +74,7 @@ public class AutoRed extends LinearOpMode {
                 .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1, 1)), PI/4 + 0.1)
-                .stopAndAdd(ma.FullScoreAction())
+                .stopAndAdd(outtake.fullScoreAction())
                 .build();
         // these lines ≠ meepmeep
         waitForStart();

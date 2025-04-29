@@ -17,14 +17,11 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 //import org.firstinspires.ftc.teamcode.util.ColorDistance;
 import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.MechanismActions;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.vision.Vision;
@@ -45,7 +42,6 @@ public class Controlled extends LinearOpMode{
         Intake intake = new Intake(hardwareMap);
         Outtake outtake;
         outtake = new Outtake(hardwareMap);
-        MechanismActions actions = new MechanismActions(intake,outtake,this);
         Thread t = new Thread(() -> {
             while (opModeIsActive()){
                 if (intake.linear_slide.getPosition() > 100){
@@ -74,8 +70,8 @@ public class Controlled extends LinearOpMode{
                                     return pose2dDual.value().position.minus(score_pose.position).norm() < 24 ? 30 : 100;
                                 }
                             })
-                            .afterDisp(score_pose.position.minus(drive.pose.position).norm() - 12, actions.OuttakeSlideUpAction())
-                            .stopAndAdd(actions.ScoreAction())
+                            .afterDisp(score_pose.position.minus(drive.pose.position).norm() - 12, outtake.slideUpAction())
+                            .stopAndAdd(outtake.scoreAction())
                             .build();
                 }else if (next_auto_action == 1){
                     auto_action = vision.LookAtSample();
@@ -114,9 +110,9 @@ public class Controlled extends LinearOpMode{
                 intake.claw.open();
             }
             if (gamepad1.y){
-                Actions.runBlocking(actions.OuttakeSlideUpAction());
+                Actions.runBlocking(outtake.slideUpAction());
             } else if (gamepad1.a){
-                Actions.runBlocking(actions.OuttakeSlideDownAction());
+                Actions.runBlocking(outtake.slideDownAction());
             } else if (gamepad1.b){
                 outtake.open();
             } else if (gamepad1.x){

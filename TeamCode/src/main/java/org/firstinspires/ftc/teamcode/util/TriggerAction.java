@@ -14,7 +14,7 @@ public class TriggerAction implements Action {
      * Creates a new action that ends when condition is true
      * @param condition
      */
-    TriggerAction(Supplier<Boolean> condition) {
+    public TriggerAction(Supplier<Boolean> condition) {
         this.condition = condition;
     }
     @Override

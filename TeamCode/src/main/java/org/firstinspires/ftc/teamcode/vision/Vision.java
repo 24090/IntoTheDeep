@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.Rotation2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -16,6 +17,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
+
+import java.lang.ref.Reference;
 
 import kotlin.Triple;
 
@@ -58,6 +61,24 @@ public class Vision {
                 }
         );
     }
+//    public class FindSample implements Action {
+////        Pose2d[] sample_out;
+////        FindSample(Pose2d[1] relative_sample_out){
+////            this.sample_out = relative_sample_out;
+////        }
+////
+////        @Override
+////        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+////            if (pipeline.getAnalysis().isEmpty()) {
+////                return true;
+////            }
+////            Triple<Double, Double, Double>  sample_triple = pipeline.getAnalysis().get(0);
+////            sample_out.heading = Rotation2d.fromDouble(sample_triple.getThird());
+////            sample_
+////                    new Pose2d(sample_triple.getFirst(), sample_triple.getSecond(), sample_triple.getThird());
+////            return false;
+//        }
+//    }
     public class LookAtSample implements Action {
         Pose2d sample = null;
         boolean turned = false;
@@ -76,7 +97,7 @@ public class Vision {
                 turned = !turn_action.run(telemetryPacket);
                 return true;
             }
-            intake.linear_slide.goTo(intake.linear_slide.inToTicks(Math.max(Math.min(sample.position.norm() - 4, GameMap.MinIntakeDistance), GameMap.MaxIntakeDistance)), 50);
+            intake.linear_slide.goTo(intake.linear_slide.inToTicks(Math.max(Math.min(sample.position.norm() - 4, GameMap.MinIntakeDistance), GameMap.MaxIntakeDistance)));
             return !intake.linear_slide.within_error;
         }
     }

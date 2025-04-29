@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.util.linearslides;
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -35,11 +31,11 @@ public class OuttakeSlide extends LinearSlide {
         }
     }
 
-    public void moveDown(){
-        this.goTo(0, 50);
+    public void down(){
+        this.goTo(0);
     }
 
-    public void moveUp(){
-        this.goTo(5000, 50);
+    public void up(){
+        this.goTo(5000);
     }
 }

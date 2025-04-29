@@ -21,10 +21,10 @@ public class IntakeSlide extends LinearSlide {
         this.motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public void moveIn(){
-        goTo(0, 50);
+        goTo(0);
     }
     public void moveOut(){
-        goTo(1000, 50);
+        goTo(1000);
     }
 
     public double powerFunction(){

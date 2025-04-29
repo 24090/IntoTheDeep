@@ -2,7 +2,12 @@ package org.firstinspires.ftc.teamcode.util.linearslides;
 
 import android.util.Log;
 
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.teamcode.util.TriggerAction;
 
 public abstract class LinearSlide {
     protected DcMotor motor;
@@ -69,7 +74,7 @@ public abstract class LinearSlide {
             assert(target_pos <= max_extend);
             assert(target_pos >= min_extend);
 
-            this.within_error = (Math.abs(target_pos - getPosition()) < max_error);
+            within_error = (Math.abs(target_pos - getPosition()) < max_error);
             if (within_error) {
                 this.stop();
             } else {
@@ -104,10 +109,12 @@ public abstract class LinearSlide {
         max_error = err;
     }
 
+    public void goTo(double pos){
+        target_pos = pos;
+    }
+
     /**
      * Waits for movement. This is breaking, so avoid using this when possible
      */
-    public void waitForMovement(){
-        while (!within_error){}
-    }
+    public void waitForMovement(){while (!within_error);}
 }

@@ -1,11 +1,7 @@
 package org.firstinspires.ftc.teamcode.testing;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.util.Outtake;
 
@@ -23,17 +19,17 @@ public class OuttakeTesting extends LinearOpMode {
                 outtake.close();
             }
             if (gamepad1.dpad_up){
-                outtake.up();
+                outtake.linear_slide.up();
             } else if (gamepad1.dpad_down){
-                outtake.down();
+                outtake.linear_slide.down();
             }
             if (gamepad1.left_bumper){
                 outtake.close();
                 wait(300);
-                outtake.down();
+                outtake.linear_slide.down();
             }
             if (gamepad1.right_bumper){
-                outtake.up();
+                outtake.linear_slide.up();
                 outtake.open();
             }
             telemetry.addData("pos", outtake.linear_slide.getPosition());

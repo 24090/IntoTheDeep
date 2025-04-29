@@ -26,7 +26,7 @@ public class Intake {
     public void readyGrab(double linear_slide_to_in, double claw_rotation){
         claw.open();
         claw.toGrabPos();
-        linear_slide.goTo(linear_slide.inToTicks(linear_slide_to_in), linear_slide.max_error);
+        linear_slide.goTo(linear_slide.inToTicks(linear_slide_to_in));
 
     }
 
