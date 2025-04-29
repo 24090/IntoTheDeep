@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class OuttakeSlide extends LinearSlide {
-    private static final double MAX_EXTEND = 5050;
-    private static final double MIN_EXTEND = 0;
+    public static final double MAX_EXTEND = 5050;
+    public static final double MIN_EXTEND = 0;
 
     /**
      * Class for using the Outtake slide

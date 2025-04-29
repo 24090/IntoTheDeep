@@ -5,9 +5,13 @@ import android.util.Log;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.util.TriggerAction;
+
+import java.util.function.Supplier;
 
 public abstract class LinearSlide {
     protected DcMotor motor;
@@ -81,7 +85,6 @@ public abstract class LinearSlide {
                 motor.setPower(powerFunction());
             }
         }
-
     }
 
     /**

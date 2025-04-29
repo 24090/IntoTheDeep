@@ -25,7 +25,7 @@ public class AutoRed extends LinearOpMode {
         // HW stuff
         Intake intake = new Intake(hardwareMap);
         Outtake outtake = new Outtake(hardwareMap);
-        outtake.linear_slide.startThread();
+        outtake.slide.startThread();
         intake.linear_slide.startThread();
         // same as meepmeep
         final Pose2d start_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(24.5 + GameMap.RobotWidth / 2, GameMap.RobotLength / 2)), PI / 2);
@@ -81,6 +81,6 @@ public class AutoRed extends LinearOpMode {
         Actions.runBlocking(path);
         PoseStorer.pose = drive.pose;
         intake.linear_slide.stopThread();
-        outtake.linear_slide.stopThread();
+        outtake.slide.stopThread();
     }
 }

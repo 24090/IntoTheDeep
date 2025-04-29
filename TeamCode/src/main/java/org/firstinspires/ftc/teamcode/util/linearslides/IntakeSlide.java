@@ -9,12 +9,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.util.GameMap;
 
+import java.util.function.Supplier;
+
 public class IntakeSlide extends LinearSlide {
-    private static final double MAX_EXTEND = 1200;
-    private static final double MIN_EXTEND = 0;
+    public static final double MAX_EXTEND = 1200;
+    public static final double MIN_EXTEND = 0;
     /**
      * Class for using Intake Slide
      * @param hwmap the hardware map, used to find the motor
+     * @param thread_ender end the loop when the function returns true
      */
     public IntakeSlide(HardwareMap hwmap) {
         super(hwmap.get(DcMotor.class, "intake_motor"), MIN_EXTEND, MAX_EXTEND, 0, 50);

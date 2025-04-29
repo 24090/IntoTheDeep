@@ -10,7 +10,7 @@ public class OuttakeTesting extends LinearOpMode {
     Outtake outtake;
     public void runOpMode() throws InterruptedException {
         outtake = new Outtake(hardwareMap);
-        outtake.linear_slide.startThread();
+        outtake.slide.startThread();
         waitForStart();
         while (opModeIsActive()){
             if (gamepad1.dpad_left){
@@ -19,23 +19,21 @@ public class OuttakeTesting extends LinearOpMode {
                 outtake.close();
             }
             if (gamepad1.dpad_up){
-                outtake.linear_slide.up();
+                outtake.slide.up();
             } else if (gamepad1.dpad_down){
-                outtake.linear_slide.down();
+                outtake.down();
             }
             if (gamepad1.left_bumper){
-                outtake.close();
-                wait(300);
-                outtake.linear_slide.down();
+                outtake.down();
             }
             if (gamepad1.right_bumper){
-                outtake.linear_slide.up();
+                outtake.slide.up();
                 outtake.open();
             }
-            telemetry.addData("pos", outtake.linear_slide.getPosition());
+            telemetry.addData("pos", outtake.slide.getPosition());
             telemetry.update();
         }
-        outtake.linear_slide.stopThread();
+        outtake.slide.stopThread();
     }
 
 
