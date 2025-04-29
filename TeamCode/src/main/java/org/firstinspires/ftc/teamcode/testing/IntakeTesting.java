@@ -17,9 +17,9 @@ public class IntakeTesting extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
             if (gamepad1.dpad_down){
-                intake.moveDown();
+                intake.claw.toGrabPos();
             } else if (gamepad1.dpad_up){
-                intake.moveUp();
+                intake.claw.toTransferPos();
             }
             if (gamepad1.dpad_left) {
                 intake.linear_slide.moveIn();
@@ -27,11 +27,9 @@ public class IntakeTesting extends LinearOpMode {
                 intake.linear_slide.moveOut();
             }
             if (gamepad1.y){
-                intake.grab();
-            } else if (gamepad1.x){
-                intake.hold();
-            } else if (gamepad1.a){
-                intake.release();
+                intake.claw.grab();
+            }else if (gamepad1.a){
+                intake.claw.open();
             }
             telemetry.addData("pos", intake.linear_slide.getPosition());
             telemetry.update();

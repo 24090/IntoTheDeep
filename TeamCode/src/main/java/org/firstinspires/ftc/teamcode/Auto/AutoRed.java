@@ -45,33 +45,29 @@ public class AutoRed extends LinearOpMode {
         // this line ≠ meepmeep
         Action path = drive.actionBuilder(start_pose)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                .stopAndAdd(new ParallelAction(ma.ScoreAction(), ma.ReadyGrabAction(InnerDistance.norm())))
+                .stopAndAdd(new ParallelAction(ma.ScoreAction(), intake.readyGrabAction(InnerDistance.norm(), InnerDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, InnerDistance.angleCast().toDouble(), new VelConstraint() {
                     @Override
                     public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
                         return 20;
                     }})
-                .stopAndAdd(ma.GrabSpinAction())
-                .setTangent(0)
-                .strafeTo(neutral_spike_mark_position.plus(InnerDistance.div(InnerDistance.norm()).angleCast().times(new Vector2d(7, 0))))
-                .stopAndAdd(ma.FullTransferAction())
+                .stopAndAdd(new InstantAction(intake.claw::grab))
+                .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
-                .stopAndAdd(new ParallelAction(ma.ScoreAction(), ma.ReadyGrabAction(CenterDistance.norm() - 2)))
+                .stopAndAdd(new ParallelAction(ma.ScoreAction(), intake.readyGrabAction(CenterDistance.norm() - 2, CenterDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble(), new VelConstraint() {
                     @Override
                     public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
                         return 10;
                     }})
-                .stopAndAdd(ma.GrabSpinAction())
-                .setTangent(0)
-                .strafeTo(neutral_spike_mark_position.plus(CenterDistance.div(CenterDistance.norm()).angleCast().times(new Vector2d(7, 0))))
-                .stopAndAdd(ma.FullTransferAction())
+                .stopAndAdd(new InstantAction(intake.claw::grab))
+                .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1.5, 1.5)), PI/4 + 0.1)
-                .stopAndAdd(new ParallelAction(ma.ScoreAction(), ma.ReadyGrabAction(OuterDistance.norm() - 2)))
+                .stopAndAdd(new ParallelAction(ma.ScoreAction(), intake.readyGrabAction(OuterDistance.norm() - 2, InnerDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, OuterDistance.angleCast().toDouble(), new VelConstraint() {
                     @Override
@@ -79,10 +75,8 @@ public class AutoRed extends LinearOpMode {
                         return 20;
                     }}
                 )
-                .stopAndAdd(ma.GrabSpinAction())
-                .setTangent(0)
-                .strafeTo(neutral_spike_mark_position.plus(OuterDistance.div(OuterDistance.norm()).angleCast().times(new Vector2d(7, 0))))
-                .stopAndAdd(ma.FullTransferAction())
+                .stopAndAdd(new InstantAction(intake.claw::grab))
+                .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1, 1)), PI/4 + 0.1)
                 .stopAndAdd(ma.FullScoreAction())

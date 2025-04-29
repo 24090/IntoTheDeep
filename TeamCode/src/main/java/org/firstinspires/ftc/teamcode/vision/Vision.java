@@ -70,13 +70,13 @@ public class Vision {
                 Triple<Double, Double, Double>  sample_triple = pipeline.getAnalysis().get(0);
                 sample = new Pose2d(sample_triple.getFirst(), sample_triple.getSecond(), sample_triple.getThird());
                 turn_action = drive.actionBuilder(drive.pose).turn(new Rotation2d(sample.position.y, sample.position.x).toDouble()).build();
-                intake.moveDown();
+                intake.readyGrab(GameMap.MinIntakeDistance, sample.heading.toDouble());
             }
             if (!turned) {
                 turned = !turn_action.run(telemetryPacket);
                 return true;
             }
-            intake.slideTo(intake.linear_slide.inToTicks(Math.max(Math.min(sample.position.norm() - 4, GameMap.MinIntakeDistance), GameMap.MaxIntakeDistance)));
+            intake.linear_slide.goTo(intake.linear_slide.inToTicks(Math.max(Math.min(sample.position.norm() - 4, GameMap.MinIntakeDistance), GameMap.MaxIntakeDistance)), 50);
             return !intake.linear_slide.within_error;
         }
     }

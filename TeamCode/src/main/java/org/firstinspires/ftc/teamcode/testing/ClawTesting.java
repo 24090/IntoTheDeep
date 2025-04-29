@@ -12,7 +12,7 @@ public class ClawTesting extends LinearOpMode {
         double r = 0;
         claw.rotateClaw(0);
         claw.toTransferPos();
-        claw.release();
+        claw.open();
         waitForStart();
         double last_time = 0.0;
         while(opModeIsActive()){
@@ -34,7 +34,7 @@ public class ClawTesting extends LinearOpMode {
                 claw.grab();
             }
             if (gamepad1.y){
-                claw.release();
+                claw.open();
             }
             telemetry.addData("rotation", r);
             telemetry.update();

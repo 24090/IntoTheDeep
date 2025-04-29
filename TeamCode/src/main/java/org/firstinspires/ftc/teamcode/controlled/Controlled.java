@@ -66,7 +66,7 @@ public class Controlled extends LinearOpMode{
                 Action auto_action = null;
                 if (next_auto_action == 2) {
                     auto_action = drive.actionBuilder(drive.pose)
-                            .stopAndAdd(actions.FullTransferAction())
+                            .stopAndAdd(intake.fullTransferAction())
                             .setTangent(0)
                             .strafeToSplineHeading(score_pose.position, score_pose.heading, new VelConstraint() {
                                 @Override
@@ -81,7 +81,7 @@ public class Controlled extends LinearOpMode{
                     auto_action = vision.LookAtSample();
                 } else if (next_auto_action == 0){
                     auto_action = drive.actionBuilder(drive.pose)
-                            .stopAndAdd(actions.ReadyTransferAction())
+                            .stopAndAdd(intake.readyTransferAction())
                             .setTangent(0)
                             .strafeToSplineHeading(GameMap.SubmersibleRedEdge.minus(new Vector2d(GameMap.RobotLength + 28,-24)), 0)
                             .setTangent(0)
@@ -101,16 +101,17 @@ public class Controlled extends LinearOpMode{
 
             }
             if (gamepad1.left_bumper){
-                Actions.runBlocking(actions.ReadyGrabAction(gamepad1.left_trigger * (GameMap.MaxIntakeDistance - GameMap.MinIntakeDistance) + GameMap.MinIntakeDistance));
+                intake.readyGrab(
+                        gamepad1.left_trigger * (GameMap.MaxIntakeDistance - GameMap.MinIntakeDistance),
+                        0 // TODO: Claw rotation
+                );
             } else if (gamepad1.right_bumper){
-                Actions.runBlocking(actions.FullTransferAction());
+                intake.readyTransfer();
             }
             if (gamepad1.dpad_up){
-                intake.grab();
+                intake.claw.grab();
             } else if (gamepad1.dpad_down){
-                intake.release();
-            } else {
-                intake.stop();
+                intake.claw.open();
             }
             if (gamepad1.y){
                 Actions.runBlocking(actions.OuttakeSlideUpAction());

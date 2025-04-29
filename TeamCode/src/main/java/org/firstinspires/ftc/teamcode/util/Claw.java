@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,16 +12,16 @@ public class Claw {
     ServoImplEx elbow_servo_left;
     ServoImplEx elbow_servo_right;
 
-    public int ELBOW_LEFT_IN = 950;
-    public int ELBOW_LEFT_OUT = 2000;
-    public int ELBOW_RIGHT_IN = 2250;
-    public int ELBOW_RIGHT_OUT = 1200;
-    public int WRIST_MOVEMENT_IN = 1600;
-    public int WRIST_MOVEMENT_OUT = 2250;
-    public int WRIST_TURRET_NEG90 = 1000;
-    public int WRIST_TURRET_90 = 2200;
-    public int CLAW_OPEN = 1700;
-    public int CLAW_CLOSED = 1350;
+    public static final int ELBOW_LEFT_IN = 950;
+    public static final int ELBOW_LEFT_OUT = 2000;
+    public static final int ELBOW_RIGHT_IN = 2250;
+    public static final int ELBOW_RIGHT_OUT = 1200;
+    public static final int WRIST_MOVEMENT_IN = 1600;
+    public static final int WRIST_MOVEMENT_OUT = 2250;
+    public static final int WRIST_TURRET_NEG90 = 1000;
+    public static final int WRIST_TURRET_90 = 2200;
+    public static final int CLAW_OPEN = 1700;
+    public static final int CLAW_CLOSED = 1350;
 
     public Claw(HardwareMap hardwareMap){
         claw_servo = hardwareMap.get(ServoImplEx.class, "claw_servo");
@@ -46,7 +45,7 @@ public class Claw {
         claw_servo.setPosition(1);
     }
 
-    public void release(){
+    public void open(){
         claw_servo.setPosition(0);
     }
 
