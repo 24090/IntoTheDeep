@@ -2,38 +2,64 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 public class Claw {
-    LinearOpMode opMode;
-    HardwareMap hardwareMap;
-    Servo clawServo;
-    Servo wrist1Servo;
-    Servo wrist2Servo;
-    Servo elbow1Servo;
-    Servo elbow2Servo;
-    public Claw(LinearOpMode opMode, HardwareMap hardwareMap){
-        this.opMode = opMode;
-        this.hardwareMap = hardwareMap;
-        clawServo = this.hardwareMap.get(Servo.class, "clawServo");
-        wrist1Servo = this.hardwareMap.get(Servo.class, "wrist1Servo");
-        wrist2Servo = this.hardwareMap.get(Servo.class, "wrist2Servo");
-        elbow1Servo = this.hardwareMap.get(Servo.class, "elbow1Servo");
-        elbow2Servo = this.hardwareMap.get(Servo.class, "elbow2Servo");
+    ServoImplEx claw_servo;
+    ServoImplEx wrist_servo_movement;
+    ServoImplEx wrist_servo_turret;
+    ServoImplEx elbow_servo_left;
+    ServoImplEx elbow_servo_right;
+
+    public int ELBOW_LEFT_IN = 950;
+    public int ELBOW_LEFT_OUT = 2000;
+    public int ELBOW_RIGHT_IN = 2250;
+    public int ELBOW_RIGHT_OUT = 1200;
+    public int WRIST_MOVEMENT_IN = 1600;
+    public int WRIST_MOVEMENT_OUT = 2250;
+    public int WRIST_TURRET_NEG90 = 1000;
+    public int WRIST_TURRET_90 = 2200;
+    public int CLAW_OPEN = 1700;
+    public int CLAW_CLOSED = 1350;
+
+    public Claw(HardwareMap hardwareMap){
+        claw_servo = hardwareMap.get(ServoImplEx.class, "claw_servo");
+            claw_servo.setPwmRange(new PwmControl.PwmRange(CLAW_CLOSED, CLAW_OPEN));
+            claw_servo.setDirection(Servo.Direction.REVERSE);
+        wrist_servo_movement = hardwareMap.get(ServoImplEx.class, "wrist_servo_movement");
+            wrist_servo_movement.setPwmRange(new PwmControl.PwmRange(WRIST_MOVEMENT_IN, WRIST_MOVEMENT_OUT));
+        wrist_servo_turret = hardwareMap.get(ServoImplEx.class, "wrist_servo_turret");
+            wrist_servo_turret.setPwmRange(new PwmControl.PwmRange(WRIST_TURRET_NEG90, WRIST_TURRET_90));
+        elbow_servo_left = hardwareMap.get(ServoImplEx.class, "elbow_servo_left");
+            elbow_servo_left.setPwmRange(new PwmControl.PwmRange(ELBOW_LEFT_IN, ELBOW_LEFT_OUT));
+        elbow_servo_right = hardwareMap.get(ServoImplEx.class, "elbow_servo_right");
+            elbow_servo_right.setPwmRange(new PwmControl.PwmRange(ELBOW_RIGHT_OUT, ELBOW_RIGHT_IN));
     }
-    public void clawServoSetPosition(double value){
-        clawServo.setPosition(value);
+
+    public void rotateClaw(double value_radians){
+        wrist_servo_turret.setPosition(value_radians%(Math.PI) / Math.PI);
     }
-    public void wrist1ServoSetPosition(double value){
-        wrist1Servo.setPosition(value);
+
+    public void grab(){
+        claw_servo.setPosition(1);
     }
-    public void wrist2ServoSetPosition(double value){
-        wrist2Servo.setPosition(value);
+
+    public void release(){
+        claw_servo.setPosition(0);
     }
-    public void elbow1ServoSetPosition(double value){
-        elbow1Servo.setPosition(value);
+
+    public void toGrabPos() {
+        elbow_servo_left.setPosition(1);
+        elbow_servo_right.setPosition(0);
+        wrist_servo_movement.setPosition(1);
     }
-    public void elbow2ServoSetPosition(double value){
-        elbow2Servo.setPosition(value);
+
+    public void toTransferPos() {
+        elbow_servo_left.setPosition(0);
+        elbow_servo_right.setPosition(1);
+        wrist_servo_movement.setPosition(0);
+        wrist_servo_turret.setPosition(0.5);
     }
 }
