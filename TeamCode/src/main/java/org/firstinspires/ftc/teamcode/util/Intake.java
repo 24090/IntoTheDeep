@@ -25,17 +25,21 @@ public class Intake {
 
     public void readyGrab(double linear_slide_to_in, double claw_rotation){
         claw.open();
-        claw.toGrabPos();
+        claw.toReadyGrabPos();
         linear_slide.goTo(linear_slide.inToTicks(linear_slide_to_in));
-
     }
 
     public void slideStop(){
         linear_slide.stopThread();
         linear_slide.stop();
     }
+
     public Action pickUpAction(){
-        return new SequentialAction(new InstantAction(() -> claw.toGrabbingPos()), new InstantAction(() -> claw.grab()), new SleepAction(0.2), new InstantAction(() -> claw.toGrabPos()));
+        return new SequentialAction(
+                new InstantAction(claw::toGrabPos),
+                new InstantAction(claw::grab),
+                new SleepAction(0.2),
+                new InstantAction(claw::toReadyGrabPos));
     }
     public Action readyGrabAction(double linear_slide_to_in, double claw_rotation){
         return new ParallelAction(
@@ -52,9 +56,6 @@ public class Intake {
                 new SleepAction(0.2) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
         );
     }
-    public Action fullerTransferAction(){
-        return new SequentialAction(readyTransferAction(), new InstantAction(() -> claw.open()), new SleepAction(1), new InstantAction(() -> claw.toStandbyPos()));
-    }
 
     public Action readyTransferAction(){
         return new ParallelAction(
@@ -70,12 +71,4 @@ public class Intake {
                 new SleepAction(0.2) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
         );
     }
-    public Action rotateTurretLeft(){
-        return new SequentialAction(new InstantAction (() -> claw.rotateTurret("left")), new SleepAction(0.03));
-    }
-    public Action rotateTurretRight(){
-        return new SequentialAction(new InstantAction (() -> claw.rotateTurret("right")), new SleepAction(0.03));
-    }
-
-
 }

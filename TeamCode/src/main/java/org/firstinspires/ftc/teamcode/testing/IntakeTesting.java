@@ -14,7 +14,7 @@ public class IntakeTesting extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
             if (gamepad1.dpad_down){
-                intake.claw.toGrabPos();
+                intake.claw.toReadyGrabPos();
             } else if (gamepad1.dpad_up){
                 intake.claw.toTransferPos();
             }

@@ -8,8 +8,10 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Arclength;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.PosePath;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -37,12 +39,13 @@ public class Controlled extends LinearOpMode{
     FtcDashboard dash = FtcDashboard.getInstance();
     int next_auto_action = 0;
     public void runOpMode(){
+        double last_time = 0;
         final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(16.5, 16.5)), PI / 4);
         MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
         Intake intake;
         intake = new Intake(hardwareMap);
         Outtake outtake;
-        intake.claw.toStandbyPos();
+        intake.claw.toReadyGrabPos();
         outtake = new Outtake(hardwareMap);
         Thread t = new Thread(() -> {
             while (opModeIsActive()){
@@ -60,6 +63,7 @@ public class Controlled extends LinearOpMode{
         waitForStart();
         t.start();
         while (opModeIsActive()){
+            double turret_angle = 0;
             outtake.slide.movementLoop();
             intake.linear_slide.movementLoop();
             /*if (gamepad1.right_trigger > 0.6) {
@@ -107,7 +111,10 @@ public class Controlled extends LinearOpMode{
                         0 // TODO: Claw rotation
                 );
             } else if (gamepad1.right_bumper){
-                Actions.runBlocking(intake.fullerTransferAction());
+                Actions.runBlocking(new SequentialAction(
+                        intake.fullTransferAction(),
+                        new InstantAction(intake.claw::toReadyGrabPos)
+                ));
             }
             if (gamepad1.dpad_up){
                 Actions.runBlocking(intake.pickUpAction());
@@ -115,20 +122,22 @@ public class Controlled extends LinearOpMode{
                 intake.claw.open();
             }
             if (gamepad1.dpad_left){
-                Actions.runBlocking(intake.rotateTurretLeft());
+                turret_angle -= (time - last_time);
+                intake.claw.rotateClaw(turret_angle);
             } else if (gamepad1.dpad_right){
-                Actions.runBlocking(intake.rotateTurretRight());
+                turret_angle += (time - last_time);
+                intake.claw.rotateClaw(turret_angle);
             }
             if (gamepad1.y){
                 outtake.slide.up();
             } else if (gamepad1.a){
-                outtake.slide.down();
+                outtake.down();
             } else if (gamepad1.b){
                 outtake.open();
             } else if (gamepad1.x){
                 outtake.close();
             }
-            intake.claw.updateTurretPos();
+            last_time = time;
         }
     }
 }

@@ -25,8 +25,6 @@ public class AutoRed extends LinearOpMode {
         // HW stuff
         Intake intake = new Intake(hardwareMap);
         Outtake outtake = new Outtake(hardwareMap);
-        outtake.slide.startThread();
-        intake.linear_slide.startThread();
         // same as meepmeep
         final Pose2d start_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(24.5 + GameMap.RobotWidth / 2, GameMap.RobotLength / 2)), PI / 2);
         final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(17, 17)), PI / 4);
@@ -41,30 +39,31 @@ public class AutoRed extends LinearOpMode {
         Action path = drive.actionBuilder(start_pose)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(InnerDistance.norm(), InnerDistance.angleCast().toDouble())))
+                .afterTime(0, outtake.slide.loopUntilDone())
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, InnerDistance.angleCast().toDouble(), new VelConstraint() {
                     @Override
                     public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
                         return 20;
                     }})
-                .afterTime(0, outtake.slide.loopUntilDone())
                 .stopAndAdd(new InstantAction(intake.claw::grab))
                 .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm() - 2, CenterDistance.angleCast().toDouble())))
+                .afterTime(0, outtake.slide.loopUntilDone())
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble(), new VelConstraint() {
                     @Override
                     public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
                         return 10;
                     }})
-                .afterTime(0, outtake.slide.loopUntilDone())
                 .stopAndAdd(new InstantAction(intake.claw::grab))
                 .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1.5, 1.5)), PI/4 + 0.1)
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm() - 2, InnerDistance.angleCast().toDouble())))
+                .afterTime(0, outtake.slide.loopUntilDone())
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, OuterDistance.angleCast().toDouble(), new VelConstraint() {
                     @Override
@@ -72,7 +71,6 @@ public class AutoRed extends LinearOpMode {
                         return 20;
                     }}
                 )
-                .afterTime(0, outtake.slide.loopUntilDone())
                 .stopAndAdd(new InstantAction(intake.claw::grab))
                 .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
@@ -83,7 +81,5 @@ public class AutoRed extends LinearOpMode {
         waitForStart();
         Actions.runBlocking(path);
         PoseStorer.pose = drive.pose;
-        intake.linear_slide.stopThread();
-        outtake.slide.stopThread();
     }
 }

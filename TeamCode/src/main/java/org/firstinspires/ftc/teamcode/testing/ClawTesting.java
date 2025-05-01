@@ -25,7 +25,7 @@ public class ClawTesting extends LinearOpMode {
                 claw.rotateClaw(r);
             }
             if (gamepad1.a){
-                claw.toGrabPos();
+                claw.toReadyGrabPos();
             }
             if (gamepad1.b){
                 claw.toTransferPos();
