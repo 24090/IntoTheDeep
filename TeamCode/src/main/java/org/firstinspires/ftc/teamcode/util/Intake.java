@@ -34,12 +34,14 @@ public class Intake {
         linear_slide.stopThread();
         linear_slide.stop();
     }
-
+    public Action pickUpAction(){
+        return new SequentialAction(new InstantAction(() -> claw.toGrabbingPos()), new InstantAction(() -> claw.grab()), new SleepAction(0.2), new InstantAction(() -> claw.toGrabPos()));
+    }
     public Action readyGrabAction(double linear_slide_to_in, double claw_rotation){
         return new ParallelAction(
                     new SleepAction(1), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
                     new InstantAction(() -> readyGrab(linear_slide_to_in, claw_rotation)),
-                    new TriggerAction(() -> linear_slide.within_error)
+                    linear_slide.loopUntilDone()
                 );
     }
 
@@ -50,21 +52,29 @@ public class Intake {
                 new SleepAction(0.2) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
         );
     }
+    public Action fullerTransferAction(){
+        return new SequentialAction(readyTransferAction(), new InstantAction(() -> claw.open()), new SleepAction(1), new InstantAction(() -> claw.toStandbyPos()));
+    }
 
     public Action readyTransferAction(){
         return new ParallelAction(
                 new SleepAction(1), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
                 new InstantAction(this::readyTransfer),
-                new TriggerAction(() -> linear_slide.within_error)
+                linear_slide.loopUntilDone()
         );
     }
-
     public Action fullTransferAction(){
         return new SequentialAction(
                 readyTransferAction(),
                 new InstantAction(claw::open),
                 new SleepAction(0.2) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
         );
+    }
+    public Action rotateTurretLeft(){
+        return new SequentialAction(new InstantAction (() -> claw.rotateTurret("left")), new SleepAction(0.03));
+    }
+    public Action rotateTurretRight(){
+        return new SequentialAction(new InstantAction (() -> claw.rotateTurret("right")), new SleepAction(0.03));
     }
 
 

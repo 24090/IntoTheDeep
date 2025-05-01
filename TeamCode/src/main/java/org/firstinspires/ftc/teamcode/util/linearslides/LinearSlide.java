@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.util.linearslides;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -73,8 +76,7 @@ public abstract class LinearSlide {
     /**
      * This method controls the linear slide throughout the program.
      */
-    private void movementLoop(){
-        while (true) {
+    public void movementLoop(){
             assert(target_pos <= max_extend);
             assert(target_pos >= min_extend);
 
@@ -84,7 +86,6 @@ public abstract class LinearSlide {
             } else {
                 motor.setPower(powerFunction());
             }
-        }
     }
 
     /**
@@ -120,4 +121,13 @@ public abstract class LinearSlide {
      * Waits for movement. This is breaking, so avoid using this when possible
      */
     public void waitForMovement(){while (!within_error);}
+    class LoopUntilDone implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            movementLoop();
+            return !within_error;
+        }
+    }
+
+    public Action loopUntilDone() {return new LoopUntilDone();}
 }

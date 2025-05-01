@@ -20,10 +20,10 @@ public class Outtake {
         this.slide = new OuttakeSlide(hwmap);
     }
     public void open(){
-        servo.setPosition(0);
+        servo.setPosition(0.33);
     }
     public void close(){
-        servo.setPosition(0.66);
+        servo.setPosition(1);
     }
 
     public void safeClose(){
@@ -48,13 +48,13 @@ public class Outtake {
         safeClose();
     }
     public Action slideDownAction(){
-        return new ParallelAction(
+        return new SequentialAction(
                 new InstantAction(this::down),
-                new TriggerAction(() -> slide.within_error)
+                slide.loopUntilDone()
         );
     }
     public Action slideUpAction(){
-        return new ParallelAction(new TriggerAction(() -> slide.within_error), new InstantAction(slide::up));
+        return new SequentialAction(new InstantAction(slide::up), slide.loopUntilDone());
     }
     public Action openGateAction(){
         return new ParallelAction(new SleepAction(1), new InstantAction(this::open));

@@ -39,8 +39,10 @@ public class Controlled extends LinearOpMode{
     public void runOpMode(){
         final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(16.5, 16.5)), PI / 4);
         MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
-        Intake intake = new Intake(hardwareMap);
+        Intake intake;
+        intake = new Intake(hardwareMap);
         Outtake outtake;
+        intake.claw.toStandbyPos();
         outtake = new Outtake(hardwareMap);
         Thread t = new Thread(() -> {
             while (opModeIsActive()){
@@ -53,11 +55,14 @@ public class Controlled extends LinearOpMode{
                 drive.updatePoseEstimate();
             }
         });
-        Vision vision = new Vision(drive, intake, telemetry, hardwareMap);
+
+        //Vision vision = new Vision(drive, intake, telemetry, hardwareMap);
         waitForStart();
         t.start();
         while (opModeIsActive()){
-            if (gamepad1.right_trigger > 0.6) {
+            outtake.slide.movementLoop();
+            intake.linear_slide.movementLoop();
+            /*if (gamepad1.right_trigger > 0.6) {
                 t.interrupt();
                 Action auto_action = null;
                 if (next_auto_action == 2) {
@@ -95,29 +100,35 @@ public class Controlled extends LinearOpMode{
                 }
                 t.start();
 
-            }
+            }*/
             if (gamepad1.left_bumper){
                 intake.readyGrab(
-                        gamepad1.left_trigger * (GameMap.MaxIntakeDistance - GameMap.MinIntakeDistance),
+                        gamepad1.left_trigger * (GameMap.MaxIntakeDistance - GameMap.MinIntakeDistance) + GameMap.MinIntakeDistance,
                         0 // TODO: Claw rotation
                 );
             } else if (gamepad1.right_bumper){
-                intake.readyTransfer();
+                Actions.runBlocking(intake.fullerTransferAction());
             }
             if (gamepad1.dpad_up){
-                intake.claw.grab();
+                Actions.runBlocking(intake.pickUpAction());
             } else if (gamepad1.dpad_down){
                 intake.claw.open();
             }
+            if (gamepad1.dpad_left){
+                Actions.runBlocking(intake.rotateTurretLeft());
+            } else if (gamepad1.dpad_right){
+                Actions.runBlocking(intake.rotateTurretRight());
+            }
             if (gamepad1.y){
-                Actions.runBlocking(outtake.slideUpAction());
+                outtake.slide.up();
             } else if (gamepad1.a){
-                Actions.runBlocking(outtake.slideDownAction());
+                outtake.slide.down();
             } else if (gamepad1.b){
                 outtake.open();
             } else if (gamepad1.x){
                 outtake.close();
             }
+            intake.claw.updateTurretPos();
         }
     }
 }

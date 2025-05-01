@@ -11,6 +11,8 @@ public class Claw {
     ServoImplEx wrist_servo_turret;
     ServoImplEx elbow_servo_left;
     ServoImplEx elbow_servo_right;
+    double i = 0.5;
+    boolean onStandby = true;
 
     public static final int ELBOW_LEFT_IN = 950;
     public static final int ELBOW_LEFT_OUT = 2000;
@@ -50,9 +52,11 @@ public class Claw {
     }
 
     public void toGrabPos() {
-        elbow_servo_left.setPosition(1);
-        elbow_servo_right.setPosition(0);
+        elbow_servo_left.setPosition(0.92);
+        elbow_servo_right.setPosition(0.08);
         wrist_servo_movement.setPosition(1);
+        wrist_servo_turret.setPosition(i);
+        onStandby = false;
     }
 
     public void toTransferPos() {
@@ -60,5 +64,33 @@ public class Claw {
         elbow_servo_right.setPosition(1);
         wrist_servo_movement.setPosition(0);
         wrist_servo_turret.setPosition(0.5);
+        onStandby = false;
+    }
+    public void toStandbyPos() {
+        elbow_servo_left.setPosition(0.5);
+        elbow_servo_right.setPosition(0.5);
+        wrist_servo_movement.setPosition(1);
+        wrist_servo_turret.setPosition(0.5);
+        onStandby = true;
+        i = 0.5;
+    }
+    public void toGrabbingPos() {
+        elbow_servo_left.setPosition(1);
+        elbow_servo_right.setPosition(0);
+        wrist_servo_movement.setPosition(1);
+        wrist_servo_turret.setPosition(i);
+        onStandby = false;
+    }
+    public void rotateTurret(String direction){
+        if (direction.equals("left") && i < 1){
+            i = i+0.02;
+        } else if (direction.equals("right") && i > 0) {
+            i= i-0.02;
+        }
+    }
+    public void updateTurretPos(){
+        if (!onStandby){
+            wrist_servo_turret.setPosition(i);
+        }
     }
 }
