@@ -34,7 +34,7 @@ public class Outtake {
                     && SERVO_CLOSE_MIN_TICKS < Math.max(slide.getPosition(), slide.target_pos)
                 ){
                     if (SERVO_CLOSE_MIN_TICKS < slide.getPosition() && slide.getPosition() < SERVO_CLOSE_MAX_TICKS) {
-                        servo.close();
+                        close();
                         break;
                     }
                 };
@@ -60,7 +60,7 @@ public class Outtake {
         return new ParallelAction(new SleepAction(1), new InstantAction(this::open));
     }
     public Action closeGateAction(){
-        return new InstantAction(this::close);
+        return new InstantAction(this::safeClose);
     }
     public Action scoreAction(){
         return new SequentialAction(

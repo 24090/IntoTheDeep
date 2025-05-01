@@ -47,6 +47,7 @@ public class AutoRed extends LinearOpMode {
                     public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
                         return 20;
                     }})
+                .afterTime(0, outtake.slide.loopUntilDone())
                 .stopAndAdd(new InstantAction(intake.claw::grab))
                 .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
@@ -58,6 +59,7 @@ public class AutoRed extends LinearOpMode {
                     public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
                         return 10;
                     }})
+                .afterTime(0, outtake.slide.loopUntilDone())
                 .stopAndAdd(new InstantAction(intake.claw::grab))
                 .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
@@ -70,6 +72,7 @@ public class AutoRed extends LinearOpMode {
                         return 20;
                     }}
                 )
+                .afterTime(0, outtake.slide.loopUntilDone())
                 .stopAndAdd(new InstantAction(intake.claw::grab))
                 .stopAndAdd(intake.fullTransferAction())
                 .setTangent(0)
