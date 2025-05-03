@@ -2,11 +2,12 @@ import numpy as np, scipy
 
 res_scale = 1
 
-focal_length       = (949.6227507184656, 957.9661574332396)
-principal_point    = (339.1850436493005, 218.54786213428162)
+focal_length       = (952.90362321, 960.00009409)
+principal_point    = (337.90515333, 165.08917237)
 rotation_xyz_euler = [50, 0, 0]
 degrees            = True
 position           = [0, 0, 14.77035 - 1.5]
+distortion         = [ 8.86386337e-04, 1.89532355e+00, -2.82422652e-02, -7.42910733e-03, -1.11640100e+01]
 
 # find intrinsics matrix
 intrinsics_matrix = np.asarray([
@@ -33,11 +34,14 @@ reprojection_matrix = np.linalg.inv(projection_matrix[:, [0,1,3]])
 # generate code to make it
 code = "// generated with ReprojectionMatrixCalculator.py\n"
 for row_num in range(3):
-	code += f"\t\tm1.put({row_num}, 0, {reprojection_matrix[row_num][0]: e}); m1.put({row_num}, 1, {reprojection_matrix[row_num][1]: e}); m1.put({row_num}, 2, {reprojection_matrix[row_num][2]: e});\n"
+	code += f"\t\trm.put({row_num}, 0, {reprojection_matrix[row_num][0]: e}); rm.put({row_num}, 1, {reprojection_matrix[row_num][1]: e}); rm.put({row_num}, 2, {reprojection_matrix[row_num][2]: e});\n"
 code += "\n"
 for row_num in range(3):
-	code += f"\t\tm2.put({row_num}, 0, {intrinsics_matrix[row_num][0]: e}); m2.put({row_num}, 1, {intrinsics_matrix[row_num][1]: e}); m2.put({row_num}, 2, {intrinsics_matrix[row_num][2]: e});\n"
-
+	code += f"\t\tcm.put({row_num}, 0, {intrinsics_matrix[row_num][0]: e}); cm.put({row_num}, 1, {intrinsics_matrix[row_num][1]: e}); cm.put({row_num}, 2, {intrinsics_matrix[row_num][2]: e});\n"
+code += "\n"
+for col_num, value in enumerate(distortion):
+	code += f"\t\tdc.put(0, {col_num}, {value: e});\n"
+code += "\t\t// end"
 print(code)
 
 # test functions
@@ -52,11 +56,10 @@ def reproject(u, v):
 	return v
 
 text = open("Camera.java", "r").read()
-text = text.split("// generated with ReprojectionMatrixCalculator.py")
-text[1] = text[1].split("\n")
-text[1] = text[1][9:]
-text[1] = "\n".join(text[1])
-text = code.join(text)
+text = text.replace("// generated with ReprojectionMatrixCalculator.py", "RMC_SPLIT")
+text = text.replace("// end", "RMC_SPLIT")
+text = text.split("RMC_SPLIT")
+text[1] = code
 print(code)
 if (input("autoreplace? ") == "y"):
-	open("Camera.java", "w").write(text)
+	open("Camera.java", "w").write("".join(text))
