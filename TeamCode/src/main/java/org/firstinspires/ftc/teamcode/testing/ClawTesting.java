@@ -10,7 +10,7 @@ public class ClawTesting extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Claw claw = new Claw(hardwareMap);
         double r = 0;
-        claw.rotateClaw(0);
+        claw.rotate(0);
         claw.toTransferPos();
         claw.open();
         waitForStart();
@@ -18,11 +18,11 @@ public class ClawTesting extends LinearOpMode {
         while(opModeIsActive()){
             if (gamepad1.dpad_up){
                 r += 2 * (last_time - time);
-                claw.rotateClaw(r);
+                claw.rotate(r);
             }
             if (gamepad1.dpad_down){
                 r -= 2 * (last_time - time);
-                claw.rotateClaw(r);
+                claw.rotate(r);
             }
             if (gamepad1.a){
                 claw.toReadyGrabPos();
