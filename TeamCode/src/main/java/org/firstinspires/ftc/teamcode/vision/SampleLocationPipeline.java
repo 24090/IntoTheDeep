@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.vision;
+
 import android.annotation.SuppressLint;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -10,9 +12,10 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import kotlin.Pair;
 import kotlin.Triple;
 

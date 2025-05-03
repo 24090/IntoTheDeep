@@ -1,4 +1,5 @@
-import numpy as np, scipy
+import numpy as np
+import scipy
 
 res_scale = 1
 

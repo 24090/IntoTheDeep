@@ -1,15 +1,10 @@
 package org.firstinspires.ftc.teamcode.util.linearslides;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.util.GameMap;
-
-import java.util.function.Supplier;
 
 public class IntakeSlide extends LinearSlide {
     public static final double MAX_EXTEND = 1200;
