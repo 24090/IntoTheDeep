@@ -6,10 +6,10 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.util.FutureAction;
+import org.firstinspires.ftc.teamcode.util.customactions.FutureAction;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.RobotActions;
-import org.firstinspires.ftc.teamcode.util.TriggerAction;
+import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 
 public class VisionTesting extends LinearOpMode {
     @Override

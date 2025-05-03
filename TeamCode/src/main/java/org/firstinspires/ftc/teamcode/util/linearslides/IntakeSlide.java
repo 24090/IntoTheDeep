@@ -17,7 +17,6 @@ public class IntakeSlide extends LinearSlide {
     /**
      * Class for using Intake Slide
      * @param hwmap the hardware map, used to find the motor
-     * @param thread_ender end the loop when the function returns true
      */
     public IntakeSlide(HardwareMap hwmap) {
         super(hwmap.get(DcMotor.class, "intake_motor"), MIN_EXTEND, MAX_EXTEND, 0, 50);

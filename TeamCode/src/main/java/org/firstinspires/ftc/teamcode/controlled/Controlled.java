@@ -2,8 +2,14 @@ package org.firstinspires.ftc.teamcode.controlled;
 
 import static java.lang.Math.PI;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.InstantFunction;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -13,11 +19,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
-//import org.firstinspires.ftc.teamcode.util.ColorDistance;
 import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
+import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 
 /**
  * TODO:
@@ -28,48 +34,57 @@ import org.firstinspires.ftc.teamcode.util.PoseStorer;
 @TeleOp(name = "Controller")
 public class Controlled extends LinearOpMode{
     FtcDashboard dash = FtcDashboard.getInstance();
-    int next_auto_action = 0;
     public void runOpMode(){
         double last_time = 0;
-        final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(16.5, 16.5)), PI / 4);
         MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
         Intake intake;
         intake = new Intake(hardwareMap);
         Outtake outtake;
         intake.claw.toReadyGrabPos();
         outtake = new Outtake(hardwareMap);
-        Thread t = new Thread(() -> {
-            while (opModeIsActive()){
-                if (intake.linear_slide.getPosition() > 100){
-                    drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x/3));
+
+        InstantAction movement = new InstantAction(() -> {
+                if (intake.linear_slide.getPosition() > 100) {
+                    drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x / 3));
                 } else {
                     drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x));
                 }
 
                 drive.updatePoseEstimate();
             }
-        });
+        );
         
         waitForStart();
-        t.start();
         while (opModeIsActive()){
             double turret_angle = 0;
-            outtake.slide.movementLoop();
+            outtake.backgroundIter();
             intake.linear_slide.movementLoop();
-
+            movement.getF().run();
             if (gamepad1.left_bumper){
                 intake.readyGrab(
                         gamepad1.left_trigger * (GameMap.MaxIntakeDistance - GameMap.MinIntakeDistance) + GameMap.MinIntakeDistance,
                         0 // TODO: Claw rotation
                 );
             } else if (gamepad1.right_bumper){
-                Actions.runBlocking(new SequentialAction(
-                        intake.fullTransferAction(),
-                        new InstantAction(intake.claw::toReadyGrabPos)
-                ));
+                Actions.runBlocking(
+                        new RaceAction(
+                            new ForeverAction(movement),
+                            new ForeverAction(outtake::backgroundIter),
+                            new SequentialAction(
+                                intake.fullTransferAction(),
+                                new InstantAction(intake.claw::toReadyGrabPos)
+                            )
+                        )
+                );
             }
             if (gamepad1.dpad_up){
-                Actions.runBlocking(intake.pickUpAction());
+                Actions.runBlocking(
+                        new RaceAction(
+                                new ForeverAction(movement),
+                                new ForeverAction(outtake::backgroundIter),
+                                intake.pickUpAction()
+                        )
+                );
             } else if (gamepad1.dpad_down){
                 intake.claw.open();
             }

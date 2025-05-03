@@ -1,20 +1,10 @@
 package org.firstinspires.ftc.teamcode.util.linearslides;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.teamcode.util.TriggerAction;
-
-import java.util.function.Supplier;
 
 public abstract class LinearSlide {
     protected DcMotor motor;
@@ -25,7 +15,6 @@ public abstract class LinearSlide {
     public double max_error;
     public double target_pos;
     public Boolean within_error;
-    Thread movement_thread;
 
     /**
      * Class for using linear slides
@@ -43,7 +32,6 @@ public abstract class LinearSlide {
         this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.target_pos = target_pos;
         this.max_error = max_error;
-        movement_thread = new Thread(this::movementLoop);
     }
 
     /**
@@ -51,20 +39,6 @@ public abstract class LinearSlide {
      */
     public void stop(){
         motor.setPower(0);
-    }
-
-    /**
-     * Starts the movement thread. To actually stop the motor, make sure to call stop() after this.
-     */
-    public void stopThread(){
-        movement_thread.interrupt();
-    }
-
-    /**
-     * Starts the movement thread. You don't need to use this function on initialization
-     */
-    public void startThread(){
-        movement_thread.start();
     }
 
     /**
@@ -121,6 +95,7 @@ public abstract class LinearSlide {
      * Waits for movement. This is breaking, so avoid using this when possible
      */
     public void waitForMovement(){while (!within_error);}
+
     class LoopUntilDone implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {

@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.Auto;
 
 import static java.lang.Math.PI;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.roadrunner.*;
 
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -42,7 +40,7 @@ public class AutoRed extends LinearOpMode {
         Action path = drive.actionBuilder(start_pose)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(InnerDistance.norm(), InnerDistance.angleCast().toDouble())))
-                .afterTime(0, outtake.slide.loopUntilDone())
+                .afterTime(0, outtake.slideWaitAction())
                 .setTangent(0)
                 .strafeToSplineHeading(inner_spike_mark_position, InnerDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 20)
                 .stopAndAdd(intake.pickUpAction())
@@ -50,7 +48,7 @@ public class AutoRed extends LinearOpMode {
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm() - 2, CenterDistance.angleCast().toDouble())))
-                .afterTime(0, outtake.slide.loopUntilDone())
+                .afterTime(0, outtake.slideWaitAction())
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
                 .stopAndAdd(intake.pickUpAction())
@@ -58,7 +56,7 @@ public class AutoRed extends LinearOpMode {
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1.5, 1.5)), PI/4 + 0.1)
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm() - 2, InnerDistance.angleCast().toDouble())))
-                .afterTime(0, outtake.slide.loopUntilDone())
+                .afterTime(0, outtake.slideWaitAction())
                 .setTangent(0)
                 .strafeToSplineHeading(outer_spike_mark_position, OuterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 20)
                 .stopAndAdd(intake.pickUpAction())
@@ -67,7 +65,7 @@ public class AutoRed extends LinearOpMode {
                 .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1, 1)), PI/4 + 0.1)
                 .stopAndAdd(outtake.fullScoreAction())
                 .build();
-        // these lines ≠ meepmeep
+        // these lines ≠ meepmeepe
         waitForStart();
         Actions.runBlocking(path);
         PoseStorer.pose = drive.pose;

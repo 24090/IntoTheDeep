@@ -10,9 +10,9 @@ public class IntakeTesting extends LinearOpMode {
     Intake intake;
     public void runOpMode() throws InterruptedException {
         intake = new Intake(hardwareMap);
-        intake.linear_slide.startThread();
         waitForStart();
         while (opModeIsActive()){
+            intake.linear_slide.movementLoop();
             if (gamepad1.dpad_down){
                 intake.claw.toReadyGrabPos();
             } else if (gamepad1.dpad_up){
@@ -31,7 +31,6 @@ public class IntakeTesting extends LinearOpMode {
             telemetry.addData("pos", intake.linear_slide.getPosition());
             telemetry.update();
         }
-        intake.linear_slide.stopThread();
     }
 
 }

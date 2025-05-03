@@ -30,11 +30,6 @@ public class Intake {
         linear_slide.goTo(linear_slide.inToTicks(linear_slide_to_in));
     }
 
-    public void slideStop(){
-        linear_slide.stopThread();
-        linear_slide.stop();
-    }
-
     public Action pickUpAction(){
         return new SequentialAction(
                 new InstantAction(claw::toGrabPos),
