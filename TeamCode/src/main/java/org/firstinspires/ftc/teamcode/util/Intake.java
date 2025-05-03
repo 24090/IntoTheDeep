@@ -26,6 +26,7 @@ public class Intake {
     public void readyGrab(double linear_slide_to_in, double claw_rotation){
         claw.open();
         claw.toReadyGrabPos();
+        claw.rotate(claw_rotation);
         linear_slide.goTo(linear_slide.inToTicks(linear_slide_to_in));
     }
 
@@ -47,14 +48,6 @@ public class Intake {
                     new InstantAction(() -> readyGrab(linear_slide_to_in, claw_rotation)),
                     linear_slide.loopUntilDone()
                 );
-    }
-
-    public Action fullGrabAction(double linear_slide_to_in, double claw_rotation){
-        return new SequentialAction(
-                readyGrabAction(linear_slide_to_in, claw_rotation),
-                new InstantAction(claw::grab),
-                new SleepAction(0.2) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
-        );
     }
 
     public Action readyTransferAction(){
