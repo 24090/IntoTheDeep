@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Intake;
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.util.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.FutureAction;
 import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 
+@TeleOp(group = "testing")
 public class VisionTesting extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

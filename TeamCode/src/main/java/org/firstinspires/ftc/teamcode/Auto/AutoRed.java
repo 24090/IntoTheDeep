@@ -2,20 +2,28 @@ package org.firstinspires.ftc.teamcode.Auto;
 
 import static java.lang.Math.PI;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.util.BulkReads;
 import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
+import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 
 @Autonomous(name = "AutoRed", group = "auto")
 public class AutoRed extends LinearOpMode {
@@ -26,50 +34,70 @@ public class AutoRed extends LinearOpMode {
         Intake intake = new Intake(hardwareMap);
         Outtake outtake = new Outtake(hardwareMap);
         // same as meepmeep
-        final Pose2d start_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(24.5 + GameMap.RobotWidth / 2, GameMap.RobotLength / 2)), PI / 2);
-        final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(17.5, 17.5)), PI / 4);
-        final Vector2d inner_spike_mark_position = GameMap.SpikeMarkNeutralLeftInner.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 2));
-        final Vector2d neutral_spike_mark_position = GameMap.SpikeMarkNeutralLeftCenter.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 2));
-        final Vector2d outer_spike_mark_position = GameMap.SpikeMarkNeutralLeftOuter.minus(
-                Rotation2d.fromDouble(2*PI/3).vec().times(GameMap.MaxIntakeDistance - 2)
+        final Vector2d inner_sample = new Vector2d(-48, -26);
+        final Vector2d corner = new Vector2d(-72, -72);
+        final Pose2d start_pose = new Pose2d(corner.plus(new Vector2d(25 + GameMap.RobotLength / 2, GameMap.RobotWidth/ 2)), 0);
+        final Pose2d score_pose = new Pose2d(corner.plus(new Vector2d(18, 18)), PI / 4);
+        final Vector2d inner_spike_mark_position = inner_sample.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 4));
+        final Vector2d neutral_spike_mark_position = inner_sample.minus(new Vector2d(10, 0)).minus(new Vector2d(0, GameMap.MaxIntakeDistance - 4));
+        final Vector2d outer_spike_mark_position = inner_sample.minus(new Vector2d(20, 0)).plus(
+                Rotation2d.fromDouble(-0.95).vec().times(GameMap.MaxIntakeDistance - 2)
         );
-        final Vector2d InnerDistance = GameMap.SpikeMarkNeutralLeftInner.minus(inner_spike_mark_position);
-        final Vector2d CenterDistance = GameMap.SpikeMarkNeutralLeftCenter.minus(neutral_spike_mark_position);
-        final Vector2d OuterDistance = GameMap.SpikeMarkNeutralLeftOuter.minus(outer_spike_mark_position);
+        final Vector2d InnerDistance = inner_sample.minus(inner_spike_mark_position);
+        final Vector2d CenterDistance = inner_sample.minus(new Vector2d(10, 0)).minus(neutral_spike_mark_position);
+        final Vector2d OuterDistance = inner_sample.minus(new Vector2d(20, 0)).minus(outer_spike_mark_position);
 // this line ≠ meepmeep
         MecanumDrive drive = new MecanumDrive(hardwareMap, start_pose);
         // this line ≠ meepmeep
         Action path = drive.actionBuilder(start_pose)
+                .setTangent(0)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(InnerDistance.norm(), InnerDistance.angleCast().toDouble())))
-                .afterTime(0, outtake.slideWaitAction())
+                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(InnerDistance.norm(), -InnerDistance.angleCast().toDouble())))
                 .setTangent(0)
-                .strafeToSplineHeading(inner_spike_mark_position, InnerDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 20)
+                .afterTime(0, outtake.slideWaitAction())
+                .strafeToSplineHeading(inner_spike_mark_position, InnerDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
                 .stopAndAdd(intake.pickUpAction())
+                .setTangent(0)
                 .afterTime(0, intake.fullTransferAction())
+                .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm(), -CenterDistance.angleCast().toDouble())))
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
-                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm() - 2, CenterDistance.angleCast().toDouble())))
                 .afterTime(0, outtake.slideWaitAction())
-                .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
                 .stopAndAdd(intake.pickUpAction())
-                .afterTime(0, intake.fullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1.5, 1.5)), PI/4 + 0.1)
-                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm() - 2, InnerDistance.angleCast().toDouble())))
+                .afterTime(0, intake.fullTransferAction())
+                .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm(), -OuterDistance.angleCast().toDouble())))
+                .setTangent(0)
                 .afterTime(0, outtake.slideWaitAction())
-                .setTangent(0)
-                .strafeToSplineHeading(outer_spike_mark_position, OuterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 20)
+                .strafeToSplineHeading(outer_spike_mark_position, OuterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
                 .stopAndAdd(intake.pickUpAction())
-                .afterTime(0, intake.fullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1, 1)), PI/4 + 0.1)
+                .afterTime(0, intake.fullTransferAction())
+                .strafeToSplineHeading(score_pose.position, score_pose.heading)
                 .stopAndAdd(outtake.fullScoreAction())
                 .build();
         // these lines ≠ meepmeepe
         waitForStart();
-        Actions.runBlocking(path);
+        BulkReads.setCachingMode(hardwareMap, LynxModule.BulkCachingMode.MANUAL);
+        Actions.runBlocking(
+            new ParallelAction(
+                    path,
+                    new ForeverAction(() -> BulkReads.readManual(hardwareMap)),
+                    new Action() {
+                        double last_time = -1;
+                        @Override
+                        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                            if (last_time == -1){
+                                last_time = time;
+                            } else {
+                                telemetryPacket.addLine("Loop Time (ms)" + Double.toString(last_time - time * 1000));
+                                last_time = time;
+                            }
+                            return true;
+                    }
+        }));
         PoseStorer.pose = drive.pose;
     }
 }

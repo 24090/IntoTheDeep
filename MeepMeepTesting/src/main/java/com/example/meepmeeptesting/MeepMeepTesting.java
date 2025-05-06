@@ -12,16 +12,18 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
     public static void main(String[] args) {
-        final Pose2d start_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(24.5 + GameMap.RobotWidth / 2, GameMap.RobotLength / 2)), PI / 2);
-        final Pose2d score_pose = new Pose2d(GameMap.NetRedCorner.plus(new Vector2d(17.5, 17.5)), PI / 4);
-        final Vector2d inner_spike_mark_position = GameMap.SpikeMarkNeutralLeftInner.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 2));
-        final Vector2d neutral_spike_mark_position = GameMap.SpikeMarkNeutralLeftCenter.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 2));
-        final Vector2d outer_spike_mark_position = GameMap.SpikeMarkNeutralLeftOuter.minus(
-                Rotation2d.fromDouble(2*PI/3).vec().times(GameMap.MaxIntakeDistance - 2)
+        final Vector2d inner_sample = new Vector2d(-48, -26);
+        final Vector2d corner = new Vector2d(-72, -72);
+        final Pose2d start_pose = new Pose2d(corner.plus(new Vector2d(25 + GameMap.RobotLength / 2, GameMap.RobotWidth/ 2)), 0);
+        final Pose2d score_pose = new Pose2d(corner.plus(new Vector2d(18, 18)), PI / 4);
+        final Vector2d inner_spike_mark_position = inner_sample.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 4));
+        final Vector2d neutral_spike_mark_position = inner_sample.minus(new Vector2d(10, 0)).minus(new Vector2d(0, GameMap.MaxIntakeDistance - 4));
+        final Vector2d outer_spike_mark_position = inner_sample.minus(new Vector2d(20, 0)).plus(
+                Rotation2d.fromDouble(-0.95).vec().times(GameMap.MaxIntakeDistance - 2)
         );
-        final Vector2d InnerDistance = GameMap.SpikeMarkNeutralLeftInner.minus(inner_spike_mark_position);
-        final Vector2d CenterDistance = GameMap.SpikeMarkNeutralLeftCenter.minus(neutral_spike_mark_position);
-        final Vector2d OuterDistance = GameMap.SpikeMarkNeutralLeftOuter.minus(outer_spike_mark_position);
+        final Vector2d InnerDistance = inner_sample.minus(inner_spike_mark_position);
+        final Vector2d CenterDistance = inner_sample.minus(new Vector2d(10, 0)).minus(neutral_spike_mark_position);
+        final Vector2d OuterDistance = inner_sample.minus(new Vector2d(20, 0)).minus(outer_spike_mark_position);
         MeepMeep meepMeep = new MeepMeep(800);
 
         RoadRunnerBotEntity robot = new DefaultBotBuilder(meepMeep)
@@ -30,32 +32,33 @@ public class MeepMeepTesting {
                 .setDimensions(GameMap.RobotWidth, GameMap.RobotLength)
                 .build();
         Action action = robot.getDrive().actionBuilder(start_pose)
+                .setTangent(0)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
-//                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(InnerDistance.norm(), InnerDistance.angleCast().toDouble())))
-//                .afterTime(0, outtake.slide.loopUntilDone())
+                // .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(InnerDistance.norm(), InnerDistance.angleCast().toDouble())))
+                // // .afterTime(0, outtake.slideWaitAction())
                 .setTangent(0)
-                .strafeToSplineHeading(inner_spike_mark_position, InnerDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 20)
-//                .stopAndAdd(intake.pickUpAction())
-//                .stopAndAdd(intake.fullTransferAction())
+                .strafeToSplineHeading(inner_spike_mark_position, InnerDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
+                // .stopAndAdd(intake.pickUpAction())
+                // .afterTime(0, intake.fullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(0.5, 0.5)), PI/4 + 0.1)
-//                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm() - 2, CenterDistance.angleCast().toDouble())))
-//                .afterTime(0, outtake.slide.loopUntilDone())
+                .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                // .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm(), CenterDistance.angleCast().toDouble())))
+                // .afterTime(0, outtake.slideWaitAction())
                 .setTangent(0)
                 .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
-//                .stopAndAdd(intake.pickUpAction())
-//                .stopAndAdd(intake.fullTransferAction())
+                // .stopAndAdd(intake.pickUpAction())
+                // .afterTime(0, intake.fullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1.5, 1.5)), PI/4 + 0.1)
-//                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm() - 2, InnerDistance.angleCast().toDouble())))
-//                .afterTime(0, outtake.slide.loopUntilDone())
+                .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                // .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm(), InnerDistance.angleCast().toDouble())))
+                // .afterTime(0, outtake.slideWaitAction())
                 .setTangent(0)
-                .strafeToSplineHeading(outer_spike_mark_position, OuterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 20)
-//                .stopAndAdd(intake.pickUpAction())
-//                .stopAndAdd(intake.fullTransferAction())
+                .strafeToSplineHeading(outer_spike_mark_position, OuterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
+                // .stopAndAdd(intake.pickUpAction())
+                // .afterTime(0, intake.fullTransferAction())
                 .setTangent(0)
-                .strafeToSplineHeading(score_pose.position.minus(new Vector2d(1, 1)), PI/4 + 0.1)
-//                .stopAndAdd(outtake.fullScoreAction())
+                .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                // .stopAndAdd(outtake.fullScoreAction())
                 .build();
         robot.runAction(action);
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)

@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class OuttakeSlide extends LinearSlide {
-    public static final double MAX_EXTEND = 5050;
+    public static final double MAX_EXTEND = 3650;
     public static final double MIN_EXTEND = 0;
 
     /**
@@ -36,6 +36,6 @@ public class OuttakeSlide extends LinearSlide {
     }
 
     public void up(){
-        this.goTo(5000);
+        this.goTo(3600);
     }
 }

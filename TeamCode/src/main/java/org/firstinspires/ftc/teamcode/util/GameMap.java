@@ -36,7 +36,7 @@ public class GameMap {
     public static final Vector2d SpikeMarkNeutralRightOuter =SpikeMarkNeutralRightInner.plus(new Vector2d(20,0));
     // NEUTRAL LEFT
     // left = -x
-    public static final Vector2d SpikeMarkNeutralLeftInner = new Vector2d(-48 - 0.5 - 1.5/2, -24.5-3.5/2);
+    public static final Vector2d SpikeMarkNeutralLeftInner = new Vector2d(-48, -26);
     public static final Vector2d SpikeMarkNeutralLeftCenter = SpikeMarkNeutralLeftInner.plus(new Vector2d(-10,0));
     public static final Vector2d SpikeMarkNeutralLeftOuter = SpikeMarkNeutralLeftInner.plus(new Vector2d(-20,0));
     // -------APRIL TAGS-----------------
