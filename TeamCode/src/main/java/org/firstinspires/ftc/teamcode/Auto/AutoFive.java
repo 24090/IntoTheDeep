@@ -32,8 +32,8 @@ import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 import org.firstinspires.ftc.teamcode.vision.Sample;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
-@Autonomous(name = "AutoRed", group = "auto")
-public class AutoRed extends LinearOpMode {
+@Autonomous(name = "Five Sample Auto", group = "auto")
+public class AutoFive extends LinearOpMode {
     MecanumDrive drive;
     Intake intake;
     Outtake outtake;
@@ -45,7 +45,7 @@ public class AutoRed extends LinearOpMode {
         outtake = new Outtake(hardwareMap);
         vision = new Vision(telemetry, hardwareMap);
         // same as meepmeep
-        final Vector2d inner_sample = new Vector2d(-49, -27);
+        final Vector2d inner_sample = new Vector2d(-48.75, -27);
         final Vector2d corner = new Vector2d(-72, -72);
         final Pose2d start_pose = new Pose2d(corner.plus(new Vector2d(24 + GameMap.RobotLength / 2, GameMap.RobotWidth/ 2)), 0);
         final Pose2d score_pose = new Pose2d(corner.plus(new Vector2d(18.5, 17)), PI / 4);
@@ -57,6 +57,7 @@ public class AutoRed extends LinearOpMode {
         final Vector2d InnerDistance = inner_sample.minus(inner_spike_mark_position);
         final Vector2d CenterDistance = inner_sample.minus(new Vector2d(10, 0)).minus(neutral_spike_mark_position);
         final Vector2d OuterDistance = inner_sample.minus(new Vector2d(20, 0)).minus(outer_spike_mark_position);
+        Sample sample = new Sample();
         // this line ≠ meepmeep
         drive = new MecanumDrive(hardwareMap, start_pose);
         // this line ≠ meepmeep
@@ -66,11 +67,11 @@ public class AutoRed extends LinearOpMode {
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(InnerDistance.norm(), -InnerDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .afterTime(0, outtake.slideWaitAction())
-                .strafeToSplineHeading(inner_spike_mark_position, InnerDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 7)
+                .strafeToSplineHeading(inner_spike_mark_position, InnerDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
                 .stopAndAdd(intake.pickUpAction())
                 .setTangent(0)
                 .afterTime(0, intake.fullTransferAction())
-                .strafeToSplineHeading(score_pose.position, score_pose.heading, (pose2dDual, posePath, v) -> 7)
+                .strafeToSplineHeading(score_pose.position, score_pose.heading, (pose2dDual, posePath, v) -> 12)
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm(), -CenterDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .afterTime(0, outtake.slideWaitAction())
@@ -78,15 +79,30 @@ public class AutoRed extends LinearOpMode {
                 .stopAndAdd(intake.pickUpAction())
                 .setTangent(0)
                 .afterTime(0, intake.fullTransferAction())
-                .strafeToSplineHeading(score_pose.position, score_pose.heading,  (pose2dDual, posePath, v) -> 7)
+                .strafeToSplineHeading(score_pose.position, score_pose.heading,  (pose2dDual, posePath, v) -> 12)
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm(), -OuterDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .afterTime(0, outtake.slideWaitAction())
-                .strafeToSplineHeading(outer_spike_mark_position, OuterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 7)
+                .strafeToSplineHeading(outer_spike_mark_position, OuterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 8)
                 .stopAndAdd(intake.pickUpAction())
                 .setTangent(0)
                 .afterTime(0, intake.fullTransferAction())
-                .strafeToSplineHeading(score_pose.position, score_pose.heading, (pose2dDual, posePath, v) -> 7)
+                .strafeToSplineHeading(score_pose.position, score_pose.heading, (pose2dDual, posePath, v) -> 12)
+                .stopAndAdd(outtake.fullScoreAction())
+                .setTangent(0)
+                .strafeToSplineHeading(new Vector2d(-48, -12), 0, (pose2dDual, posePath, v) -> 50)
+                .setTangent(0)
+                .splineTo(new Vector2d(-30, -12), 0, (pose2dDual, posePath, v) -> 50)
+                .stopAndAdd( new SequentialAction(
+                        vision.findSample(sample),
+                        new FutureAction( () ->
+                                RobotActions.reachSample(sample.pose, intake, drive)
+                        ),
+                        intake.pickUpAction(),
+                        intake.fullTransferAction()
+                ))
+                .strafeToSplineHeading(new Vector2d(-48, -12), 0, (pose2dDual, posePath, v) -> 50)
+                .strafeToSplineHeading(score_pose.position, score_pose.heading, (pose2dDual, posePath, v) -> 40)
                 .stopAndAdd(outtake.fullScoreAction())
                 .build();
         // these lines ≠ meepmeep
@@ -94,22 +110,22 @@ public class AutoRed extends LinearOpMode {
         waitForStart();
         bulkreads.setCachingMode(LynxModule.BulkCachingMode.MANUAL);
         Actions.runBlocking(
-            new ParallelAction(
-                    path,
-                    new ForeverAction(bulkreads::readManual),
-                    new Action() {
-                        double last_time = -1;
-                        @Override
-                        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                            if (last_time == -1){
-                                last_time = time;
-                            } else {
-                                telemetryPacket.addLine("Loop Time (ms): " + (last_time - time) * 1000);
-                                last_time = time;
+                new ParallelAction(
+                        path,
+                        new ForeverAction(bulkreads::readManual),
+                        new Action() {
+                            double last_time = -1;
+                            @Override
+                            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                                if (last_time == -1){
+                                    last_time = time;
+                                } else {
+                                    telemetryPacket.addLine("Loop Time (ms): " + (last_time - time) * 1000);
+                                    last_time = time;
+                                }
+                                return true;
                             }
-                            return true;
-                    }
-        }));
+                        }));
         PoseStorer.pose = drive.pose;
     }
 }

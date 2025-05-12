@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 public class RobotActions {
     public static Action reachSample(Pose2d relative_sample, Intake intake, MecanumDrive drive){
         return new SequentialAction(
-            
             drive.actionBuilder(drive.pose).turnTo(
                     drive.pose.heading.times(
                             new Rotation2d(relative_sample.position.x, relative_sample.position.y)

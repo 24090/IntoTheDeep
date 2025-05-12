@@ -12,10 +12,10 @@ public class Claw {
     ServoImplEx elbow_servo_left;
     ServoImplEx elbow_servo_right;
 
-    public static final int ELBOW_LEFT_IN = 950;
-    public static final int ELBOW_LEFT_OUT = 2000;
-    public static final int ELBOW_RIGHT_IN = 2250;
-    public static final int ELBOW_RIGHT_OUT = 1200;
+    public static final int ELBOW_LEFT_IN = 900;
+    public static final int ELBOW_LEFT_OUT = 2050;
+    public static final int ELBOW_RIGHT_IN = 2300;
+    public static final int ELBOW_RIGHT_OUT = 1150;
     public static final int WRIST_MOVEMENT_IN = 1600;
     public static final int WRIST_MOVEMENT_OUT = 2250;
     public static final int WRIST_TURRET_NEG90 = 1000;

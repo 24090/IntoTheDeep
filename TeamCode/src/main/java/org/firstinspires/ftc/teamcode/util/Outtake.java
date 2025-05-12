@@ -79,7 +79,7 @@ public class Outtake {
         return new SequentialAction(new InstantAction(slide::up), slideWaitAction());
     }
     public Action openGateAction(){
-        return new ParallelAction(new SleepAction(1), new InstantAction(this::open));
+        return new ParallelAction(new SleepAction(0.3), new InstantAction(this::open));
     }
 
     public Action scoreAction(){

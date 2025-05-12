@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import static org.firstinspires.ftc.teamcode.util.GameMap.RobotLength;
+
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -10,6 +12,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.util.linearslides.IntakeSlide;
 
 public class Intake {
+    public static final double MaxDistance = 14 + RobotLength/2;
+    public static final double MinDistance = 0.75 + RobotLength/2;
+
     public IntakeSlide linear_slide;
     public Claw claw;
 
@@ -35,12 +40,12 @@ public class Intake {
         return new SequentialAction(
                 new InstantAction(claw::toGrabPos),
                 new InstantAction(claw::grab),
-                new SleepAction(0.5),
+                new SleepAction(0.4),
                 new InstantAction(claw::toReadyGrabPos));
     }
     public Action readyGrabAction(double linear_slide_to_in, double claw_rotation){
         return new ParallelAction(
-                    new SleepAction(1), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
+                    new SleepAction(0.5), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
                     new InstantAction(() -> readyGrab(linear_slide_to_in, claw_rotation)),
                     linear_slide.loopUntilDone()
                 );
@@ -48,7 +53,7 @@ public class Intake {
 
     public Action readyTransferAction(){
         return new ParallelAction(
-                new SleepAction(1), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
+                new SleepAction(0.5), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
                 new InstantAction(this::readyTransfer),
                 linear_slide.loopUntilDone()
         );
@@ -57,7 +62,7 @@ public class Intake {
         return new SequentialAction(
                 readyTransferAction(),
                 new InstantAction(claw::open),
-                new SleepAction(0.5) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
+                new SleepAction(0.4) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
         );
     }
 }

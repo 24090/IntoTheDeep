@@ -47,7 +47,7 @@ public class Vision {
                 }
         );
     }
-    Action findSample(Sample out) {
+    public Action findSample(Sample out) {
         return (telemetry_packet) -> {
             if (pipeline.getAnalysis().isEmpty()) {
                 return true;
