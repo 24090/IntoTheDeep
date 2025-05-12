@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Rotation2d;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -36,12 +37,12 @@ public class AutoRed extends LinearOpMode {
         // same as meepmeep
         final Vector2d inner_sample = new Vector2d(-48, -26);
         final Vector2d corner = new Vector2d(-72, -72);
-        final Pose2d start_pose = new Pose2d(corner.plus(new Vector2d(25 + GameMap.RobotLength / 2, GameMap.RobotWidth/ 2)), 0);
-        final Pose2d score_pose = new Pose2d(corner.plus(new Vector2d(18, 18)), PI / 4);
-        final Vector2d inner_spike_mark_position = inner_sample.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 4));
-        final Vector2d neutral_spike_mark_position = inner_sample.minus(new Vector2d(10, 0)).minus(new Vector2d(0, GameMap.MaxIntakeDistance - 4));
+        final Pose2d start_pose = new Pose2d(corner.plus(new Vector2d(23 + GameMap.RobotLength / 2, GameMap.RobotWidth/ 2)), 0);
+        final Pose2d score_pose = new Pose2d(corner.plus(new Vector2d(17, 17)), PI / 4);
+        final Vector2d inner_spike_mark_position = inner_sample.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 1));
+        final Vector2d neutral_spike_mark_position = inner_sample.minus(new Vector2d(10, 0)).minus(new Vector2d(0, GameMap.MaxIntakeDistance - 1));
         final Vector2d outer_spike_mark_position = inner_sample.minus(new Vector2d(20, 0)).plus(
-                Rotation2d.fromDouble(-0.95).vec().times(GameMap.MaxIntakeDistance - 2)
+                Rotation2d.fromDouble(-0.95).vec().times(GameMap.MaxIntakeDistance - 1)
         );
         final Vector2d InnerDistance = inner_sample.minus(inner_spike_mark_position);
         final Vector2d CenterDistance = inner_sample.minus(new Vector2d(10, 0)).minus(neutral_spike_mark_position);
@@ -58,33 +59,40 @@ public class AutoRed extends LinearOpMode {
                 .strafeToSplineHeading(inner_spike_mark_position, InnerDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
                 .stopAndAdd(intake.pickUpAction())
                 .setTangent(0)
-                .afterTime(0, intake.fullTransferAction())
+                .afterTime(0, intake.readyTransferAction())
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                .stopAndAdd(intake.claw::open)
+                .stopAndAdd(new SleepAction(0.5))
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm(), -CenterDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .afterTime(0, outtake.slideWaitAction())
                 .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
                 .stopAndAdd(intake.pickUpAction())
                 .setTangent(0)
-                .afterTime(0, intake.fullTransferAction())
+                .afterTime(0, intake.readyTransferAction())
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                .stopAndAdd(intake.claw::open)
+                .stopAndAdd(new SleepAction(0.5))
                 .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm(), -OuterDistance.angleCast().toDouble())))
                 .setTangent(0)
                 .afterTime(0, outtake.slideWaitAction())
                 .strafeToSplineHeading(outer_spike_mark_position, OuterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
                 .stopAndAdd(intake.pickUpAction())
                 .setTangent(0)
-                .afterTime(0, intake.fullTransferAction())
+                .afterTime(0, intake.readyTransferAction())
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
+                .stopAndAdd(intake.claw::open)
+                .stopAndAdd(new SleepAction(0.5))
                 .stopAndAdd(outtake.fullScoreAction())
                 .build();
-        // these lines ≠ meepmeepe
+        // these lines ≠ meepmeep
+        BulkReads bulkreads = new BulkReads(hardwareMap);
         waitForStart();
-        BulkReads.setCachingMode(hardwareMap, LynxModule.BulkCachingMode.MANUAL);
+        bulkreads.setCachingMode(LynxModule.BulkCachingMode.MANUAL);
         Actions.runBlocking(
             new ParallelAction(
                     path,
-                    new ForeverAction(() -> BulkReads.readManual(hardwareMap)),
+                    new ForeverAction(bulkreads::readManual),
                     new Action() {
                         double last_time = -1;
                         @Override
@@ -92,7 +100,7 @@ public class AutoRed extends LinearOpMode {
                             if (last_time == -1){
                                 last_time = time;
                             } else {
-                                telemetryPacket.addLine("Loop Time (ms)" + Double.toString(last_time - time * 1000));
+                                telemetryPacket.addLine("Loop Time (ms): " + (last_time - time) * 1000);
                                 last_time = time;
                             }
                             return true;

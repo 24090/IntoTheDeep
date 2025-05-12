@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.linearslides;
 
+import static java.lang.Double.max;
+import static java.lang.Double.min;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -26,7 +29,7 @@ public class IntakeSlide extends LinearSlide {
 
     public double powerFunction(){
         double distance = target_pos - getPosition();
-        return Math.signum(distance) * 0.3 + distance * 6;
+        return Math.signum(distance) * 0.3 + distance/1000;
     }
     /**
      * Converts
@@ -35,5 +38,8 @@ public class IntakeSlide extends LinearSlide {
      */
     public double inToTicks(double extension_from_center_in){
         return (extension_from_center_in - GameMap.MinIntakeDistance)/(GameMap.MaxIntakeDistance-GameMap.MinIntakeDistance) * (MAX_EXTEND - MIN_EXTEND) + MIN_EXTEND;
+    }
+    public double trimIn(double in){
+        return max(min(in, GameMap.MaxIntakeDistance), GameMap.MinIntakeDistance);
     }
 }

@@ -47,13 +47,13 @@ public class Vision {
                 }
         );
     }
-    Action findSample(Pose2d[] sample_out) {
+    Action findSample(Sample out) {
         return (telemetry_packet) -> {
             if (pipeline.getAnalysis().isEmpty()) {
                 return true;
             }
             Triple<Double, Double, Double>  sample_triple = pipeline.getAnalysis().get(0);
-            sample_out[0] = new Pose2d(sample_triple.getFirst(), sample_triple.getSecond(), sample_triple.getThird());
+            out.pose = new Pose2d(sample_triple.getSecond(), sample_triple.getFirst(), sample_triple.getThird());
             return false;
         };
     }

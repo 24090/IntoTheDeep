@@ -35,7 +35,7 @@ public class Intake {
         return new SequentialAction(
                 new InstantAction(claw::toGrabPos),
                 new InstantAction(claw::grab),
-                new SleepAction(0.2),
+                new SleepAction(0.5),
                 new InstantAction(claw::toReadyGrabPos));
     }
     public Action readyGrabAction(double linear_slide_to_in, double claw_rotation){
@@ -57,7 +57,7 @@ public class Intake {
         return new SequentialAction(
                 readyTransferAction(),
                 new InstantAction(claw::open),
-                new SleepAction(0.2) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
+                new SleepAction(0.5) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
         );
     }
 }

@@ -57,9 +57,9 @@ public class GameMap {
     public static final int AprilTagRedRightID = 14;
 
     //------ROBOT CONSTANTS-------------
-    public static final double RobotWidth = 17.9;
-    public static final double RobotLength = 16.6;
+    public static final double RobotWidth = 18.5;
+    public static final double RobotLength = 16.9;
     public static final double OuttakeDistance = 6.7 + RobotLength/2;
-    public static final double MaxIntakeDistance = 12 + RobotLength/2;
+    public static final double MaxIntakeDistance = 15 + RobotLength/2;
     public static final double MinIntakeDistance = 0.75 + RobotLength/2;
 }

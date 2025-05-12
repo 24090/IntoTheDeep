@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 
 public class Outtake {
     public static final double SERVO_CLOSE_MIN_TICKS = 1000;
-    public static final double SERVO_CLOSE_MAX_TICKS = 4000;
+    public static final double SERVO_CLOSE_MAX_TICKS = 1500;
     Servo servo;
     Boolean close_plan = false;
     public OuttakeSlide slide;
@@ -27,6 +27,13 @@ public class Outtake {
     }
     public void close(){
         servo.setPosition(1);
+    }
+    public void toggleBucket(){
+        if (servo.getPosition() > 0.5) {
+            open();
+        } else {
+            close();
+        }
     }
 
     public void safeCloseIter(){
@@ -87,10 +94,6 @@ public class Outtake {
                 slideUpAction(),
                 openGateAction(),
                 new ParallelAction(
-                        new SequentialAction(
-                                new InstantAction(this::close),
-                                new SleepAction(0.5)
-                        ),
                         slideDownAction()
                 )
         );

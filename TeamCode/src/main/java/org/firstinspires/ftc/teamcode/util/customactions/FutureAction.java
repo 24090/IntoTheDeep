@@ -18,7 +18,6 @@ public class FutureAction implements Action {
         if (action == null) {
            action = action_supplier.get();
         }
-        action.run(telemetryPacket);
-        return false;
+        return action.run(telemetryPacket);
     }
 }

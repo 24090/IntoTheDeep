@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.linearslides;
 
+import static java.lang.Double.max;
+import static java.lang.Double.min;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -34,6 +37,10 @@ public abstract class LinearSlide {
         this.max_error = max_error;
     }
 
+    public double trimTicks(double ticks){
+        return max(min(ticks, max_extend), min_extend);
+    }
+
     /**
      * Stops any movement. Only use this function while the movement thread is paused.
      */
@@ -62,6 +69,9 @@ public abstract class LinearSlide {
             }
     }
 
+    public void setMotorPower(double power){
+        motor.setPower(power);
+    }
     /**
      * Sets the slide to be zero at this position
      */

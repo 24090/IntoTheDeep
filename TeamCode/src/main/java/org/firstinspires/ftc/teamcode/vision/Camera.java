@@ -23,9 +23,9 @@ public class Camera {
 		Mat dc = new Mat(1, 5, 6);
 
 		// generated with ReprojectionMatrixCalculator.py
-		rm.put(0, 0,  1.049424e-03); rm.put(0, 1,  2.504268e-21); rm.put(0, 2, -3.546058e-01);
-		rm.put(1, 0,  0.000000e+00); rm.put(1, 1,  6.695704e-04); rm.put(1, 2, -8.765833e-01);
-		rm.put(2, 0, -0.000000e+00); rm.put(2, 1, -6.013126e-05); rm.put(2, 2, -3.851086e-02);
+		rm.put(0, 0,  1.049424e-03); rm.put(0, 1,  1.612999e-20); rm.put(0, 2, -3.546058e-01);
+		rm.put(1, 0,  0.000000e+00); rm.put(1, 1,  4.688838e-04); rm.put(1, 2, -1.005112e+00);
+		rm.put(2, 0, -0.000000e+00); rm.put(2, 1, -5.498263e-05); rm.put(2, 2, -3.521343e-02);
 
 		cm.put(0, 0,  9.529036e+02); cm.put(0, 1,  0.000000e+00); cm.put(0, 2,  3.379052e+02);
 		cm.put(1, 0,  0.000000e+00); cm.put(1, 1,  9.600001e+02); cm.put(1, 2,  1.650892e+02);

@@ -4,7 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Claw;
-@TeleOp
+
+@TeleOp(group = "testing", name = "Claw Testing")
 public class ClawTesting extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

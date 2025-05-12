@@ -4,16 +4,21 @@ import com.acmerobotics.roadrunner.ftc.LynxFirmware;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.util.List;
+
 public class BulkReads {
-    public static void setCachingMode(HardwareMap hardwareMap, LynxModule.BulkCachingMode mode){
-        LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
-        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
+    List<LynxModule> modules;
+    public BulkReads(HardwareMap hwmap){
+        modules = hwmap.getAll(LynxModule.class);
+    }
+    public void setCachingMode(LynxModule.BulkCachingMode mode){
+        for (LynxModule module : modules){
             module.setBulkCachingMode(mode);
         }
     }
 
-    public static void readManual(HardwareMap hardwareMap){
-        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
+    public void readManual(){
+        for (LynxModule module : modules) {
             module.clearBulkCache();
         }
     }
