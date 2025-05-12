@@ -38,6 +38,5 @@ repositories {
 dependencies {
     implementation project(':FtcRobotController')
     implementation "com.acmerobotics.roadrunner:actions:1.0.1"
-    implementation "com.acmerobotics.dashboard:dashboard:0.4.16"
     implementation 'androidx.annotation:annotation-jvm:1.9.1'
 }
