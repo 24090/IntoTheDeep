@@ -18,7 +18,7 @@ public class RobotActions {
                     )
             ).build(),
             new ParallelAction(
-                intake.readyGrabAction(GameMap.MinIntakeDistance, relative_sample.heading.toDouble()),
+                intake.readyGrabAction(Intake.MinDistance, relative_sample.heading.toDouble()),
                 new InstantAction( () -> intake.linear_slide.goTo( intake.linear_slide.inToTicks(
                         intake.linear_slide.trimIn(relative_sample.position.norm())
                 ))),

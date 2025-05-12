@@ -49,10 +49,10 @@ public class AutoRed extends LinearOpMode {
         final Vector2d corner = new Vector2d(-72, -72);
         final Pose2d start_pose = new Pose2d(corner.plus(new Vector2d(24 + GameMap.RobotLength / 2, GameMap.RobotWidth/ 2)), 0);
         final Pose2d score_pose = new Pose2d(corner.plus(new Vector2d(18.5, 17)), PI / 4);
-        final Vector2d inner_spike_mark_position = inner_sample.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 1));
-        final Vector2d neutral_spike_mark_position = inner_sample.minus(new Vector2d(10, 0)).minus(new Vector2d(0, GameMap.MaxIntakeDistance - 1));
+        final Vector2d inner_spike_mark_position = inner_sample.minus(new Vector2d(0, Intake.MaxDistance - 0.5));
+        final Vector2d neutral_spike_mark_position = inner_sample.minus(new Vector2d(10, 0)).minus(new Vector2d(0, Intake.MaxDistance - 0.5 ));
         final Vector2d outer_spike_mark_position = inner_sample.minus(new Vector2d(20, 0)).plus(
-                Rotation2d.fromDouble(-0.95).vec().times(GameMap.MaxIntakeDistance - 1)
+                Rotation2d.fromDouble(-0.95).vec().times(Intake.MaxDistance - 0.5)
         );
         final Vector2d InnerDistance = inner_sample.minus(inner_spike_mark_position);
         final Vector2d CenterDistance = inner_sample.minus(new Vector2d(10, 0)).minus(neutral_spike_mark_position);

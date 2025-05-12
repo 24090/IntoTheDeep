@@ -54,7 +54,7 @@ public class Controlled extends LinearOpMode{
             movement.getF().run();
             if (gamepad1.left_bumper){
                 intake.readyGrab(
-                        gamepad1.left_trigger * (GameMap.MaxIntakeDistance - GameMap.MinIntakeDistance) + GameMap.MinIntakeDistance,
+                        gamepad1.left_trigger * (Intake.MaxDistance - Intake.MinDistance) + Intake.MinDistance,
                         0 // TODO: Claw rotation
                 );
             } else if (gamepad1.right_bumper){

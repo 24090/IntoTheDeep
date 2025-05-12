@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
+import static org.firstinspires.ftc.teamcode.util.GameMap.RobotLength;
+import static org.firstinspires.ftc.teamcode.util.GameMap.RobotWidth;
 import static java.lang.Math.PI;
 
 import androidx.annotation.NonNull;
@@ -32,7 +34,7 @@ import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 import org.firstinspires.ftc.teamcode.vision.Sample;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
-@Autonomous(name = "Five Sample Auto", group = "auto")
+@Autonomous(name = "Five", group = "auto")
 public class AutoFive extends LinearOpMode {
     MecanumDrive drive;
     Intake intake;
@@ -47,16 +49,16 @@ public class AutoFive extends LinearOpMode {
         // same as meepmeep
         final Vector2d inner_sample = new Vector2d(-48.75, -27);
         final Vector2d corner = new Vector2d(-72, -72);
-        final Pose2d start_pose = new Pose2d(corner.plus(new Vector2d(24 + GameMap.RobotLength / 2, GameMap.RobotWidth/ 2)), 0);
+        final Pose2d start_pose = new Pose2d(corner.plus(new Vector2d(24 + RobotLength / 2, RobotWidth/ 2)), 0);
         final Pose2d score_pose = new Pose2d(corner.plus(new Vector2d(18.5, 17)), PI / 4);
-        final Vector2d inner_spike_mark_position = inner_sample.minus(new Vector2d(0, GameMap.MaxIntakeDistance - 1));
-        final Vector2d neutral_spike_mark_position = inner_sample.minus(new Vector2d(10, 0)).minus(new Vector2d(0, GameMap.MaxIntakeDistance - 1));
+        final Vector2d inner_spike_mark_position = inner_sample.minus(new Vector2d(0, Intake.MaxDistance));
+        final Vector2d neutral_spike_mark_position = inner_sample.minus(new Vector2d(10, 0)).minus(new Vector2d(0, Intake.MaxDistance - 0.5));
         final Vector2d outer_spike_mark_position = inner_sample.minus(new Vector2d(20, 0)).plus(
-                Rotation2d.fromDouble(-0.95).vec().times(GameMap.MaxIntakeDistance - 1)
+                Rotation2d.fromDouble(-0.95).vec().times(Intake.MaxDistance - 0.5)
         );
-        final Vector2d InnerDistance = inner_sample.minus(inner_spike_mark_position);
-        final Vector2d CenterDistance = inner_sample.minus(new Vector2d(10, 0)).minus(neutral_spike_mark_position);
-        final Vector2d OuterDistance = inner_sample.minus(new Vector2d(20, 0)).minus(outer_spike_mark_position);
+        final Vector2d inner_distance = inner_sample.minus(inner_spike_mark_position);
+        final Vector2d center_distance = inner_sample.minus(new Vector2d(10, 0)).minus(neutral_spike_mark_position);
+        final Vector2d outer_distance = inner_sample.minus(new Vector2d(20, 0)).minus(outer_spike_mark_position);
         Sample sample = new Sample();
         // this line ≠ meepmeep
         drive = new MecanumDrive(hardwareMap, start_pose);
@@ -64,32 +66,33 @@ public class AutoFive extends LinearOpMode {
         Action path = drive.actionBuilder(start_pose)
                 .setTangent(0)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading)
-                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(InnerDistance.norm(), -InnerDistance.angleCast().toDouble())))
+                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(inner_distance.norm(), -inner_distance.angleCast().toDouble())))
                 .setTangent(0)
                 .afterTime(0, outtake.slideWaitAction())
-                .strafeToSplineHeading(inner_spike_mark_position, InnerDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
+                .strafeToSplineHeading(inner_spike_mark_position, inner_distance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 10)
                 .stopAndAdd(intake.pickUpAction())
                 .setTangent(0)
                 .afterTime(0, intake.fullTransferAction())
                 .strafeToSplineHeading(score_pose.position, score_pose.heading, (pose2dDual, posePath, v) -> 12)
-                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(CenterDistance.norm(), -CenterDistance.angleCast().toDouble())))
+                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(center_distance.norm(), -center_distance.angleCast().toDouble())))
                 .setTangent(0)
                 .afterTime(0, outtake.slideWaitAction())
-                .strafeToSplineHeading(neutral_spike_mark_position, CenterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 7)
+                .strafeToSplineHeading(neutral_spike_mark_position, center_distance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 7)
                 .stopAndAdd(intake.pickUpAction())
                 .setTangent(0)
                 .afterTime(0, intake.fullTransferAction())
                 .strafeToSplineHeading(score_pose.position, score_pose.heading,  (pose2dDual, posePath, v) -> 12)
-                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(OuterDistance.norm(), -OuterDistance.angleCast().toDouble())))
+                .stopAndAdd(new ParallelAction(outtake.scoreAction(), intake.readyGrabAction(outer_distance.norm(), -outer_distance.angleCast().toDouble())))
                 .setTangent(0)
                 .afterTime(0, outtake.slideWaitAction())
-                .strafeToSplineHeading(outer_spike_mark_position, OuterDistance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 8)
+                .strafeToSplineHeading(outer_spike_mark_position, outer_distance.angleCast().toDouble(), (pose2dDual, posePath, v) -> 8)
                 .stopAndAdd(intake.pickUpAction())
                 .setTangent(0)
                 .afterTime(0, intake.fullTransferAction())
                 .strafeToSplineHeading(score_pose.position, score_pose.heading, (pose2dDual, posePath, v) -> 12)
-                .stopAndAdd(outtake.fullScoreAction())
+                .stopAndAdd(outtake.scoreAction())
                 .setTangent(0)
+                .afterTime(0, outtake.slideWaitAction())
                 .strafeToSplineHeading(new Vector2d(-48, -12), 0, (pose2dDual, posePath, v) -> 50)
                 .setTangent(0)
                 .splineTo(new Vector2d(-30, -12), 0, (pose2dDual, posePath, v) -> 50)
@@ -103,7 +106,9 @@ public class AutoFive extends LinearOpMode {
                 ))
                 .strafeToSplineHeading(new Vector2d(-48, -12), 0, (pose2dDual, posePath, v) -> 50)
                 .strafeToSplineHeading(score_pose.position, score_pose.heading, (pose2dDual, posePath, v) -> 40)
-                .stopAndAdd(outtake.fullScoreAction())
+                .stopAndAdd(outtake.scoreAction())
+                .setTangent(0)
+                .afterTime(0, outtake.slideWaitAction())
                 .build();
         // these lines ≠ meepmeep
         BulkReads bulkreads = new BulkReads(hardwareMap);

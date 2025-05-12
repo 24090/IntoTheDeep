@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.util.GameMap;
+import org.firstinspires.ftc.teamcode.util.Intake;
 
 public class IntakeSlide extends LinearSlide {
     public static final double MAX_EXTEND = 1200;
@@ -37,9 +38,9 @@ public class IntakeSlide extends LinearSlide {
      * @return number of ticks to extend linear slide to
      */
     public double inToTicks(double extension_from_center_in){
-        return (extension_from_center_in - GameMap.MinIntakeDistance)/(GameMap.MaxIntakeDistance-GameMap.MinIntakeDistance) * (MAX_EXTEND - MIN_EXTEND) + MIN_EXTEND;
+        return (extension_from_center_in - Intake.MinDistance)/(Intake.MaxDistance-Intake.MinDistance) * (MAX_EXTEND - MIN_EXTEND) + MIN_EXTEND;
     }
     public double trimIn(double in){
-        return max(min(in, GameMap.MaxIntakeDistance), GameMap.MinIntakeDistance);
+        return max(min(in, Intake.MaxDistance), Intake.MinDistance);
     }
 }
