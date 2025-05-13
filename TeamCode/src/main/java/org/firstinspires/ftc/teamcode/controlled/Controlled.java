@@ -5,17 +5,16 @@ import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+
+import pedroPathing.constants.FConstants;
+import pedroPathing.constants.LConstants;
 
 /**
  * TODO:
@@ -28,7 +27,7 @@ public class Controlled extends LinearOpMode{
     FtcDashboard dash = FtcDashboard.getInstance();
     public void runOpMode(){
         double last_time = 0;
-        MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
+        Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         Intake intake;
         intake = new Intake(hardwareMap);
         Outtake outtake;
@@ -37,12 +36,11 @@ public class Controlled extends LinearOpMode{
 
         InstantAction movement = new InstantAction(() -> {
                 if (intake.linear_slide.getPosition() > 100) {
-                    drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x / 3));
+                    follower.setTeleOpMovementVectors(-gamepad1.left_stick_y/3, -gamepad1.left_stick_x/3, -gamepad1.right_stick_x / 3);
                 } else {
-                    drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), gamepad1.right_stick_x));
+                    follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
                 }
-
-                drive.updatePoseEstimate();
+                follower.poseUpdater.update();
             }
         );
         

@@ -1,33 +1,27 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
+import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
 import static java.lang.Math.PI;
-import static java.lang.Math.min;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
-
-import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
-import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
-import org.firstinspires.ftc.teamcode.util.linearslides.IntakeSlide;
+import pedroPathing.constants.FConstants;
+import pedroPathing.constants.LConstants;
 
 @TeleOp(name = "New Controlled")
 public class NewControlled extends LinearOpMode {
     FtcDashboard dash = FtcDashboard.getInstance();
     double last_time = 0;
     public void runOpMode(){
-        MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
+        Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         Intake intake;
         intake = new Intake(hardwareMap);
         Outtake outtake;
@@ -63,11 +57,11 @@ public class NewControlled extends LinearOpMode {
 
         InstantAction movement = new InstantAction(() -> {
             if (intake.linear_slide.getPosition() > 200 || gamepad1.right_stick_button) {
-                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.right_stick_y/3, -gamepad1.left_stick_x/3), -gamepad1.right_stick_x/3));
+                follower.setTeleOpMovementVectors(-gamepad1.right_stick_y/3, -gamepad1.left_stick_x/3, -gamepad1.right_stick_x/3);
             } else {
-                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.right_stick_y, -gamepad1.right_stick_x), gamepad1.left_stick_x));
+                follower.setTeleOpMovementVectors(-gamepad1.right_stick_y, -gamepad1.right_stick_x, gamepad1.left_stick_x);
             }
-            drive.updatePoseEstimate();
+            follower.poseUpdater.update();
         }
         );
         boolean old_a = false;
@@ -82,7 +76,7 @@ public class NewControlled extends LinearOpMode {
             movement.getF().run();
             telemetry.addData("loop time after intake+outtake+movement", (time - last_time) * 1000);
             if (gamepad1.left_bumper){
-                Actions.runBlocking(
+                runBlocking(
                     new RaceAction(
                         new ForeverAction(movement),
                         new ForeverAction(outtake::backgroundIter),
@@ -94,7 +88,7 @@ public class NewControlled extends LinearOpMode {
                 );
             }
             if (gamepad1.right_bumper) {
-                Actions.runBlocking(
+                runBlocking(
                     new RaceAction(
                         new ForeverAction(movement),
                         new ForeverAction(outtake::backgroundIter),

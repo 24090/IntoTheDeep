@@ -11,15 +11,18 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.pathgen.Point;
+import com.pedropathing.pathgen.Vector;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+
+import pedroPathing.constants.FConstants;
+import pedroPathing.constants.LConstants;
 
 @TeleOp(name = "Safe Controlled")
 public class SafeControlled extends LinearOpMode {
@@ -27,7 +30,7 @@ public class SafeControlled extends LinearOpMode {
     double last_time = 0;
     public void runOpMode(){
         // Initialize
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0, 0));
+        Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         Intake intake;
         intake = new Intake(hardwareMap);
         Outtake outtake;
@@ -62,23 +65,23 @@ public class SafeControlled extends LinearOpMode {
         });
 
         InstantAction movement = new InstantAction(() -> {
-            Vector2d relative_vel = new Vector2d(-gamepad1.right_stick_y, -gamepad1.right_stick_x);
-            Vector2d field_vel = drive.pose.heading.times(new Vector2d(-gamepad1.right_stick_y, -gamepad1.right_stick_x));
-            if (drive.pose.position.x > 11) {
-                field_vel = new Vector2d(min(field_vel.x, -0.1), field_vel.y);
+            Vector vel = new Vector(new Point(-gamepad1.right_stick_y, -gamepad1.right_stick_x));
+            vel.rotateVector(follower.getPose().getHeading());
+            if (follower.getPose().getX() > 11) {
+                vel.setOrthogonalComponents(min(vel.getXComponent(), -0.1), vel.getYComponent());
             }
-            if (drive.pose.position.y > 11) {
-                field_vel = new Vector2d(field_vel.x, min(field_vel.y, -0.1));
+            if (follower.getPose().getY() > 11) {
+                vel.setOrthogonalComponents(vel.getXComponent(), min(vel.getYComponent(), -0.1));
             }
-            if (drive.pose.position.x < -11) {
-                field_vel = new Vector2d(max(field_vel.x, 0.1), field_vel.y);
+            if (follower.getPose().getX() < -11) {
+                vel.setOrthogonalComponents(max(vel.getXComponent(), 0.1), vel.getYComponent());
             }
-            if (drive.pose.position.y < -11) {
-                field_vel = new Vector2d(field_vel.x, max(field_vel.y, 0.1));
+            if (follower.getPose().getY() < -11) {
+                vel.setOrthogonalComponents(vel.getXComponent(), max(vel.getYComponent(), 0.1));
             }
-            relative_vel = drive.pose.heading.inverse().times(field_vel);
-            drive.setDrivePowers(new PoseVelocity2d(relative_vel, gamepad1.left_stick_x));
-            drive.updatePoseEstimate();
+            vel.rotateVector(-follower.getPose().getHeading());
+            follower.setTeleOpMovementVectors(vel.getXComponent(), vel.getYComponent(), -gamepad1.left_stick_x);
+            follower.updatePose();
         }
         );
         boolean old_a = false;

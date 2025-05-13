@@ -6,11 +6,10 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.SequentialAction;
-
-import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
+import com.pedropathing.follower.Follower;
 
 public class RobotActions {
-    public static Action reachSample(Pose2d relative_sample, Intake intake, MecanumDrive drive){
+    public static Action reachSample(Pose2d relative_sample, Intake intake, Follower follower){
         return new SequentialAction(
             drive.actionBuilder(drive.pose).turnTo(
                     drive.pose.heading.times(
