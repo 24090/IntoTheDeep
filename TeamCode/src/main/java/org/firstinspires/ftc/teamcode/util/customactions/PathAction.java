@@ -6,19 +6,23 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.pathgen.PathChain;
-import com.pedropathing.pathgen.Path;
+
 public class PathAction implements Action{
     PathChain path_chain;
     Follower follower;
-
-    public PathAction(PathChain path_chain, Follower follower) {
+    Boolean path_set = false;
+    public PathAction(Follower follower, PathChain path_chain) {
         this.path_chain = path_chain;
         this.follower = follower;
     }
 
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        follower.followPath(path_chain, true)
+        if (!path_set) {
+            follower.followPath(path_chain, true);
+            path_set=true;
+        }
+        follower.update();
         return follower.isBusy();
     }
 }

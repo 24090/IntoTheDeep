@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
+import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
 import static java.lang.Double.max;
 import static java.lang.Double.min;
 import static java.lang.Math.PI;
@@ -96,7 +97,7 @@ public class SafeControlled extends LinearOpMode {
             movement.getF().run();
             telemetry.addData("loop time after intake+outtake+movement", (time - last_time) * 1000);
             if (gamepad1.left_bumper){
-                Actions.runBlocking(
+                runBlocking(
                         new RaceAction(
                                 new ForeverAction(movement),
                                 new ForeverAction(outtake::backgroundIter),
@@ -108,7 +109,7 @@ public class SafeControlled extends LinearOpMode {
                 );
             }
             if (gamepad1.right_bumper) {
-                Actions.runBlocking(
+                runBlocking(
                         new RaceAction(
                                 new ForeverAction(movement),
                                 new ForeverAction(outtake::backgroundIter),

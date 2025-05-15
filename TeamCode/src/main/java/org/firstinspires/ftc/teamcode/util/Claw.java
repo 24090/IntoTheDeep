@@ -54,8 +54,8 @@ public class Claw {
         }
     }
     public void toReadyGrabPos() {
-        elbow_servo_left.setPosition(0.92);
-        elbow_servo_right.setPosition(0.08);
+        elbow_servo_left.setPosition(0.85);
+        elbow_servo_right.setPosition(0.15);
         wrist_servo_movement.setPosition(1);
     }
 

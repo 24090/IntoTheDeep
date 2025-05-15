@@ -1,29 +1,44 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import static java.lang.Math.PI;
+
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Rotation2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.Point;
+import com.pedropathing.pathgen.Vector;
+
+import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+import org.firstinspires.ftc.teamcode.util.customactions.PathAction;
+import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 
 public class RobotActions {
-    public static Action reachSample(Pose2d relative_sample, Intake intake, Follower follower){
-        return new SequentialAction(
-            drive.actionBuilder(drive.pose).turnTo(
-                    drive.pose.heading.times(
-                            new Rotation2d(relative_sample.position.x, relative_sample.position.y)
-                    )
-            ).build(),
+    public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
+        Pose pose2 = follower.getPose();
+        Vector vector = new Vector(new Point(relative_sample.getX(), relative_sample.getY() + 0.75));
+        pose2.add(new Pose(0,0, vector.getTheta()));
+        return new RaceAction( new SequentialAction(
+            new InstantAction( () ->
+                follower.turn(vector.getTheta(), true)
+            ),
+            new TriggerAction(()->(
+                    (!follower.isBusy())
+                    &&(follower.getVelocityMagnitude()<1)
+                    &&(follower.getHeadingError()<0.02)
+            )),
             new ParallelAction(
-                intake.readyGrabAction(Intake.MinDistance, relative_sample.heading.toDouble()),
+                intake.readyGrabAction(Intake.MinDistance, relative_sample.getHeading() - vector.getTheta()),
                 new InstantAction( () -> intake.linear_slide.goTo( intake.linear_slide.inToTicks(
-                        intake.linear_slide.trimIn(relative_sample.position.norm())
+                        intake.linear_slide.trimIn(vector.getMagnitude())
                 ))),
                 intake.linear_slide.loopUntilDone()
             )
 
-        );
+        ), new ForeverAction(follower::update));
     }
 }

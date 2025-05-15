@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
+import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
@@ -56,7 +58,7 @@ public class Controlled extends LinearOpMode{
                         0 // TODO: Claw rotation
                 );
             } else if (gamepad1.right_bumper){
-                Actions.runBlocking(
+                runBlocking(
                         new RaceAction(
                             new ForeverAction(movement),
                             new ForeverAction(outtake::backgroundIter),
@@ -68,7 +70,7 @@ public class Controlled extends LinearOpMode{
                 );
             }
             if (gamepad1.dpad_up){
-                Actions.runBlocking(
+                runBlocking(
                         new RaceAction(
                                 new ForeverAction(movement),
                                 new ForeverAction(outtake::backgroundIter),

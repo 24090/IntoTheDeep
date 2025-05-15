@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.util;
 
 import static org.firstinspires.ftc.teamcode.util.GameMap.RobotLength;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -11,9 +12,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.util.linearslides.IntakeSlide;
 
+@Config
 public class Intake {
-    public static final double MaxDistance = 14 + RobotLength/2;
-    public static final double MinDistance = 0.75 + RobotLength/2;
+    public static double MaxDistance = 12.5 + RobotLength/2;
+    public static double MinDistance = 2.5 + RobotLength/2;
 
     public IntakeSlide linear_slide;
     public Claw claw;

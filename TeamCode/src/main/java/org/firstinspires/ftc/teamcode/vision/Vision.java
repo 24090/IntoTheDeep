@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.vision;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -53,7 +54,10 @@ public class Vision {
                 return true;
             }
             Triple<Double, Double, Double>  sample_triple = pipeline.getAnalysis().get(0);
-            out.pose = new Pose2d(sample_triple.getSecond(), sample_triple.getFirst(), sample_triple.getThird());
+            out.pose = new Pose(sample_triple.getSecond() - 1.0, sample_triple.getFirst(), sample_triple.getThird());
+            telemetry_packet.addLine("Sample X" + sample_triple.getFirst());
+            telemetry_packet.addLine("Sample Y" + (sample_triple.getSecond() - 1.0));
+            telemetry_packet.addLine("Sample Heading" + sample_triple.getThird());
             return false;
         };
     }
