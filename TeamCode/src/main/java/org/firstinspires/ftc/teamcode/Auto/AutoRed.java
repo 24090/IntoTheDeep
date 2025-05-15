@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
+import static org.firstinspires.ftc.teamcode.util.customactions.PathAction.pathAction;
 import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
 import static java.lang.Math.PI;
 
@@ -10,8 +11,10 @@ import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
@@ -26,9 +29,13 @@ import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
+import org.firstinspires.ftc.teamcode.util.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+import org.firstinspires.ftc.teamcode.util.customactions.FutureAction;
 import org.firstinspires.ftc.teamcode.util.customactions.PathAction;
 import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
+import org.firstinspires.ftc.teamcode.vision.Sample;
+import org.firstinspires.ftc.teamcode.vision.Vision;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -39,41 +46,63 @@ public class AutoRed extends LinearOpMode {
     Follower follower;
     Intake intake;
     Outtake outtake;
+    Vision vision;
 
     Action move_line_action(Pose a, Pose b) {
         PathChain path = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(a), new Point(b)))
                 .setLinearHeadingInterpolation(a.getHeading(), b.getHeading())
                 .build();
-        return new SequentialAction(
-                new InstantAction(()->follower.followPath(path, true)),
-                new TriggerAction(()->(!follower.isBusy())&&(follower.getVelocityMagnitude()<1)&&(follower.getHeadingError()<0.02))
-        );
+        return pathAction(follower, path);
     }
     @Override
     public void runOpMode() {
-        final Pose inner_sample = new Pose(48-2.75, 121.5, 0);
+        vision = new Vision(telemetry, hardwareMap);
+        Sample sample = new Sample();
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         final Pose start_pose = new Pose(GameMap.RobotWidth/2, 120 - GameMap.RobotLength / 2, -PI/2);
+        follower.setStartingPose(start_pose);
+
+        final Pose inner_sample = new Pose(48-2.75, 121.5, 0);
         final Pose score_pose = new Pose(18,144-18, -PI / 4);
         final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 0.5, inner_sample.getY() + 0.75, 0);
         final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 0.5, inner_sample.getY() + 9.25, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX(), inner_sample.getY() + 20, 0.9);
-        final Vector outer_offset = new Vector(Intake.MaxDistance - 0.5, 0.9);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX(), inner_sample.getY() + 20, 0.7);
+        final Pose submersible_pose = new Pose(72, 100, -PI/2);
+        PathChain submersible_path = follower.pathBuilder()
+                .addPath(
+                    new BezierCurve(
+                            new Point(score_pose),
+                            new Point(72, 124),
+                            new Point(submersible_pose)
+                    )
+                ).setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
+                .build();
+        PathChain sub_to_score = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Point(submersible_pose),
+                                new Point(72, 124),
+                                new Point(score_pose)
+                        )
+                ).setLinearHeadingInterpolation(submersible_pose.getHeading(), score_pose.getHeading())
+                .build();
+        final Vector outer_offset = new Vector(Intake.MaxDistance - 0.5, 0.7);
 
         // HW stuff
         intake = new Intake(hardwareMap);
         outtake = new Outtake(hardwareMap);
         // same as meepmeep
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
-        // this line ≠ meepmeep
-        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
-        follower.setStartingPose(start_pose);
-        // this line ≠ meepmeep
         Action path = new SequentialAction(
-            move_line_action(start_pose, score_pose),
+            new ParallelAction(
+                move_line_action(start_pose, score_pose),
+                outtake.slideUpAction(),
+                outtake.slideWaitAction()
+            ),
             new ParallelAction(
                 outtake.scoreAction(),
-                intake.readyGrabAction(Intake.MaxDistance - 0.5, -PI/2)
+                intake.readyGrabAction(Intake.MaxDistance - 0.5, PI/2)
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
@@ -81,12 +110,16 @@ public class AutoRed extends LinearOpMode {
             ),
             intake.pickUpAction(),
             new ParallelAction(
-                intake.fullTransferAction(),
+                new SequentialAction(
+                    intake.fullTransferAction(),
+                    outtake.slideUpAction(),
+                    outtake.slideWaitAction()
+                ),
                 move_line_action(inner_grab_pose, score_pose)
             ),
             new ParallelAction(
                 outtake.scoreAction(),
-                intake.readyGrabAction(Intake.MaxDistance - 0.5, -PI/2)
+                intake.readyGrabAction(Intake.MaxDistance - 0.5, PI/2)
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
@@ -94,22 +127,51 @@ public class AutoRed extends LinearOpMode {
             ),
             intake.pickUpAction(),
             new ParallelAction(
-                intake.fullTransferAction(),
+                new SequentialAction(
+                        intake.fullTransferAction(),
+                        outtake.slideUpAction(),
+                        outtake.slideWaitAction()
+                ),
                 move_line_action(center_grab_pose, score_pose)
             ),
             new ParallelAction(
-                outtake.scoreAction()
+                outtake.scoreAction(),
+                intake.readyGrabAction(Intake.MaxDistance - 0.5, 0.7)
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
-                move_line_action(score_pose, outer_grab_pose),
-                intake.readyGrabAction(Intake.MaxDistance - 0.5, 0.9)
+                move_line_action(score_pose, outer_grab_pose)
             ),
             intake.pickUpAction(),
             new ParallelAction(
-                intake.fullTransferAction()
+                new SequentialAction(
+                        intake.fullTransferAction(),
+                        outtake.slideUpAction(),
+                        outtake.slideWaitAction()
+                ),
+                move_line_action(outer_grab_pose, score_pose)
             ),
-            move_line_action(start_pose, score_pose),
+            outtake.scoreAction(),
+            new ParallelAction(
+                    outtake.slideWaitAction(),
+                    pathAction(follower, submersible_path)
+            ),
+            new SequentialAction(
+                    vision.findSample(sample),
+                    new FutureAction( () ->
+                            RobotActions.reachSample(sample.pose, intake, follower)
+                    ),
+                    new SleepAction(0.5),
+                    intake.pickUpAction()
+            ),
+            new ParallelAction(
+                    new SequentialAction(
+                            intake.fullTransferAction(),
+                            outtake.slideUpAction(),
+                            outtake.slideWaitAction()
+                    ),
+                    pathAction(follower, sub_to_score)
+            ),
             outtake.fullScoreAction()
         );
         // these lines ≠ meepmeep
