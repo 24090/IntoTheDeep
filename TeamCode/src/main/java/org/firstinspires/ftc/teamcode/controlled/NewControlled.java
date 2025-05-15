@@ -29,26 +29,26 @@ public class NewControlled extends LinearOpMode {
         outtake = new Outtake(hardwareMap);
 
         InstantAction intake_update = new InstantAction(() -> {
-            if (Math.abs(gamepad1.left_stick_y) > 0.5) {
+            /*if (Math.abs(gamepad2.left_stick_y) > 0.5) {
                 intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 100 * Math.signum(gamepad1.left_stick_y)),
+                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 100 * Math.signum(gamepad2.left_stick_y)),
                         50
                 );
-                intake.linear_slide.setMotorPower(-gamepad1.left_stick_y * 2 + Math.signum(gamepad1.left_stick_y));
-            } else if (gamepad1.dpad_up) {
+                intake.linear_slide.setMotorPower(-gamepad1.left_stick_y * 2 + Math.signum(gamepad2.left_stick_y));
+            }*/ if (gamepad2.dpad_up) {
                 intake.linear_slide.goTo(
                         intake.linear_slide.trimTicks(intake.linear_slide.getPosition() + 200 * (last_time - time)),
                         50
                 );
                 intake.linear_slide.setMotorPower(0.1);
-            } else if (gamepad1.dpad_down) {
+            } else if (gamepad2.dpad_down) {
                 intake.linear_slide.goTo(
                         intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 200 * (last_time - time)),
                         50
                 );
                 intake.linear_slide.setMotorPower(-0.1);
             } else {
-                if (gamepad1.left_stick_button) {
+                if (gamepad2.left_stick_button) {
                     intake.linear_slide.moveOut();
                 }
                 intake.linear_slide.movementLoop();

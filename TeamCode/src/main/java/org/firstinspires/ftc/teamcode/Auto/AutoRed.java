@@ -65,7 +65,7 @@ public class AutoRed extends LinearOpMode {
 
         final Pose inner_sample = new Pose(48-2.75, 121.5, 0);
         final Pose score_pose = new Pose(18,144-18, -PI / 4);
-        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 0.5, inner_sample.getY() + 0.75, 0);
+        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 0.75, inner_sample.getY() + 0.75, 0);
         final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 0.5, inner_sample.getY() + 9.25, 0);
         final Pose outer_grab_pose = new Pose(inner_sample.getX(), inner_sample.getY() + 20, 0.7);
         final Pose submersible_pose = new Pose(72, 100, -PI/2);
@@ -173,6 +173,7 @@ public class AutoRed extends LinearOpMode {
                     pathAction(follower, sub_to_score)
             ),
             outtake.fullScoreAction()
+
         );
         // these lines ≠ meepmeep
         BulkReads bulkreads = new BulkReads(hardwareMap);
