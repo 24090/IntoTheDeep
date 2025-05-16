@@ -32,7 +32,7 @@ public class Claw {
         elbow_servo_right = hardwareMap.get(ServoImplEx.class, "elbow_servo_right");
             elbow_servo_right.setPwmRange(new PwmControl.PwmRange(ELBOW_RIGHT_OUT, ELBOW_RIGHT_IN));
     }
-
+    public void to_angle(double value)
     public void rotate(double value_radians){
         wrist_servo_turret.setPosition(
                 (1+((value_radians/Math.PI)%1))%1

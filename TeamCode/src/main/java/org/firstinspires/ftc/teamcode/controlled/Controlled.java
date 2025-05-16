@@ -42,10 +42,10 @@ public class Controlled extends LinearOpMode{
                 } else {
                     follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
                 }
-                follower.poseUpdater.update();
+                follower.update();
             }
         );
-        
+        follower.startTeleopDrive();
         waitForStart();
         while (opModeIsActive()){
             double turret_angle = 0;

@@ -82,11 +82,12 @@ public class SafeControlled extends LinearOpMode {
             }
             vel.rotateVector(-follower.getPose().getHeading());
             follower.setTeleOpMovementVectors(vel.getXComponent(), vel.getYComponent(), -gamepad1.left_stick_x);
-            follower.updatePose();
+            follower.update();
         }
         );
         boolean old_a = false;
         boolean old_b = false;
+        follower.startTeleopDrive();
         waitForStart();
         while (opModeIsActive()){
             double turret_angle = 0;

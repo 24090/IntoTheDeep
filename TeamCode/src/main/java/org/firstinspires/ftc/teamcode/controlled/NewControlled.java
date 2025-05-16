@@ -61,11 +61,12 @@ public class NewControlled extends LinearOpMode {
             } else {
                 follower.setTeleOpMovementVectors(-gamepad1.right_stick_y, -gamepad1.right_stick_x, gamepad1.left_stick_x);
             }
-            follower.poseUpdater.update();
+            follower.update();
         }
         );
         boolean old_a = false;
         boolean old_b = false;
+        follower.startTeleopDrive();
         waitForStart();
         while (opModeIsActive()){
             double turret_angle = 0;
