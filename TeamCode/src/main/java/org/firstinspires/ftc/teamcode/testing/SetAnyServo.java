@@ -2,14 +2,16 @@ package org.firstinspires.ftc.teamcode.testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 @TeleOp(group = "testing", name = "Set Any Servo")
 public class SetAnyServo extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         String[] servo_names = {
-                "claw_servo", "wrist_servo_movement", "wrist_servo_turret", "elbow_servo_left", "elbow_servo_right", "outtake_servo"
+                "claw_servo", "wrist_servo_left", "wrist_servo_right", "elbow_servo_left", "elbow_servo_right", "outtake_servo"
         };
         int servo_number = 0;
         double pos = 0;
@@ -24,6 +26,7 @@ public class SetAnyServo extends LinearOpMode {
             telemetry.addLine("DPAD UP - increment position");
             telemetry.addLine("DPAD DOWN - increment position");
             if (gamepad1.a) {
+                hardwareMap.get(ServoImplEx.class, servo_names[servo_number]).setPwmRange(new PwmControl.PwmRange(500, 2500));
                 hardwareMap.get(Servo.class, servo_names[servo_number]).getController().pwmEnable();
             } else if (gamepad1.b) {
                 hardwareMap.get(Servo.class, servo_names[servo_number]).getController().pwmDisable();

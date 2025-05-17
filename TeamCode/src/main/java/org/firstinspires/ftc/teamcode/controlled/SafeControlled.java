@@ -7,11 +7,8 @@ import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.pathgen.Vector;
@@ -19,7 +16,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
-import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 
 import pedroPathing.constants.FConstants;
@@ -137,10 +133,10 @@ public class SafeControlled extends LinearOpMode {
             }
             if (gamepad1.dpad_left) {
                 turret_angle += (time-last_time);
-                intake.claw.rotate(turret_angle);
+                intake.claw.rotate_turret(turret_angle);
             } else if (gamepad1.dpad_right){
                 turret_angle -= (time-last_time);
-                intake.claw.rotate(turret_angle);
+                intake.claw.rotate_turret(turret_angle);
             }
             old_a = gamepad1.a;
             old_b = gamepad1.b;

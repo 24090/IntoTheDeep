@@ -10,20 +10,20 @@ public class ClawTesting extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Claw claw = new Claw(hardwareMap);
-        double r = 0;
-        claw.rotate(0);
+        double turret_angle = 0;
+        double positioning_angle = 0;
         claw.toTransferPos();
         claw.open();
         waitForStart();
         double last_time = 0.0;
         while(opModeIsActive()){
             if (gamepad1.dpad_up){
-                r += 2 * (last_time - time);
-                claw.rotate(r);
+                turret_angle += 2 * (last_time - time);
+                claw.rotate_turret(turret_angle);
             }
             if (gamepad1.dpad_down){
-                r -= 2 * (last_time - time);
-                claw.rotate(r);
+                turret_angle -= 2 * (last_time - time);
+                claw.rotate_turret(turret_angle);
             }
             if (gamepad1.a){
                 claw.toReadyGrabPos();
@@ -37,7 +37,8 @@ public class ClawTesting extends LinearOpMode {
             if (gamepad1.y){
                 claw.open();
             }
-            telemetry.addData("rotation", r);
+            telemetry.addData("turret", turret_angle);
+            telemetry.addData("positioning", positioning_angle);
             telemetry.update();
             last_time = time;
         }
