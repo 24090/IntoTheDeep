@@ -18,12 +18,12 @@ public class ClawTesting extends LinearOpMode {
         double last_time = 0.0;
         while(opModeIsActive()){
             if (gamepad1.dpad_up){
-                turret_angle += 2 * (last_time - time);
-                claw.rotate_turret(turret_angle);
+                turret_angle += 10 * (last_time - time);
+                claw.rotate(turret_angle);
             }
             if (gamepad1.dpad_down){
-                turret_angle -= 2 * (last_time - time);
-                claw.rotate_turret(turret_angle);
+                turret_angle -= 10 * (last_time - time);
+                claw.rotate(turret_angle);
             }
             if (gamepad1.a){
                 claw.toReadyGrabPos();

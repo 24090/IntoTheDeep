@@ -133,10 +133,10 @@ public class SafeControlled extends LinearOpMode {
             }
             if (gamepad1.dpad_left) {
                 turret_angle += (time-last_time);
-                intake.claw.rotate_turret(turret_angle);
+                intake.claw.rotate(turret_angle);
             } else if (gamepad1.dpad_right){
                 turret_angle -= (time-last_time);
-                intake.claw.rotate_turret(turret_angle);
+                intake.claw.rotate(turret_angle);
             }
             old_a = gamepad1.a;
             old_b = gamepad1.b;

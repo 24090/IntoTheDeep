@@ -22,7 +22,7 @@ public class TurretVision extends LinearOpMode{
             if (!data.isEmpty()) {
                 angle = data.get(0).getThird();
             }
-            claw.rotate_turret(angle);
+            claw.rotate(angle);
         }
 
     }

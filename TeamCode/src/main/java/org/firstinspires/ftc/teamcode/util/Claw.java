@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.floorMod;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,15 +16,17 @@ public class Claw {
     ServoImplEx elbow_servo_left;
     ServoImplEx elbow_servo_right;
 
-    public static int ELBOW_LEFT_IN = 1600;
-    public static int ELBOW_LEFT_OUT = 2400;
-    public static int ELBOW_RIGHT_IN = 1400;
-    public static int ELBOW_RIGHT_OUT = 600;
-    public static double WRIST_SCALE_FACTOR = (2*PI);
-    public static double LEFT_WRIST_OFFSET = 0.5;
-    public static double RIGHT_WRIST_OFFSET = 0.5;
-    double current_positioning_angle;
-    double current_turret_angle;
+    public static int ELBOW_LEFT_IN = 1700;
+    public static int ELBOW_LEFT_OUT = 2300;
+    public static int ELBOW_RIGHT_IN = 1800;
+    public static int ELBOW_RIGHT_OUT = 1200;
+    public static double WRIST_LEFT_IN = 1;
+    public static double WRIST_LEFT_OUT_0 = 0;
+    public static double WRIST_LEFT_OUT_180 = 1;
+    public static double WRIST_RIGHT_IN = 0;
+    public static double WRIST_RIGHT_OUT_0 = 0;
+    public static double WRIST_RIGHT_OUT_180 = 1;
+
     public Claw(HardwareMap hardwareMap){
         claw_servo = hardwareMap.get(ServoImplEx.class, "claw_servo");
         wrist_servo_right = hardwareMap.get(ServoImplEx.class, "wrist_servo_right");
@@ -35,25 +38,22 @@ public class Claw {
         elbow_servo_right = hardwareMap.get(ServoImplEx.class, "elbow_servo_right");
             elbow_servo_right.setPwmRange(new PwmControl.PwmRange(ELBOW_RIGHT_OUT, ELBOW_RIGHT_IN));
     }
-    public void setWrist(double positioning_angle, double turret_angle){
-        current_positioning_angle = positioning_angle;
-        current_turret_angle = turret_angle;
-        wrist_servo_left.setPosition((positioning_angle + turret_angle)/(2* WRIST_SCALE_FACTOR) + LEFT_WRIST_OFFSET);
-        wrist_servo_left.setPosition((positioning_angle - turret_angle)/(2* WRIST_SCALE_FACTOR) + RIGHT_WRIST_OFFSET);
+
+
+    public void rotate(double turret_angle){
+        double rots = (1+(turret_angle/(PI) + 0.5)%1)%1;
+        wrist_servo_left.setPosition((1-rots) * WRIST_LEFT_OUT_0 + rots * WRIST_LEFT_OUT_180);
+        wrist_servo_right.setPosition((1-rots) * WRIST_RIGHT_OUT_0 + rots * WRIST_RIGHT_OUT_180);
     }
-    public void rotate_turret(double turret_angle){
-        setWrist(current_positioning_angle, turret_angle);
-    }
-    public void rotate_positioning(double positioning_angle){
-        setWrist(positioning_angle, current_turret_angle);
-    }
+
     public void grab(){
-        claw_servo.setPosition(0);
+        claw_servo.setPosition(0.4);
     }
 
     public void open(){
-        claw_servo.setPosition(0.4);
+        claw_servo.setPosition(0);
     }
+
     public void toggleGrab(){
         if (claw_servo.getPosition() > 0.5) {
             open();
@@ -61,22 +61,25 @@ public class Claw {
             grab();
         }
     }
-    public void toReadyGrabPos() {
+
+    public void toReadyGrabPos(double angle) {
         elbow_servo_left.setPosition(0.85);
         elbow_servo_right.setPosition(0.15);
-        setWrist(0, current_turret_angle);
+        rotate(angle);
     }
-
+    public void toReadyGrabPos() {
+        toReadyGrabPos(0);
+    }
     public void toTransferPos() {
         elbow_servo_left.setPosition(0);
         elbow_servo_right.setPosition(1);
-        setWrist(PI, 0);
+        wrist_servo_left.setPosition(WRIST_LEFT_IN);
+        wrist_servo_right.setPosition(WRIST_RIGHT_IN);
     }
 
 
     public void toGrabPos() {
         elbow_servo_left.setPosition(1);
         elbow_servo_right.setPosition(0);
-        setWrist(0, current_turret_angle);
     }
 }
