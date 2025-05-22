@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import static java.lang.Math.PI;
+
 import android.annotation.SuppressLint;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
@@ -23,14 +26,17 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     Telemetry telemetry;
     public Scalar color_min;
     public Scalar color_max;
-    public int stage = 4;
+    public int stage = 5;
     Mat input_undistort = new Mat();
     Mat color_mask = new Mat();
     Mat color_filtered_image = new Mat();
     Mat output = new Mat();
     final Mat empty_mat = new Mat();
     Mat hierarchy = new Mat();
+    Mat lines = new Mat();
     Mat greyscale = new Mat();
+    Mat horizontal_edges = new Mat();
+    Mat vertical_edges = new Mat();
     public ArrayList<Triple<Double, Double, Double>> object_field_coords = new ArrayList<>();
     final double top_distance_weight  = 0.05;
     final double top2_distance_weight = 2.4;
@@ -79,7 +85,10 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(color_filtered_image,greyscale, Imgproc.COLOR_HSV2RGB);
         Imgproc.cvtColor(greyscale,greyscale, Imgproc.COLOR_RGB2GRAY);
         Core.bitwise_not(greyscale, greyscale);
-
+        Imgproc.Sobel(greyscale, horizontal_edges, CvType.CV_8U, 0, 1);
+        Imgproc.Sobel(greyscale, vertical_edges, CvType.CV_8U, 0, 1);
+        Core.subtract(greyscale, horizontal_edges, greyscale);
+        Core.subtract(greyscale, vertical_edges, greyscale);
         Imgproc.findContours(greyscale, dst, hierarchy, Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE );
     }
 
@@ -125,7 +134,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
             return null;
         }
         boolean short_side = (distance < 2);
-        double angle = Math.atan((world_point_a.y - world_point_b.y)/(world_point_b.x - world_point_a.x)) + (short_side ? Math.PI/2: 0);
+        double angle = Math.atan((world_point_a.y - world_point_b.y)/(world_point_b.x - world_point_a.x)) + (short_side ? PI/2: 0);
         double multiplier = (short_side ? 1.5/2: 3.5/2) * (world_point_a.x < world_point_b.x ? 1: -1);
         double world_x = (world_point_a.x + world_point_b.x)/2 + (world_point_a.y - world_point_b.y)/distance * multiplier;
         double world_y = (world_point_a.y + world_point_b.y)/2 - (world_point_a.x - world_point_b.x)/distance * multiplier;
@@ -142,7 +151,6 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         // Get coords + rotation for each contour
         int n = 0;
         for (MatOfPoint points: contours){
-
             n += 1;
             MatOfPoint2f points2f = new MatOfPoint2f(points.toArray());
             Imgproc.approxPolyDP(points2f, points2f, 2, true);
@@ -173,22 +181,22 @@ public class SampleLocationPipeline extends OpenCvPipeline {
             telemetry.addData("x, y, θ", String.format("%.1f, %.1f, %.2f", pose.getFirst(), pose.getSecond(), pose.getThird()));
         }
         switch(stage){
+            case 5:
+                Imgproc.cvtColor(color_filtered_image, output, Imgproc.COLOR_HSV2RGB);
+                break;
             case 4:
-                color_filtered_image.copyTo(output);
+                Imgproc.cvtColor(greyscale, output, Imgproc.COLOR_GRAY2RGB);
                 break;
             case 3:
-                greyscale.copyTo(output);
+                Imgproc.cvtColor(horizontal_edges, output, Imgproc.COLOR_GRAY2RGB);
                 break;
             case 2:
-                color_mask.copyTo(output);
+                Imgproc.cvtColor(color_mask, output, Imgproc.COLOR_HSV2RGB);
                 break;
             default:
-                input_undistort.copyTo(output);
+                Imgproc.cvtColor(input_undistort, output, Imgproc.COLOR_HSV2RGB);
                 break;
         }
-        // HSV -> RGB
-
-        Imgproc.cvtColor(output, output, Imgproc.COLOR_HSV2RGB);
         telemetry.update();
         return output;
     }
