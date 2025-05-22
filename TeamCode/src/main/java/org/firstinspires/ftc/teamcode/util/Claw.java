@@ -16,16 +16,16 @@ public class Claw {
     ServoImplEx elbow_servo_left;
     ServoImplEx elbow_servo_right;
 
-    public static int ELBOW_LEFT_IN = 1700;
-    public static int ELBOW_LEFT_OUT = 2300;
-    public static int ELBOW_RIGHT_IN = 1800;
-    public static int ELBOW_RIGHT_OUT = 1200;
+    public static int ELBOW_LEFT_IN = 1000;
+    public static int ELBOW_LEFT_OUT = 2200;
+    public static int ELBOW_RIGHT_IN = 2500;
+    public static int ELBOW_RIGHT_OUT = 1300;
     public static double WRIST_LEFT_IN = 1;
     public static double WRIST_LEFT_OUT_0 = 0;
     public static double WRIST_LEFT_OUT_180 = 1;
     public static double WRIST_RIGHT_IN = 0;
-    public static double WRIST_RIGHT_OUT_0 = 0;
-    public static double WRIST_RIGHT_OUT_180 = 1;
+    public static double WRIST_RIGHT_OUT_0 = 0.6;
+    public static double WRIST_RIGHT_OUT_180 = 0.5;
 
     public Claw(HardwareMap hardwareMap){
         claw_servo = hardwareMap.get(ServoImplEx.class, "claw_servo");
@@ -41,7 +41,7 @@ public class Claw {
 
 
     public void rotate(double turret_angle){
-        double rots = (1+(turret_angle/(PI) + 0.5)%1)%1;
+        double rots = (1+(turret_angle/(PI))%1)%1;
         wrist_servo_left.setPosition((1-rots) * WRIST_LEFT_OUT_0 + rots * WRIST_LEFT_OUT_180);
         wrist_servo_right.setPosition((1-rots) * WRIST_RIGHT_OUT_0 + rots * WRIST_RIGHT_OUT_180);
     }

@@ -60,13 +60,13 @@ public class AutoRed extends LinearOpMode {
         vision = new Vision(telemetry, hardwareMap);
         Sample sample = new Sample();
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
-        final Pose start_pose = new Pose(GameMap.RobotWidth/2, 120 - GameMap.RobotLength / 2, -PI/2);
+        final Pose start_pose = new Pose(GameMap.RobotWidth/2, 120.5 - GameMap.RobotLength / 2, -PI/2);
         follower.setStartingPose(start_pose);
 
-        final Pose inner_sample = new Pose(48-2.75, 121.75, 0);
+        final Pose inner_sample = new Pose(48-1.75, 123.5, 0);
         final Pose score_pose = new Pose(18,144-18, -PI / 4);
-        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 0.75, inner_sample.getY() + 0, 0);
-        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 0.5, inner_sample.getY() + 10, 0);
+        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0, 0);
+        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10, 0);
         final Pose outer_grab_pose = new Pose(inner_sample.getX(), inner_sample.getY() + 20, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 100, -PI/2);
         PathChain submersible_path = follower.pathBuilder()
