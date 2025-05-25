@@ -4,27 +4,29 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Outtake;
+import org.firstinspires.ftc.teamcode.util.OuttakeClaw;
 
-@TeleOp(group = "testing", name = "Outtake Testing")
-public class OuttakeTesting extends LinearOpMode {
-    Outtake outtake;
+@TeleOp(group = "testing", name = "Outtake Claw Testing")
+public class OuttakeClawTesting extends LinearOpMode {
+    OuttakeClaw claw;
     public void runOpMode() throws InterruptedException {
-        outtake = new Outtake(hardwareMap);
+        claw = new OuttakeClaw(hardwareMap);
         waitForStart();
         while (opModeIsActive()){
-            outtake.backgroundIter();
             if (gamepad1.dpad_left){
-                outtake.claw.open();
+                claw.open();
             } else if (gamepad1.dpad_right){
-                outtake.claw.grab();
+                claw.grab();
             }
             if (gamepad1.x){
-                outtake.readyTransfer();
+                claw.toTransferPos();
             }
             if (gamepad1.y){
-                outtake.readySample();
+                claw.toSamplePos();
             }
-            telemetry.addData("pos", outtake.slide.getPosition());
+            if (gamepad1.y){
+                claw.toSpecimenPose();
+            }
             telemetry.update();
         }
     }

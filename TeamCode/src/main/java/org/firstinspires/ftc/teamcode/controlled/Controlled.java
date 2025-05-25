@@ -86,13 +86,13 @@ public class Controlled extends LinearOpMode{
                 intake.claw.rotate(turret_angle);
             }
             if (gamepad1.y){
-                outtake.slide.up();
+                outtake.readySampleAction();
             } else if (gamepad1.a){
-                outtake.down();
+                outtake.readyTransfer();
             } else if (gamepad1.b){
-                outtake.open();
+                outtake.claw.open();
             } else if (gamepad1.x){
-                outtake.close();
+                outtake.claw.grab();
             }
             last_time = time;
         }

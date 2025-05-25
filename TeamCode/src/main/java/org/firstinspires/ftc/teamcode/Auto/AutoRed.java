@@ -5,9 +5,7 @@ import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runB
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -19,7 +17,6 @@ import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.pathgen.Vector;
-import com.pedropathing.util.Constants;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -32,7 +29,6 @@ import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 import org.firstinspires.ftc.teamcode.util.customactions.FutureAction;
-import org.firstinspires.ftc.teamcode.util.customactions.PathAction;
 import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 import org.firstinspires.ftc.teamcode.vision.Sample;
 import org.firstinspires.ftc.teamcode.vision.Vision;
@@ -97,7 +93,7 @@ public class AutoRed extends LinearOpMode {
         Action path = new SequentialAction(
             new ParallelAction(
                 move_line_action(start_pose, score_pose),
-                outtake.slideUpAction(),
+                outtake.readySampleAction(),
                 outtake.slideWaitAction()
             ),
             new ParallelAction(
@@ -112,7 +108,7 @@ public class AutoRed extends LinearOpMode {
             new ParallelAction(
                 new SequentialAction(
                     intake.fullTransferAction(),
-                    outtake.slideUpAction(),
+                    outtake.readySampleAction(),
                     outtake.slideWaitAction()
                 ),
                 move_line_action(inner_grab_pose, score_pose)
@@ -129,7 +125,7 @@ public class AutoRed extends LinearOpMode {
             new ParallelAction(
                 new SequentialAction(
                         intake.fullTransferAction(),
-                        outtake.slideUpAction(),
+                        outtake.readySampleAction(),
                         outtake.slideWaitAction()
                 ),
                 move_line_action(center_grab_pose, score_pose)
@@ -146,7 +142,7 @@ public class AutoRed extends LinearOpMode {
             new ParallelAction(
                 new SequentialAction(
                         intake.fullTransferAction(),
-                        outtake.slideUpAction(),
+                        outtake.readySampleAction(),
                         outtake.slideWaitAction()
                 ),
                 move_line_action(outer_grab_pose, score_pose)
@@ -167,7 +163,7 @@ public class AutoRed extends LinearOpMode {
             new ParallelAction(
                     new SequentialAction(
                             intake.fullTransferAction(),
-                            outtake.slideUpAction(),
+                            outtake.readySampleAction(),
                             outtake.slideWaitAction()
                     ),
                     pathAction(follower, sub_to_score)

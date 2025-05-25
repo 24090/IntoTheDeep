@@ -6,96 +6,80 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+import org.firstinspires.ftc.teamcode.util.linearslides.MirrorMotor;
 import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 
 public class Outtake {
     public static final double SERVO_CLOSE_MIN_TICKS = 1000;
     public static final double SERVO_CLOSE_MAX_TICKS = 1500;
-    Servo servo;
-    Boolean close_plan = false;
+    private final MirrorMotor mirror_slide;
     public OuttakeSlide slide;
+    public OuttakeClaw claw;
     public Outtake(HardwareMap hwmap) {
-        this.servo = hwmap.get(Servo.class, "outtake_servo");
         this.slide = new OuttakeSlide(hwmap);
-    }
-    public void open(){
-        servo.setPosition(0.33);
-    }
-    public void close(){
-        servo.setPosition(1);
-    }
-    public void toggleBucket(){
-        if (servo.getPosition() > 0.5) {
-            open();
-        } else {
-            close();
-        }
-    }
-
-    public void safeCloseIter(){
-        if (SERVO_CLOSE_MIN_TICKS < slide.getPosition() && slide.getPosition() < SERVO_CLOSE_MAX_TICKS && close_plan) {
-            close();
-            close_plan = false;
-        }
-
-        // While the slide position and destination makes movement possible
-        close_plan = close_plan &&(
-                Math.min(slide.getPosition(),  slide.target_pos)  <  SERVO_CLOSE_MAX_TICKS
-                        && SERVO_CLOSE_MIN_TICKS < Math.max(slide.getPosition(), slide.target_pos)
+        this.mirror_slide = new MirrorMotor(
+                hwmap.get(DcMotor.class, "outtake_slide_left"),
+                hwmap.get(DcMotor.class, "outtake_slide_right"),
+                DcMotorSimple.Direction.REVERSE
         );
+        this.claw = new OuttakeClaw(hwmap);
     }
 
     public void backgroundIter(){
-        safeCloseIter();
+        mirror_slide.update();
         slide.movementLoop();
     }
 
-    public void safeClose(){
-        close_plan = true;
+    public void readyTransfer(){
+        slide.down();
+        claw.toTransferPos();
     }
 
-    public void down(){
-        slide.down();
-        safeClose();
+    public void readySample(){
+        slide.up();
+        claw.toSamplePos();
     }
 
     public Action slideWaitAction(){
         return new RaceAction(
-                new ForeverAction(this::safeCloseIter),
                 slide.loopUntilDone()
         );
     }
-    public Action slideDownAction(){
+    public Action readyTransferAction(){
         return new SequentialAction(
-                new InstantAction(this::down),
+                new InstantAction(this::readyTransfer),
                 slideWaitAction()
         );
     }
-    public Action slideUpAction(){
-        return new SequentialAction(new InstantAction(slide::up), slideWaitAction());
+    public Action readySampleAction(){
+        return new SequentialAction(
+                new InstantAction(this::readySample),
+                slideWaitAction());
     }
-    public Action openGateAction(){
-        return new ParallelAction(new SleepAction(0.3), new InstantAction(this::open));
+    public Action openClawAction(){
+        return new ParallelAction(new SleepAction(0.2), new InstantAction(this.claw::open));
+    }
+    public Action closeClawAction(){
+        return new ParallelAction(new SleepAction(0.2), new InstantAction(this.claw::grab));
     }
 
     public Action scoreAction(){
         return new SequentialAction(
-                slideUpAction(),
-                openGateAction(),
-                new InstantAction(this::down)
+                readySampleAction(),
+                openClawAction(),
+                new InstantAction(this::readyTransfer)
         );
     }
     public Action fullScoreAction(){
         return new SequentialAction(
-                slideUpAction(),
-                openGateAction(),
-                new ParallelAction(
-                        slideDownAction()
-                )
+                readySampleAction(),
+                openClawAction(),
+                readyTransferAction()
         );
     }
 }

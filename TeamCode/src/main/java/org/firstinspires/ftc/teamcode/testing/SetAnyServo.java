@@ -11,7 +11,15 @@ public class SetAnyServo extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         String[] servo_names = {
-                "claw_servo", "wrist_servo_left", "wrist_servo_right", "elbow_servo_left", "elbow_servo_right", "outtake_servo"
+                "claw_servo",
+                "wrist_servo_left",
+                "wrist_servo_right",
+                "elbow_servo_left",
+                "elbow_servo_right",
+                "outtake_claw_servo",
+                "outtake_left_servo",
+                "outtake_right_servo",
+                "outtake_wrist_servo"
         };
         int servo_number = 0;
         double pos = 0;

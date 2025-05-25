@@ -116,17 +116,17 @@ public class SafeControlled extends LinearOpMode {
 
             }
             if (gamepad1.x) {
-                outtake.slide.up();
+                outtake.readySampleAction();
             } else if (gamepad1.y) {
-                outtake.slide.down();
+                outtake.readyTransfer();
             }
             if (gamepad1.left_trigger > 0.4) {
-                outtake.slide.down();
+                outtake.readyTransfer();
             } else if (gamepad1.right_trigger > 0.4) {
-                outtake.slide.up();
+                outtake.readySampleAction();
             }
             if (gamepad1.a && !old_a){
-                outtake.toggleBucket();
+                outtake.claw.toggleGrab();
             }
             if (gamepad1.b && !old_b){
                 intake.claw.toggleGrab();

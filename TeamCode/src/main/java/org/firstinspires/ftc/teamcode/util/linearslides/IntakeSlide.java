@@ -11,26 +11,26 @@ import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 
 public class IntakeSlide extends LinearSlide {
-    public static final double MAX_EXTEND = 1200;
+    public static final double MAX_EXTEND = 320;
     public static final double MIN_EXTEND = 0;
     /**
      * Class for using Intake Slide
      * @param hwmap the hardware map, used to find the motor
      */
     public IntakeSlide(HardwareMap hwmap) {
-        super(hwmap.get(DcMotor.class, "intake_motor"), MIN_EXTEND, MAX_EXTEND, 0, 50);
+        super(hwmap.get(DcMotor.class, "intake_motor"), MIN_EXTEND, MAX_EXTEND, 0, 10);
         this.motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public void moveIn(){
         goTo(0);
     }
     public void moveOut(){
-        goTo(1000);
+        goTo(319);
     }
 
     public double powerFunction(){
         double distance = target_pos - getPosition();
-        return Math.signum(distance) * 0.3 + distance/1000;
+        return Math.signum(distance) * 0.4 + distance/600;
     }
     /**
      * Converts
