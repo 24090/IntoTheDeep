@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -13,8 +14,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.util.linearslides.MirrorMotor;
 import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
-
+@Config
 public class Outtake {
+    public static  double LOW_HANG = 700;
     public static final double SERVO_CLOSE_MIN_TICKS = 1000;
     public static final double SERVO_CLOSE_MAX_TICKS = 1500;
     private final MirrorMotor mirror_slide;
@@ -39,7 +41,21 @@ public class Outtake {
         slide.down();
         claw.toTransferPos();
     }
-
+    public void readyHang(){
+        claw.toTransferPos();
+        slide.up();
+    }
+    public void readyHang2(){
+        claw.toTransferPos();
+        slide.goTo(LOW_HANG);
+    }
+    public void hang(){
+        slide.down();
+        claw.wrist_servo.close();
+        claw.left_servo.close();
+        claw.right_servo.close();
+        claw.claw_servo.close();
+    }
     public void readySample(){
         slide.up();
         claw.toSamplePos();

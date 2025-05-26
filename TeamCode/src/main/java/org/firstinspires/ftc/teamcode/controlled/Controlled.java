@@ -61,8 +61,7 @@ public class Controlled extends LinearOpMode{
                             new ForeverAction(movement),
                             new ForeverAction(outtake::backgroundIter),
                             new SequentialAction(
-                                intake.fullTransferAction(),
-                                new InstantAction(intake.claw::toReadyGrabPos)
+                                intake.readyTransferAction()
                             )
                         )
                 );
@@ -86,7 +85,7 @@ public class Controlled extends LinearOpMode{
                 intake.claw.rotate(turret_angle);
             }
             if (gamepad1.y){
-                outtake.readySampleAction();
+                outtake.readySample();
             } else if (gamepad1.a){
                 outtake.readyTransfer();
             } else if (gamepad1.b){

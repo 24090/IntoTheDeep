@@ -11,6 +11,7 @@ public class MirrorMotor {
         this.mirror_motor = mirror_motor;
         this.main_motor = main_motor;
         mirror_motor.setDirection(direction);
+        mirror_motor.setZeroPowerBehavior(main_motor.getZeroPowerBehavior());
     }
 
     public void update(){
