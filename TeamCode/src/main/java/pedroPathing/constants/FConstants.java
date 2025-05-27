@@ -17,18 +17,18 @@ public class FConstants {
         FollowerConstants.rightFrontMotorName = "par1";
         FollowerConstants.rightRearMotorName = "motor";
 
-        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
-        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.FORWARD;
+        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
+        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.REVERSE;
         FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
         FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.FORWARD;
 
         FollowerConstants.mass = 16;
 
-        FollowerConstants.xMovement = 58.713077692356094;
-        FollowerConstants.yMovement = 43.623180212830064;
+        FollowerConstants.xMovement = 74.71785841522455;
+        FollowerConstants.yMovement = 55.78156464111031;
 
-        FollowerConstants.forwardZeroPowerAcceleration = -40.01544855892198;
-        FollowerConstants.lateralZeroPowerAcceleration = -72.5455474677653;
+        FollowerConstants.forwardZeroPowerAcceleration = -33.316274741070124;
+        FollowerConstants.lateralZeroPowerAcceleration = -75.7521639758366;
 
         FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.08,0,0.008,0);
         FollowerConstants.useSecondaryTranslationalPID = false;
@@ -38,12 +38,12 @@ public class FConstants {
         FollowerConstants.useSecondaryHeadingPID = false;
         FollowerConstants.secondaryHeadingPIDFCoefficients.setCoefficients(0.1,0,0.01,0); // Not being used, @see useSecondaryHeadingPID
 
-        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.02,0,0.000006,0.6,0);
+        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.005,0,0.000006,0.6,0);
         FollowerConstants.useSecondaryDrivePID = true;
         FollowerConstants.secondaryDrivePIDFCoefficients.setCoefficients(0.015,0,0,0.6,0); // Not being used, @see useSecondaryDrivePID
 
         FollowerConstants.zeroPowerAccelerationMultiplier = 2;
-        FollowerConstants.centripetalScaling = 0.0003;
+        FollowerConstants.centripetalScaling = 0.0008;
 
         FollowerConstants.pathEndTimeoutConstraint = 500;
         FollowerConstants.pathEndTValueConstraint = 0.995;

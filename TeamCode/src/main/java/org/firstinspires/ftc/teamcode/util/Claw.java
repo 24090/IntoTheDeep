@@ -72,8 +72,8 @@ public class Claw {
         toReadyGrabPos(0);
     }
     public void toTransferPos() {
-        elbow_servo_left.setPosition(0);
-        elbow_servo_right.setPosition(1);
+        elbow_servo_left.setPosition(0.2);
+        elbow_servo_right.setPosition(0.8);
         wrist_servo_left.setPosition(WRIST_LEFT_IN);
         wrist_servo_right.setPosition(WRIST_RIGHT_IN);
     }

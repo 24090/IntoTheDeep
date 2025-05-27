@@ -97,7 +97,6 @@ public class AutoRed extends LinearOpMode {
                 outtake.slideWaitAction()
             ),
             new ParallelAction(
-                outtake.scoreAction(),
                 intake.readyGrabAction(Intake.MaxDistance - 0.5, PI/2)
             ),
             new ParallelAction(

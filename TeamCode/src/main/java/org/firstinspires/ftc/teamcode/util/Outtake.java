@@ -74,6 +74,8 @@ public class Outtake {
     }
     public Action readySampleAction(){
         return new SequentialAction(
+
+
                 new InstantAction(this::readySample),
                 slideWaitAction());
     }
