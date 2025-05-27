@@ -41,4 +41,14 @@ public class RobotActions {
 
         ), new ForeverAction(follower::update));
     }
+    public static Action fullTransferAction(Intake intake, Outtake outtake){
+        return new SequentialAction(
+            new ParallelAction(
+                intake.readyTransferAction(),
+                outtake.readyTransferAction()
+            ),
+            outtake.closeClawAction(),
+            intake.readyGrabAction(0,0)
+        );
+    }
 }
