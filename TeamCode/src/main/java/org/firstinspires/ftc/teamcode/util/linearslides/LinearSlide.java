@@ -16,8 +16,9 @@ public abstract class LinearSlide {
     private final double max_extend;
     private double zero_pos;
     public double max_error;
+
     public double target_pos;
-    public Boolean within_error;
+    public Boolean within_error = false;
 
     /**
      * Class for using linear slides
@@ -106,13 +107,10 @@ public abstract class LinearSlide {
      */
     public void waitForMovement(){while (!within_error);}
 
-    class LoopUntilDone implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+    public Action loopUntilDone() {
+        return telemetryPacket -> {
             movementLoop();
             return !within_error;
-        }
+        };
     }
-
-    public Action loopUntilDone() {return new LoopUntilDone();}
 }

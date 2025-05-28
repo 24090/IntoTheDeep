@@ -63,9 +63,7 @@ public class Controlled extends LinearOpMode{
                         new RaceAction(
                             new ForeverAction(movement),
                             new ForeverAction(outtake::backgroundIter),
-                            new SequentialAction(
-                                intake.readyTransferAction()
-                            )
+                            RobotActions.fullTransferAction(intake, outtake)
                         )
                 );
             }

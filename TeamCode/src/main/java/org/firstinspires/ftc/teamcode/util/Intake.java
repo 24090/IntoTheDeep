@@ -60,11 +60,4 @@ public class Intake {
                 linear_slide.loopUntilDone()
         );
     }
-    public Action fullTransferAction(){
-        return new SequentialAction(
-                readyTransferAction(),
-                new InstantAction(claw::open),
-                new SleepAction(0.4) // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
-        );
-    }
 }

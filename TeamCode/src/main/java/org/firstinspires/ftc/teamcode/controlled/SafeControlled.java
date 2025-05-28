@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
+import org.firstinspires.ftc.teamcode.util.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 
 import pedroPathing.constants.FConstants;
@@ -99,7 +100,7 @@ public class SafeControlled extends LinearOpMode {
                                 new ForeverAction(movement),
                                 new ForeverAction(outtake::backgroundIter),
                                 new SequentialAction(
-                                        intake.fullTransferAction(),
+                                        RobotActions.fullTransferAction(intake, outtake),
                                         new InstantAction(intake.claw::toReadyGrabPos)
                                 )
                         )

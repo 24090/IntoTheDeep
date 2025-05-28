@@ -32,8 +32,8 @@ public class Outtake {
     }
 
     public void backgroundIter(){
-        mirror_slide.update();
         slide.movementLoop();
+        mirror_slide.update();
     }
 
     public void readyTransfer(){
@@ -62,7 +62,8 @@ public class Outtake {
 
     public Action slideWaitAction(){
         return new RaceAction(
-                slide.loopUntilDone()
+                new ForeverAction(this::backgroundIter),
+                new TriggerAction(() -> slide.within_error)
         );
     }
     public Action readyTransferAction(){
@@ -79,10 +80,9 @@ public class Outtake {
     }
     public Action readySampleAction(){
         return new SequentialAction(
-
-
                 new InstantAction(this::readySample),
-                slideWaitAction());
+                slideWaitAction()
+        );
     }
     public Action openClawAction(){
         return new ParallelAction(new SleepAction(0.2), new InstantAction(this.claw::open));

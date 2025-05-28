@@ -65,39 +65,37 @@ public class AutoRed extends LinearOpMode {
         final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10, 0);
         final Pose outer_grab_pose = new Pose(inner_sample.getX(), inner_sample.getY() + 20, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 100, -PI/2);
+        final Vector outer_offset = new Vector(Intake.MaxDistance - 0.5, 0.7);
+        outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
         PathChain submersible_path = follower.pathBuilder()
-                .addPath(
-                    new BezierCurve(
-                            new Point(score_pose),
-                            new Point(72, 124),
-                            new Point(submersible_pose)
-                    )
-                ).setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
+                .addPath(new BezierCurve(
+                    new Point(score_pose),
+                    new Point(72, 124),
+                    new Point(submersible_pose)
+                ))
+                .setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
                 .build();
         PathChain sub_to_score = follower.pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Point(submersible_pose),
-                                new Point(72, 124),
-                                new Point(score_pose)
-                        )
-                ).setLinearHeadingInterpolation(submersible_pose.getHeading(), score_pose.getHeading())
+                .addPath(new BezierCurve(
+                    new Point(submersible_pose),
+                    new Point(72, 124),
+                    new Point(score_pose)
+                )).setLinearHeadingInterpolation(submersible_pose.getHeading(), score_pose.getHeading())
                 .build();
-        final Vector outer_offset = new Vector(Intake.MaxDistance - 0.5, 0.7);
 
         // HW stuff
         intake = new Intake(hardwareMap);
         outtake = new Outtake(hardwareMap);
-        // same as meepmeep
-        outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
         Action path = new SequentialAction(
+            // Preload
             new ParallelAction(
                 move_line_action(start_pose, score_pose),
-                outtake.readySampleAction(),
-                outtake.slideWaitAction()
+                outtake.readySampleAction()
             ),
             new ParallelAction(
-                intake.readyGrabAction(Intake.MaxDistance - 0.5, PI/2)
+                outtake.scoreAction(),
+            // Inner
+                intake.readyGrabAction(Intake.MaxDistance - 0.5, 0)
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
@@ -106,15 +104,15 @@ public class AutoRed extends LinearOpMode {
             intake.pickUpAction(),
             new ParallelAction(
                 new SequentialAction(
-                    intake.fullTransferAction(),
-                    outtake.readySampleAction(),
-                    outtake.slideWaitAction()
+                    RobotActions.fullTransferAction(intake, outtake),
+                    outtake.readySampleAction()
                 ),
                 move_line_action(inner_grab_pose, score_pose)
             ),
             new ParallelAction(
                 outtake.scoreAction(),
-                intake.readyGrabAction(Intake.MaxDistance - 0.5, PI/2)
+            // Middle
+                intake.readyGrabAction(Intake.MaxDistance - 0.5, 0)
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
@@ -123,14 +121,14 @@ public class AutoRed extends LinearOpMode {
             intake.pickUpAction(),
             new ParallelAction(
                 new SequentialAction(
-                        intake.fullTransferAction(),
-                        outtake.readySampleAction(),
-                        outtake.slideWaitAction()
+                        RobotActions.fullTransferAction(intake, outtake),
+                        outtake.readySampleAction()
                 ),
                 move_line_action(center_grab_pose, score_pose)
             ),
             new ParallelAction(
                 outtake.scoreAction(),
+            // Outer
                 intake.readyGrabAction(Intake.MaxDistance - 0.5, 0.7)
             ),
             new ParallelAction(
@@ -140,15 +138,15 @@ public class AutoRed extends LinearOpMode {
             intake.pickUpAction(),
             new ParallelAction(
                 new SequentialAction(
-                        intake.fullTransferAction(),
-                        outtake.readySampleAction(),
-                        outtake.slideWaitAction()
+                        RobotActions.fullTransferAction(intake, outtake),
+                        outtake.readySampleAction()
                 ),
                 move_line_action(outer_grab_pose, score_pose)
             ),
             outtake.scoreAction(),
             new ParallelAction(
                     outtake.slideWaitAction(),
+            // SUB 1
                     pathAction(follower, submersible_path)
             ),
             new SequentialAction(
@@ -161,16 +159,14 @@ public class AutoRed extends LinearOpMode {
             ),
             new ParallelAction(
                     new SequentialAction(
-                            intake.fullTransferAction(),
-                            outtake.readySampleAction(),
-                            outtake.slideWaitAction()
+                            RobotActions.fullTransferAction(intake, outtake),
+                            outtake.readySampleAction()
                     ),
                     pathAction(follower, sub_to_score)
             ),
             outtake.fullScoreAction()
 
         );
-        // these lines ≠ meepmeep
         BulkReads bulkreads = new BulkReads(hardwareMap);
         waitForStart();
         bulkreads.setCachingMode(LynxModule.BulkCachingMode.MANUAL);

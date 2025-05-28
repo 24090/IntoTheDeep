@@ -42,8 +42,8 @@ public class VisionTesting extends LinearOpMode {
                             ),
                             new SleepAction(0.5),
                             intake.pickUpAction(),
-                            intake.fullTransferAction(),
-                            new TriggerAction(() -> gamepad1.a)
+//                                RobotActions.fullTransferAction(intake, outtake),
+                                new TriggerAction(() -> gamepad1.a)
                         ),
                         new ForeverAction(() -> {
                             if (sample.pose != null) {
