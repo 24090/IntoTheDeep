@@ -14,11 +14,12 @@ public class OuttakeClaw {
     public static double LEFT_SAMPLE = 1;
     public static double LEFT_SPECIMEN = 1;
     public static double LEFT_TRANSFER = 0.66;
+    public static double LEFT_STANDBY = 0.71;
     public static double RIGHT_TRANSFER = 0.44;
-    public static double LEFT_READY_TRANSFER = 0.71;
-    public static double RIGHT_READY_TRANSFER = 0.39;
     public static double RIGHT_SAMPLE = 0.1;
     public static double RIGHT_SPECIMEN = 0.1;
+
+    public static double RIGHT_STANDBY = 0.39;
     public static double WRIST_TRANSFER = 0.3;
     public static double WRIST_SAMPLE = 0.65;
     public static double WRIST_SPECIMEN = 0.5;
@@ -59,9 +60,9 @@ public class OuttakeClaw {
         claw_servo.setPosition(CLAW_OPEN);
     }
 
-    public void toReadyTransferPos(){
-        left_servo.setPosition(LEFT_READY_TRANSFER);
-        right_servo.setPosition(RIGHT_READY_TRANSFER);
+    public void toStandbyPos(){
+        left_servo.setPosition(LEFT_STANDBY);
+        right_servo.setPosition(RIGHT_STANDBY);
         wrist_servo.setPosition(WRIST_TRANSFER);
         claw_servo.setPosition(CLAW_OPEN);
     }

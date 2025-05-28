@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.controlled;
 import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.roadrunner.Actions;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -91,7 +90,7 @@ public class Controlled extends LinearOpMode{
             if (gamepad1.y){
                 outtake.readySample();
             } else if (gamepad1.a){
-                outtake.standbyTransfer();
+                outtake.standby();
             } else if (gamepad1.b){
                 outtake.claw.open();
             } else if (gamepad1.x){

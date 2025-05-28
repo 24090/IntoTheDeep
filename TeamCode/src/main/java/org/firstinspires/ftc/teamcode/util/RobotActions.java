@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import static java.lang.Math.PI;
-
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -10,12 +8,10 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.pathgen.Vector;
 
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.PathAction;
 import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 
 public class RobotActions {
@@ -43,7 +39,16 @@ public class RobotActions {
         ), new ForeverAction(follower::update));
     }
     public static Action fullTransferAction(Intake intake, Outtake outtake){
-        return new SequentialAction( new ParallelAction(intake.readyTransferAction(),outtake.stanbyTransferAction(), new ParallelAction(new SequentialAction(new SleepAction(0.4), new InstantAction(() -> intake.claw.open())), outtake.readyTransferAction()), new SequentialAction(new SleepAction(0.4), new InstantAction(() -> outtake.claw.grab()))
-        ));
+        return new SequentialAction(
+            new ParallelAction(
+                intake.readyTransferAction(),
+                outtake.standbyAction()
+            ),
+            outtake.readyTransferAction(),
+            new SleepAction(0.4),
+            new InstantAction(intake.claw::open),
+            new SleepAction(0.4),
+            new InstantAction(outtake.claw::grab)
+        );
     }
 }

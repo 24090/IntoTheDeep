@@ -10,15 +10,14 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 import org.firstinspires.ftc.teamcode.util.linearslides.MirrorMotor;
 import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 @Config
 public class Outtake {
-    public static  double LOW_HANG = 700;
-    public static final double SERVO_CLOSE_MIN_TICKS = 1000;
-    public static final double SERVO_CLOSE_MAX_TICKS = 1500;
+    public static  double HANG = 700;
     private final MirrorMotor mirror_slide;
     public OuttakeSlide slide;
     public OuttakeClaw claw;
@@ -41,17 +40,13 @@ public class Outtake {
         slide.down();
         claw.toTransferPos();
     }
-    public void standbyTransfer(){
+    public void standby(){
         slide.down();
-        claw.toReadyTransferPos();
+        claw.toStandbyPos();
     }
     public void readyHang(){
         claw.toTransferPos();
-        slide.up();
-    }
-    public void readyHang2(){
-        claw.toTransferPos();
-        slide.goTo(LOW_HANG);
+        slide.goTo(HANG);
     }
     public void hang(){
         slide.down();
@@ -76,9 +71,9 @@ public class Outtake {
                 slideWaitAction()
         );
     }
-    public Action stanbyTransferAction(){
+    public Action standbyAction(){
         return new SequentialAction(
-                new InstantAction(this::standbyTransfer),
+                new InstantAction(this::standby),
                 slideWaitAction()
         );
     }
@@ -100,7 +95,7 @@ public class Outtake {
         return new SequentialAction(
                 readySampleAction(),
                 openClawAction(),
-                new InstantAction(this::readyTransfer)
+                new InstantAction(this::standby)
         );
     }
     public Action fullScoreAction(){

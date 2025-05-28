@@ -14,7 +14,7 @@ public class HangTesting extends LinearOpMode {
         while (opModeIsActive()){
             outtake.backgroundIter();
             if (gamepad1.x){
-                outtake.readyHang2();
+                outtake.readyHang();
             } else if (gamepad1.y){
                 outtake.hang();
             }
