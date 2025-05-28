@@ -41,6 +41,10 @@ public class Outtake {
         slide.down();
         claw.toTransferPos();
     }
+    public void standbyTransfer(){
+        slide.down();
+        claw.toReadyTransferPos();
+    }
     public void readyHang(){
         claw.toTransferPos();
         slide.up();
@@ -69,6 +73,12 @@ public class Outtake {
     public Action readyTransferAction(){
         return new SequentialAction(
                 new InstantAction(this::readyTransfer),
+                slideWaitAction()
+        );
+    }
+    public Action stanbyTransferAction(){
+        return new SequentialAction(
+                new InstantAction(this::standbyTransfer),
                 slideWaitAction()
         );
     }

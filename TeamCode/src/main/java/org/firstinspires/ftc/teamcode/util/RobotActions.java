@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierLine;
@@ -42,13 +43,7 @@ public class RobotActions {
         ), new ForeverAction(follower::update));
     }
     public static Action fullTransferAction(Intake intake, Outtake outtake){
-        return new SequentialAction(
-            new ParallelAction(
-                intake.readyTransferAction(),
-                outtake.readyTransferAction()
-            ),
-            outtake.closeClawAction(),
-            intake.readyGrabAction(0,0)
-        );
+        return new SequentialAction( new ParallelAction(intake.readyTransferAction(),outtake.stanbyTransferAction(), new ParallelAction(new SequentialAction(new SleepAction(0.4), new InstantAction(() -> intake.claw.open())), outtake.readyTransferAction()), new SequentialAction(new SleepAction(0.4), new InstantAction(() -> outtake.claw.grab()))
+        ));
     }
 }

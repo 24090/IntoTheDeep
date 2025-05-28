@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.controlled;
 import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.roadrunner.Actions;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
+import org.firstinspires.ftc.teamcode.util.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 
 import pedroPathing.constants.FConstants;
@@ -28,6 +30,8 @@ public class Controlled extends LinearOpMode{
     public void runOpMode(){
         double last_time = 0;
         Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        RobotActions robotActions;
+        robotActions = new RobotActions();
         Intake intake;
         intake = new Intake(hardwareMap);
         Outtake outtake;
@@ -87,11 +91,11 @@ public class Controlled extends LinearOpMode{
             if (gamepad1.y){
                 outtake.readySample();
             } else if (gamepad1.a){
-                outtake.readyTransfer();
+                outtake.standbyTransfer();
             } else if (gamepad1.b){
                 outtake.claw.open();
             } else if (gamepad1.x){
-                outtake.claw.grab();
+                runBlocking(robotActions.fullTransferAction(intake, outtake));
             }
             last_time = time;
         }
