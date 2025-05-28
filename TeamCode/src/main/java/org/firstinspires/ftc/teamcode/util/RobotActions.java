@@ -40,15 +40,23 @@ public class RobotActions {
     }
     public static Action fullTransferAction(Intake intake, Outtake outtake){
         return new SequentialAction(
-            new ParallelAction(
-                intake.readyTransferAction(),
-                outtake.standbyAction()
-            ),
-            outtake.readyTransferAction(),
-            new SleepAction(0.4),
-            new InstantAction(intake.claw::open),
-            new SleepAction(0.4),
-            new InstantAction(outtake.claw::grab)
-        );
+                new ParallelAction(
+                        intake.readyTransferAction(),
+                        new InstantAction(outtake::standby),
+                        new ParallelAction(
+                                new SequentialAction(
+                                        new SleepAction(0.4),
+                                        new InstantAction(intake.claw::open)
+                                ),
+                                new SequentialAction(
+                                        new SleepAction(0.4),
+                                        outtake.readyTransferAction()
+                                )
+                        ),
+                        new SequentialAction(
+                                new SleepAction(0.4),
+                                new InstantAction(outtake.claw::grab)
+                        )
+        ));
     }
 }
