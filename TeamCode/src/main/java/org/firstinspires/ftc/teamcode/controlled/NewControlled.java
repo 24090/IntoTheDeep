@@ -21,33 +21,24 @@ import pedroPathing.constants.LConstants;
 public class NewControlled extends LinearOpMode {
     FtcDashboard dash = FtcDashboard.getInstance();
     double last_time = 0;
+    public enum State{IN_GRAB, NORMAL, SCORING}
+    Controlled.State state = Controlled.State.NORMAL;
     public void runOpMode(){
         Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         Intake intake;
         intake = new Intake(hardwareMap);
         Outtake outtake;
+        RobotActions robotActions;
+        robotActions = new RobotActions();
         intake.claw.toReadyGrabPos();
         outtake = new Outtake(hardwareMap);
-
         InstantAction intake_update = new InstantAction(() -> {
-            /*if (Math.abs(gamepad2.left_stick_y) > 0.5) {
+            if (Math.abs(gamepad1.left_stick_y) > 0.5) {
                 intake.linear_slide.goTo(
                         intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 100 * Math.signum(gamepad2.left_stick_y)),
                         50
                 );
-                intake.linear_slide.setMotorPower(-gamepad1.left_stick_y * 2 + Math.signum(gamepad2.left_stick_y));
-            }*/ if (gamepad2.dpad_up) {
-                intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() + 200 * (last_time - time)),
-                        50
-                );
-                intake.linear_slide.setMotorPower(0.1);
-            } else if (gamepad2.dpad_down) {
-                intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 200 * (last_time - time)),
-                        50
-                );
-                intake.linear_slide.setMotorPower(-0.1);
+                intake.linear_slide.setMotorPower(-gamepad1.left_stick_y/4 + Math.signum(gamepad2.left_stick_y));
             } else {
                 if (gamepad2.left_stick_button) {
                     intake.linear_slide.moveOut();
@@ -55,7 +46,6 @@ public class NewControlled extends LinearOpMode {
                 intake.linear_slide.movementLoop();
             }
         });
-
         InstantAction movement = new InstantAction(() -> {
             if (intake.linear_slide.getPosition() > 200 || gamepad1.right_stick_button) {
                 follower.setTeleOpMovementVectors(-gamepad1.right_stick_y/3, -gamepad1.left_stick_x/3, -gamepad1.right_stick_x/3);
@@ -101,12 +91,7 @@ public class NewControlled extends LinearOpMode {
             if (gamepad1.x) {
                 outtake.readySample();
             } else if (gamepad1.y) {
-                outtake.readyTransfer();
-            }
-            if (gamepad1.left_trigger > 0.4) {
-                outtake.readyTransfer();
-            } else if (gamepad1.right_trigger > 0.4) {
-                outtake.readySample();
+                outtake.standby();
             }
             if (gamepad1.a && !old_a){
                 outtake.claw.toggleGrab();

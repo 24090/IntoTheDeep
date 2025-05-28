@@ -42,7 +42,7 @@ public class Controlled extends LinearOpMode{
                 if (state != State.IN_GRAB) {
                     follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
                 } else {
-                    follower.setTeleOpMovementVectors(0, -gamepad1.left_stick_x/3, 0);
+                    follower.setTeleOpMovementVectors(0, -gamepad2.left_stick_x/3, 0);
                 }
                 follower.update();
             }
