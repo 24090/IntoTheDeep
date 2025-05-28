@@ -43,20 +43,14 @@ public class RobotActions {
                 new ParallelAction(
                         intake.readyTransferAction(),
                         new InstantAction(outtake::standby),
-                        new ParallelAction(
-                                new SequentialAction(
-                                        new SleepAction(0.4),
-                                        new InstantAction(intake.claw::open)
-                                ),
-                                new SequentialAction(
-                                        new SleepAction(0.4),
-                                        outtake.readyTransferAction()
-                                )
-                        ),
                         new SequentialAction(
                                 new SleepAction(0.4),
-                                new InstantAction(outtake.claw::grab)
+                                new InstantAction(outtake.claw::grab),
+                                outtake.readyTransferAction(),
+                                new SleepAction(0.1),
+                                new InstantAction(intake.claw::open)
                         )
-        ));
+                )
+        );
     }
 }

@@ -26,6 +26,8 @@ import pedroPathing.constants.LConstants;
 @TeleOp(name = "Controller")
 public class Controlled extends LinearOpMode{
     FtcDashboard dash = FtcDashboard.getInstance();
+    public enum State{IN_GRAB, NORMAL, SCORING}
+    State state = State.NORMAL;
     public void runOpMode(){
         double last_time = 0;
         Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
@@ -36,12 +38,11 @@ public class Controlled extends LinearOpMode{
         Outtake outtake;
         intake.claw.toReadyGrabPos();
         outtake = new Outtake(hardwareMap);
-
         InstantAction movement = new InstantAction(() -> {
-                if (intake.linear_slide.getPosition() > 100) {
-                    follower.setTeleOpMovementVectors(-gamepad1.left_stick_y/3, -gamepad1.left_stick_x/3, -gamepad1.right_stick_x / 3);
-                } else {
+                if (state != State.IN_GRAB) {
                     follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+                } else {
+                    follower.setTeleOpMovementVectors(0, -gamepad1.left_stick_x/3, 0);
                 }
                 follower.update();
             }
@@ -53,12 +54,7 @@ public class Controlled extends LinearOpMode{
             outtake.backgroundIter();
             intake.linear_slide.movementLoop();
             movement.getF().run();
-            if (gamepad1.left_bumper){
-                intake.readyGrab(
-                        gamepad1.left_trigger * (Intake.MaxDistance - Intake.MinDistance) + Intake.MinDistance,
-                        0 // TODO: Claw rotation
-                );
-            } else if (gamepad1.right_bumper){
+            if (gamepad1.right_bumper){
                 runBlocking(
                         new RaceAction(
                             new ForeverAction(movement),
@@ -67,7 +63,32 @@ public class Controlled extends LinearOpMode{
                         )
                 );
             }
-            if (gamepad1.dpad_up){
+            if (gamepad1.y){
+                outtake.readySample();
+                state = State.SCORING;
+            } else if (gamepad1.a){
+                outtake.standby();
+                state = State.NORMAL;
+            } else if (gamepad1.b){
+                outtake.claw.open();
+            }
+
+
+            if (gamepad2.x){
+                runBlocking(robotActions.fullTransferAction(intake, outtake));
+                state = State.NORMAL;
+            }
+            if (gamepad2.dpad_down){
+                intake.claw.open();
+            }
+            if (gamepad2.left_bumper){
+                intake.readyGrab(
+                        gamepad2.left_trigger * (Intake.MaxDistance - Intake.MinDistance) + Intake.MinDistance,
+                        0 // TODO: Claw rotation
+                );
+                state = State.IN_GRAB;
+            }
+            if (gamepad2.dpad_up){
                 runBlocking(
                         new RaceAction(
                                 new ForeverAction(movement),
@@ -75,24 +96,13 @@ public class Controlled extends LinearOpMode{
                                 intake.pickUpAction()
                         )
                 );
-            } else if (gamepad1.dpad_down){
-                intake.claw.open();
             }
-            if (gamepad1.dpad_left){
+            if (gamepad2.dpad_left){
                 turret_angle -= (time - last_time);
                 intake.claw.rotate(turret_angle);
-            } else if (gamepad1.dpad_right){
+            } else if (gamepad2.dpad_right){
                 turret_angle += (time - last_time);
                 intake.claw.rotate(turret_angle);
-            }
-            if (gamepad1.y){
-                outtake.readySample();
-            } else if (gamepad1.a){
-                outtake.standby();
-            } else if (gamepad1.b){
-                outtake.claw.open();
-            } else if (gamepad1.x){
-                runBlocking(robotActions.fullTransferAction(intake, outtake));
             }
             last_time = time;
         }
