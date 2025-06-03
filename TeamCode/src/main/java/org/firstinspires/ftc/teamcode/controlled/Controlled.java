@@ -57,12 +57,14 @@ public class Controlled extends LinearOpMode{
             movement.getF().run();
             if (gamepad1.right_bumper){
                 if (state == State.NORMAL){
-                    outtake.readySpecimen();
+                    runBlocking(outtake.readySpecimenAction());
                     state = State.SPECIMENSCORING;
                 }
-                if (state == State.SPECIMENSCORING){
+                else if (state == State.SPECIMENSCORING){
                     outtake.scoreSpecimen();
                     state = State.NORMAL;
+                }
+                while (gamepad1.right_bumper){
                 }
             }
             if (gamepad1.y){

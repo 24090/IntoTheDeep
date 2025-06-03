@@ -60,11 +60,9 @@ public class Outtake {
         claw.toSamplePos();
     }
     public void readySpecimen(){
-        slide.goTo(300);
         claw.toSpecimenPose();
     }
     public void scoreSpecimen(){
-        slide.goTo(150);
         claw.toStandbyPos();
     }
 
@@ -73,6 +71,9 @@ public class Outtake {
                 new ForeverAction(this::backgroundIter),
                 new TriggerAction(() -> slide.within_error)
         );
+    }
+    public Action readySpecimenAction(){
+        return new SequentialAction(new InstantAction(claw::transferSpecimenPose),new SleepAction(0.5),new InstantAction(claw::toSpecimenPose));
     }
     public Action readyTransferAction(){
         return new SequentialAction(

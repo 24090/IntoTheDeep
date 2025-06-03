@@ -12,18 +12,18 @@ public class OuttakeClaw {
     ServoImplEx wrist_servo;
 
     public static double LEFT_SAMPLE = 1;
-    public static double LEFT_SPECIMEN = 1;
+    public static double LEFT_SPECIMEN = 0.95;
     public static double LEFT_TRANSFER = 0.66;
     public static double LEFT_STANDBY = 0.71;
 
     public static double RIGHT_TRANSFER = 0.44;
     public static double RIGHT_SAMPLE = 0.1;
-    public static double RIGHT_SPECIMEN = 0.1;
+    public static double RIGHT_SPECIMEN = 0.15;
     public static double RIGHT_STANDBY = 0.39;
 
-    public static double WRIST_TRANSFER = 0.3;
-    public static double WRIST_SAMPLE = 0.65;
-    public static double WRIST_SPECIMEN = 0.5;
+    public static double WRIST_TRANSFER = 0;
+    public static double WRIST_SAMPLE = 0.55;
+    public static double WRIST_SPECIMEN = 1;
     public static double CLAW_OPEN = 0;
     public static double CLAW_CLOSED = 1;
 
@@ -78,5 +78,10 @@ public class OuttakeClaw {
         left_servo.setPosition(LEFT_SPECIMEN);
         right_servo.setPosition(RIGHT_SPECIMEN);
         wrist_servo.setPosition(WRIST_SPECIMEN);
+    }
+    public void transferSpecimenPose(){
+        left_servo.setPosition(LEFT_SPECIMEN);
+        right_servo.setPosition(RIGHT_SPECIMEN);
+        wrist_servo.setPosition(0);
     }
 }
