@@ -94,13 +94,21 @@ public class SpecAuto extends LinearOpMode {
         // same as meepmeep
         Action path = new SequentialAction(
                 move_line_action(start_pose, score_pose),
-                pathAction(follower, preload_to_sample_sweep),
+                new InstantAction(outtake::readySpecimen),
+                new InstantAction(outtake::scoreSpecimen),
+                new ParallelAction(pathAction(follower, preload_to_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
                 new InstantAction(() -> {telemetry.addLine("Done"); telemetry.update();}),
+                intake.pickUpAction(),
                 move_line_action(inner_sample_sweep, new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2)),
-                move_line_action(new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2), center_sample_sweep),
+                new InstantAction(intake.claw::open),
+                new ParallelAction(move_line_action(new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2), center_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
+                intake.pickUpAction(),
                 move_line_action(center_sample_sweep, new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2)),
-                move_line_action(new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2), outer_sample_sweep),
+                new InstantAction(intake.claw::open),
+                new ParallelAction(move_line_action(new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2), outer_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
+                intake.pickUpAction(),
                 move_line_action(outer_sample_sweep, new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2)),
+                new InstantAction(intake.claw::open),
                 move_line_action(new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2), grab_pose)
 
         );

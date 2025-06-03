@@ -26,7 +26,7 @@ import pedroPathing.constants.LConstants;
 @TeleOp(name = "Controller")
 public class Controlled extends LinearOpMode{
     FtcDashboard dash = FtcDashboard.getInstance();
-    public enum State{IN_GRAB, NORMAL, SCORING}
+    public enum State{IN_GRAB, NORMAL, SAMPLESCORING, SPECIMENSCORING}
     State state = State.NORMAL;
     public void runOpMode(){
         double last_time = 0;
@@ -34,6 +34,7 @@ public class Controlled extends LinearOpMode{
         RobotActions robotActions;
         robotActions = new RobotActions();
         Intake intake;
+        int toggle = 0;
         intake = new Intake(hardwareMap);
         Outtake outtake;
         intake.claw.toReadyGrabPos();
@@ -55,17 +56,18 @@ public class Controlled extends LinearOpMode{
             intake.linear_slide.movementLoop();
             movement.getF().run();
             if (gamepad1.right_bumper){
-                runBlocking(
-                        new RaceAction(
-                            new ForeverAction(movement),
-                            new ForeverAction(outtake::backgroundIter),
-                            RobotActions.fullTransferAction(intake, outtake)
-                        )
-                );
+                if (state == State.NORMAL){
+                    outtake.readySpecimen();
+                    state = State.SPECIMENSCORING;
+                }
+                if (state == State.SPECIMENSCORING){
+                    outtake.scoreSpecimen();
+                    state = State.NORMAL;
+                }
             }
             if (gamepad1.y){
                 outtake.readySample();
-                state = State.SCORING;
+                state = State.SAMPLESCORING;
             } else if (gamepad1.a){
                 outtake.standby();
                 state = State.NORMAL;

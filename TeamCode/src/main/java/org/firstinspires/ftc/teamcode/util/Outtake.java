@@ -59,6 +59,14 @@ public class Outtake {
         slide.up();
         claw.toSamplePos();
     }
+    public void readySpecimen(){
+        slide.goTo(300);
+        claw.toSpecimenPose();
+    }
+    public void scoreSpecimen(){
+        slide.goTo(150);
+        claw.toStandbyPos();
+    }
 
     public Action slideWaitAction(){
         return new RaceAction(
