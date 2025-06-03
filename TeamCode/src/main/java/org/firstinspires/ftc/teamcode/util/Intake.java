@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.util.linearslides.IntakeSlide;
 
 @Config
 public class Intake {
-    public static double MaxDistance = 12.5 + RobotLength/2;
-    public static double MinDistance = 2.5 + RobotLength/2;
+    public static double MaxDistance = 13.5 + RobotLength/2;
+    public static double MinDistance = 0.75 + RobotLength/2;
 
     public IntakeSlide linear_slide;
     public Claw claw;
@@ -32,7 +32,6 @@ public class Intake {
     }
 
     public void readyGrab(double linear_slide_to_in, double claw_rotation){
-        claw.open();
         claw.toReadyGrabPos();
         claw.rotate(claw_rotation);
         linear_slide.goTo(linear_slide.inToTicks(linear_slide_to_in));
@@ -49,6 +48,7 @@ public class Intake {
         return new ParallelAction(
                     new SleepAction(0.5), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
                     new InstantAction(() -> readyGrab(linear_slide_to_in, claw_rotation)),
+                    new InstantAction(claw::open),
                     linear_slide.loopUntilDone()
                 );
     }

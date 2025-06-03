@@ -82,5 +82,6 @@ public class Claw {
     public void toGrabPos() {
         elbow_servo_left.setPosition(1);
         elbow_servo_right.setPosition(0);
+        open();
     }
 }
