@@ -40,8 +40,9 @@ public class Intake {
     public Action pickUpAction(){
         return new SequentialAction(
                 new InstantAction(claw::toGrabPos),
+                new SleepAction(0.1),
                 new InstantAction(claw::grab),
-                new SleepAction(0.4),
+                new SleepAction(0.3),
                 new InstantAction(claw::toReadyGrabPos));
     }
     public Action readyGrabAction(double linear_slide_to_in, double claw_rotation){

@@ -59,11 +59,11 @@ public class AutoRed extends LinearOpMode {
         final Pose start_pose = new Pose(GameMap.RobotWidth/2, 120.5 - GameMap.RobotLength / 2, -PI/2);
         follower.setStartingPose(start_pose);
 
-        final Pose inner_sample = new Pose(48-1.75, 123.5, 0);
-        final Pose score_pose = new Pose(18,144-18, -PI / 4);
+        final Pose inner_sample = new Pose(48-3.5, 123.5, 0);
+        final Pose score_pose = new Pose(18.5,144-18.5, -PI / 4);
         final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0, 0);
-        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX(), inner_sample.getY() + 20, 0.7);
+        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 9, 0);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX(), inner_sample.getY() + 19.5, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 100, -PI/2);
         final Vector outer_offset = new Vector(Intake.MaxDistance - 0.5, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
@@ -82,10 +82,12 @@ public class AutoRed extends LinearOpMode {
                     new Point(score_pose)
                 )).setLinearHeadingInterpolation(submersible_pose.getHeading(), score_pose.getHeading())
                 .build();
-
-        // HW stuff
         intake = new Intake(hardwareMap);
         outtake = new Outtake(hardwareMap);
+        // real init
+        outtake.standby();
+        outtake.claw.grab();
+        // Path Init
         Action path = new SequentialAction(
             // Preload
             new ParallelAction(
