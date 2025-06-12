@@ -17,16 +17,17 @@ import org.firstinspires.ftc.teamcode.util.linearslides.MirrorMotor;
 import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 @Config
 public class Outtake {
-    public static  double HANG = 700;
+    public static  double HANG_UP = 1600;
+    public static  double HANG_DOWN = 1300;
     private final MirrorMotor mirror_slide;
     public OuttakeSlide slide;
     public OuttakeClaw claw;
     public Outtake(HardwareMap hwmap) {
         this.slide = new OuttakeSlide(hwmap);
         this.mirror_slide = new MirrorMotor(
-                hwmap.get(DcMotor.class, "outtake_slide_left"),
                 hwmap.get(DcMotor.class, "outtake_slide_right"),
-                DcMotorSimple.Direction.REVERSE
+                hwmap.get(DcMotor.class, "outtake_slide_left"),
+                DcMotorSimple.Direction.FORWARD
         );
         this.claw = new OuttakeClaw(hwmap);
     }
@@ -40,24 +41,24 @@ public class Outtake {
         slide.down();
         claw.toTransferPos();
     }
+    public void readySample(){
+        slide.up();
+        claw.toSamplePos();
+    }
     public void standby(){
         slide.down();
         claw.toStandbyPos();
     }
     public void readyHang(){
         claw.toTransferPos();
-        slide.goTo(HANG);
+        slide.goTo(HANG_UP);
     }
     public void hang(){
-        slide.down();
+        slide.goTo(HANG_DOWN);
         claw.wrist_servo.close();
         claw.left_servo.close();
         claw.right_servo.close();
         claw.claw_servo.close();
-    }
-    public void readySample(){
-        slide.up();
-        claw.toSamplePos();
     }
     public void readySpecimen(){
         claw.toSpecimenPose();
