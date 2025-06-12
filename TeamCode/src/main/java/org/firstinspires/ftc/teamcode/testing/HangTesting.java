@@ -17,6 +17,8 @@ public class HangTesting extends LinearOpMode {
                 outtake.readyHang();
             } else if (gamepad1.y){
                 outtake.hang();
+            } else if (gamepad1.a){
+                outtake.slide.down();
             }
             telemetry.addData("pos", outtake.slide.getPosition());
             telemetry.update();

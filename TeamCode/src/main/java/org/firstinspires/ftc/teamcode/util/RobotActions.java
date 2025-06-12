@@ -8,6 +8,8 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierPoint;
+import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.pathgen.Vector;
 
@@ -17,11 +19,15 @@ import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
         Pose pose2 = follower.getPose();
-        Vector vector = new Vector(new Point(relative_sample.getX(), relative_sample.getY() + 0.75));
-        pose2.add(new Pose(0,0, vector.getTheta()));
+        Vector vector = new Vector(new Point(relative_sample.getX(), relative_sample.getY()));
         return new RaceAction( new SequentialAction(
             new InstantAction( () ->
-                follower.turn(vector.getTheta(), true)
+                follower.followPath(
+                    follower.pathBuilder()
+                        .addPath(new Path(new BezierPoint(new Point(follower.getPose()))))
+                        .setConstantHeadingInterpolation(follower.getPose().getHeading() + vector.getTheta())
+                        .build()
+                )
             ),
             new TriggerAction(()->(
                     (!follower.isBusy())

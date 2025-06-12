@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class OuttakeSlide extends LinearSlide {
-    public static final double MAX_EXTEND = 1650 ;
+    public static final double MAX_EXTEND = 1850 ;
     public static final double MIN_EXTEND = 0;
 
     /**
@@ -13,8 +13,8 @@ public class OuttakeSlide extends LinearSlide {
      * @param hwmap the hardware map, used to find the motor
      */
     public OuttakeSlide(HardwareMap hwmap) {
-        super(hwmap.get(DcMotor.class, "outtake_slide_right"), MIN_EXTEND, MAX_EXTEND, 0, 50);
-        motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        super(hwmap.get(DcMotor.class, "outtake_slide_left"), MIN_EXTEND, MAX_EXTEND, 0, 50);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
@@ -37,6 +37,6 @@ public class OuttakeSlide extends LinearSlide {
     }
 
     public void up(){
-        this.goTo(1650);
+        this.goTo(1850);
     }
 }

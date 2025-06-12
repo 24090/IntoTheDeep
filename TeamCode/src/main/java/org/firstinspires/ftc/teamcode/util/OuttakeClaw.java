@@ -21,9 +21,9 @@ public class OuttakeClaw {
     public static double RIGHT_SPECIMEN = 0.15;
     public static double RIGHT_STANDBY = 0.39;
 
-    public static double WRIST_TRANSFER = 0;
-    public static double WRIST_SAMPLE = 0.55;
-    public static double WRIST_SPECIMEN = 1;
+    public static double WRIST_TRANSFER = 1;
+    public static double WRIST_SAMPLE = 0;
+    public static double WRIST_SPECIMEN = 0;
     public static double CLAW_OPEN = 0;
     public static double CLAW_CLOSED = 1;
 

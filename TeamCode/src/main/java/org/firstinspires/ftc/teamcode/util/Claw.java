@@ -64,8 +64,8 @@ public class Claw {
     }
 
     public void toReadyGrabPos(double angle) {
-        elbow_servo_left.setPosition(0.85);
-        elbow_servo_right.setPosition(0.15);
+        elbow_servo_left.setPosition(0.75);
+        elbow_servo_right.setPosition(0.25);
         rotate(angle);
     }
     public void toReadyGrabPos() {
