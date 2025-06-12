@@ -61,7 +61,7 @@ public class Controlled extends LinearOpMode{
                     state = State.SPECIMENSCORING;
                 }
                 else if (state == State.SPECIMENSCORING){
-                    outtake.scoreSpecimen();
+                    runBlocking(outtake.scoreSpecimen());
                     state = State.NORMAL;
                 }
                 while (gamepad1.right_bumper){

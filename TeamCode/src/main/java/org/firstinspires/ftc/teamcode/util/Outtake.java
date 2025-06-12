@@ -62,8 +62,16 @@ public class Outtake {
     public void readySpecimen(){
         claw.toSpecimenPose();
     }
-    public void scoreSpecimen(){
-        claw.toStandbyPos();
+    public Action scoreSpecimen(){
+        return new SequentialAction(
+                new InstantAction(slide::down),
+                new RaceAction(
+                        new ForeverAction(this::backgroundIter),
+                        new SleepAction(0.8)
+                ),
+                new InstantAction(claw::toStandbyPos)
+        );
+
     }
 
     public Action slideWaitAction(){
@@ -73,7 +81,7 @@ public class Outtake {
         );
     }
     public Action readySpecimenAction(){
-        return new SequentialAction(new InstantAction(claw::transferSpecimenPose),new SleepAction(0.5),new InstantAction(claw::toSpecimenPose));
+        return new SequentialAction(new InstantAction(claw::transferSpecimenPose),new SleepAction(0.5),new InstantAction(claw::toSpecimenPose), new InstantAction(() -> slide.goTo(500)));
     }
     public Action readyTransferAction(){
         return new SequentialAction(
