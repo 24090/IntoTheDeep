@@ -43,14 +43,11 @@ public class Controlled extends LinearOpMode{
                 follower.setTeleOpMovementVectors(
                             -gamepad1.left_stick_y - gamepad2.left_stick_y/5,
                             -gamepad1.left_stick_x - gamepad2.left_stick_x/5,
-                            -gamepad1.right_stick_x - gamepad2.right_stick_y/5
+                            -gamepad1.right_stick_x - gamepad2.right_stick_x/5
                 );
                 follower.update();
             }
         );
-        InstantAction linearSlide = new InstantAction(()->{
-            if gamepad2
-        });
         follower.startTeleopDrive();
         waitForStart();
         while (opModeIsActive()){
@@ -82,21 +79,23 @@ public class Controlled extends LinearOpMode{
             }
 
 
-            if (gamepad2.x){
+            if (gamepad2.right_bumper){
                 runBlocking(fullTransferAction(intake, outtake));
                 state = State.NORMAL;
             }
-            if (gamepad2.dpad_down){
-                intake.claw.open();
-            }
-            if (gamepad2.left_bumper){
+            if (gamepad2.right_stick_button){
                 intake.readyGrab(
-                        gamepad2.left_trigger * (Intake.MaxDistance - Intake.MinDistance) + Intake.MinDistance,
+                        Intake.MaxDistance,
                         0 // TODO: Claw rotation
                 );
                 state = State.IN_GRAB;
             }
-            if (gamepad2.dpad_up){
+            intake.linear_slide.goTo(intake.linear_slide.trimTicks(
+                    intake.linear_slide.target_pos + (
+                            gamepad2.dpad_up? 20 : (gamepad2.dpad_down? -20 :0)
+                    )*(time-last_time)
+            ));
+            if (gamepad2.a){
                 runBlocking(
                         new RaceAction(
                                 new ForeverAction(movement),
@@ -105,12 +104,13 @@ public class Controlled extends LinearOpMode{
                         )
                 );
             }
-            if (gamepad2.dpad_left){
-                turret_angle -= (time - last_time);
-                intake.claw.rotate(turret_angle);
-            } else if (gamepad2.dpad_right){
-                turret_angle += (time - last_time);
-                intake.claw.rotate(turret_angle);
+            if (gamepad2.y){
+                intake.claw.open();
+            }
+            if (gamepad2.b){
+                intake.claw.rotate(0);
+            } else if (gamepad2.x){
+                intake.claw.rotate(Math.PI/2);
             }
             last_time = time;
         }

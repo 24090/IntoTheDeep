@@ -9,6 +9,8 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.util.Intake;
+
 public abstract class LinearSlide {
     protected DcMotor motor;
 

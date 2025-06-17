@@ -44,4 +44,5 @@ public class IntakeSlide extends LinearSlide {
     public double trimIn(double in){
         return max(min(in, Intake.MaxDistance), Intake.MinDistance);
     }
+
 }
