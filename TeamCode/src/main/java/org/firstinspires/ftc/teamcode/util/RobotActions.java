@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import static org.firstinspires.ftc.teamcode.util.customactions.PathAction.pathAction;
+
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -18,31 +20,32 @@ import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
-        Pose pose2 = follower.getPose();
-        Vector vector = new Vector(new Point(relative_sample.getX(), relative_sample.getY()));
-        return new RaceAction( new SequentialAction(
-            new InstantAction( () ->
-                follower.followPath(
+        return new RaceAction(
+            new ForeverAction(follower::update),
+            new SequentialAction(
+                pathAction( follower,
                     follower.pathBuilder()
-                        .addPath(new Path(new BezierPoint(new Point(follower.getPose()))))
-                        .setConstantHeadingInterpolation(follower.getPose().getHeading() + vector.getTheta())
+                        .addPath(new Path(new BezierPoint(follower.getPose())))
+                        .setConstantHeadingInterpolation(
+                            follower.getPose().getHeading()
+                          + relative_sample.getVector().getTheta()
+                        )
                         .build()
-                )
-            ),
-            new TriggerAction(()->(
-                    (!follower.isBusy())
-                    &&(follower.getVelocityMagnitude()<1)
-                    &&(follower.getHeadingError()<0.02)
-            )),
-            new ParallelAction(
-                intake.readyGrabAction(Intake.MinDistance, relative_sample.getHeading() - vector.getTheta()),
-                new InstantAction( () -> intake.linear_slide.goTo( intake.linear_slide.inToTicks(
-                        intake.linear_slide.trimIn(vector.getMagnitude())
-                ))),
+                ),
+                new InstantAction( () ->
+                    intake.linear_slide.goTo(
+                        intake.linear_slide.inToTicks(
+                            intake.linear_slide.trimIn(relative_sample.getVector().getMagnitude())
+                        )
+                    )
+                ),
+                intake.readyGrabAction(
+                        Intake.MinDistance,
+                        relative_sample.getHeading() - relative_sample.getVector().getTheta()
+                ),
                 intake.linear_slide.loopUntilDone()
             )
-
-        ), new ForeverAction(follower::update));
+        );
     }
     public static Action fullTransferAction(Intake intake, Outtake outtake){
         return new SequentialAction(

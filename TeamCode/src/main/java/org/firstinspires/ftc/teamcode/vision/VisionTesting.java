@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.Intake;
+import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 import org.firstinspires.ftc.teamcode.util.customactions.FutureAction;
@@ -26,6 +27,7 @@ public class VisionTesting extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         Intake intake = new Intake(hardwareMap);
+        Outtake outtake = new Outtake(hardwareMap);
         Vision vision = new Vision(
                 telemetry,
                 hardwareMap
@@ -42,8 +44,8 @@ public class VisionTesting extends LinearOpMode {
                             ),
                             new SleepAction(0.5),
                             intake.pickUpAction(),
-//                                RobotActions.fullTransferAction(intake, outtake),
-                                new TriggerAction(() -> gamepad1.a)
+                            RobotActions.fullTransferAction(intake, outtake),
+                            new TriggerAction(() -> gamepad1.a)
                         ),
                         new ForeverAction(() -> {
                             if (sample.pose != null) {

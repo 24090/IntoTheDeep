@@ -25,7 +25,7 @@ public class OuttakeClawTesting extends LinearOpMode {
                 claw.toSamplePos();
             }
             if (gamepad1.y){
-                claw.toSpecimenPose();
+                claw.readySpecimen();
             }
             telemetry.update();
         }

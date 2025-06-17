@@ -40,6 +40,7 @@ public class IntakeSlide extends LinearSlide {
     public double inToTicks(double extension_from_center_in){
         return (extension_from_center_in - Intake.MinDistance)/(Intake.MaxDistance-Intake.MinDistance) * (MAX_EXTEND - MIN_EXTEND) + MIN_EXTEND;
     }
+
     public double trimIn(double in){
         return max(min(in, Intake.MaxDistance), Intake.MinDistance);
     }

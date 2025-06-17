@@ -26,7 +26,7 @@ public class OuttakeSlide extends LinearSlide {
     @Override
     public void stop(){
         if (getPosition() > 1000) {
-            motor.setPower(0.2);
+            motor.setPower(0.3);
         } else {
             motor.setPower(0.0);
         }

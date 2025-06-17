@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 public class Outtake {
     public static  double HANG_UP = 1600;
     public static  double HANG_DOWN = 1300;
+    public static double READY_SPECIMEN = 450;
     private final MirrorMotor mirror_slide;
     public OuttakeSlide slide;
     public OuttakeClaw claw;
@@ -61,16 +62,15 @@ public class Outtake {
         claw.claw_servo.close();
     }
     public void readySpecimen(){
-        claw.toSpecimenPose();
+        slide.goTo(READY_SPECIMEN);
+        claw.readySpecimen();
     }
     public Action scoreSpecimen(){
         return new SequentialAction(
-                new InstantAction(slide::down),
-                new RaceAction(
-                        new ForeverAction(this::backgroundIter),
-                        new SleepAction(0.8)
-                ),
-                new InstantAction(claw::toStandbyPos)
+                new InstantAction(claw::scoreSpecimen),
+                new SleepAction(0.5),
+                new InstantAction(claw::toStandbyPos),
+                new InstantAction(slide::down)
         );
 
     }
@@ -82,7 +82,14 @@ public class Outtake {
         );
     }
     public Action readySpecimenAction(){
-        return new SequentialAction(new InstantAction(claw::transferSpecimenPose),new SleepAction(0.5),new InstantAction(claw::toSpecimenPose), new InstantAction(() -> slide.goTo(500)));
+        return new SequentialAction(
+                new InstantAction(this::readySpecimen),
+                new ParallelAction(
+                    new SleepAction(0.5),
+                    slideWaitAction()
+                )
+
+        );
     }
     public Action readyTransferAction(){
         return new SequentialAction(
