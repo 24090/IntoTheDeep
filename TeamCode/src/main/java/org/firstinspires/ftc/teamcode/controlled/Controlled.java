@@ -91,9 +91,8 @@ public class Controlled extends LinearOpMode{
                 state = State.IN_GRAB;
             }
             intake.linear_slide.goTo(intake.linear_slide.trimTicks(
-                    intake.linear_slide.target_pos + (
-                            gamepad2.dpad_up? 20 : (gamepad2.dpad_down? -20 :0)
-                    )*(time-last_time)
+                    intake.linear_slide.target_pos +
+                    ((gamepad2.dpad_up? 1 : (gamepad2.dpad_down? -1 :0)) * 70 * (time - last_time))
             ));
             if (gamepad2.a){
                 runBlocking(
