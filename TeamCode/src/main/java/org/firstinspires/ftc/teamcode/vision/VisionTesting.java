@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.vision;
 
-import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.futureAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
 
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -9,10 +12,7 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.FutureAction;
-import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
-import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
+import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
@@ -37,15 +37,15 @@ public class VisionTesting extends LinearOpMode {
                     new ParallelAction(
                         new SequentialAction(
                             vision.findSample(sample),
-                            new FutureAction( () ->
+                            futureAction( () ->
                                 RobotActions.reachSample(sample.pose, intake, follower)
                             ),
                             new SleepAction(0.5),
                             intake.pickUpAction(),
                             RobotActions.fullTransferAction(intake, outtake),
-                            new TriggerAction(() -> gamepad1.a)
+                            triggerAction(() -> gamepad1.a)
                         ),
-                        new ForeverAction(() -> {
+                        foreverAction(() -> {
                             if (sample.pose != null) {
                                 telemetry.addData("sample x", sample.pose.getX());
                                 telemetry.addData("sample y", sample.pose.getY());

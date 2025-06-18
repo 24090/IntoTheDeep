@@ -1,4 +1,7 @@
-package org.firstinspires.ftc.teamcode.util.customactions;
+package org.firstinspires.ftc.teamcode.util.mechanisms;
+
+import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
@@ -20,7 +23,7 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
         return new RaceAction(
-            new ForeverAction(follower::update),
+            foreverAction(follower::update),
             new SequentialAction(
                 new InstantAction(()->follower.followPath(
                     follower.pathBuilder()
@@ -54,7 +57,7 @@ public class RobotActions {
     public static Action pathAction(Follower follower, PathChain path){
         return new SequentialAction(
                 new InstantAction(()->follower.followPath(path, true)),
-                new TriggerAction(()->(!follower.isBusy())&&(follower.getVelocityMagnitude()<2)&&(follower.getHeadingError()<0.04))
+                triggerAction(()->(!follower.isBusy())&&(follower.getVelocityMagnitude()<2)&&(follower.getHeadingError()<0.04))
         );
     }
     public static Action moveLineAction(Follower follower, Pose a, Pose b) {

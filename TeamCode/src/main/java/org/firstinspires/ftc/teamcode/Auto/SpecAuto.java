@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
-import static org.firstinspires.ftc.teamcode.util.customactions.RobotActions.pathAction;
-import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.pathAction;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -13,7 +15,6 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
-import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -23,9 +24,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.util.BulkReads;
 import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
-import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
+import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.vision.Sample;
@@ -103,9 +102,9 @@ public class SpecAuto extends LinearOpMode {
         runBlocking(
                 new RaceAction(
                         path,
-                        new ForeverAction(bulkreads::readManual),
-                        new ForeverAction(follower::update),
-                        new TriggerAction(()->!opModeIsActive())
+                        foreverAction(bulkreads::readManual),
+                        foreverAction(follower::update),
+                        triggerAction(()->!opModeIsActive())
                 )
         );
         PoseStorer.pose = follower.getPose();

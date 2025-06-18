@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
-import static org.firstinspires.ftc.teamcode.util.customactions.RobotActions.fullTransferAction;
-import static org.firstinspires.ftc.teamcode.util.customactions.RobotActions.moveLineAction;
-import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.fullTransferAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.moveLineAction;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -15,8 +17,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
@@ -64,7 +64,7 @@ public class Controlled extends LinearOpMode{
             if (gamepad1.dpad_down){
                 runBlocking(
                     new RaceAction(
-                        new TriggerAction(() -> !gamepad1.dpad_down),
+                        triggerAction(() -> !gamepad1.dpad_down),
                         new ParallelAction(
                             moveLineAction(
                                     follower,
@@ -81,7 +81,7 @@ public class Controlled extends LinearOpMode{
                 if (state == State.NORMAL){
                     runBlocking(
                         new RaceAction(
-                            new ForeverAction(movement),
+                            foreverAction(movement),
                             outtake.readySpecimenAction()
                         )
                     );
@@ -90,7 +90,7 @@ public class Controlled extends LinearOpMode{
                 else if (state == State.SPECIMENSCORING){
                     runBlocking(
                             new RaceAction(
-                                    new ForeverAction(movement),
+                                    foreverAction(movement),
                                     outtake.scoreSpecimenAction()
                             )
                     );
@@ -111,7 +111,7 @@ public class Controlled extends LinearOpMode{
             if (gamepad2.right_bumper){
                 runBlocking(
                     new RaceAction(
-                        new ForeverAction(movement),
+                        foreverAction(movement),
                         fullTransferAction(intake, outtake)
                     )
                 );
@@ -131,8 +131,8 @@ public class Controlled extends LinearOpMode{
             if (gamepad2.a){
                 runBlocking(
                         new RaceAction(
-                                new ForeverAction(movement),
-                                new ForeverAction(outtake::backgroundIter),
+                                foreverAction(movement),
+                                foreverAction(outtake::backgroundIter),
                                 intake.pickUpAction()
                         )
                 );

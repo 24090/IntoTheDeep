@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
-import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static java.lang.Math.PI;
 import static java.lang.Math.atan2;
 
@@ -12,8 +13,7 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
+import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
@@ -69,8 +69,8 @@ public class NewControlled extends LinearOpMode {
             if (gamepad1.left_bumper){
                 runBlocking(
                     new RaceAction(
-                        new ForeverAction(movement),
-                        new ForeverAction(outtake::backgroundIter),
+                        foreverAction(movement),
+                        foreverAction(outtake::backgroundIter),
                         new SequentialAction(
                             RobotActions.fullTransferAction(intake, outtake),
                             new InstantAction(() -> intake.claw.toReadyGrabPos())
@@ -81,8 +81,8 @@ public class NewControlled extends LinearOpMode {
             if (gamepad1.right_bumper) {
                 runBlocking(
                     new RaceAction(
-                        new ForeverAction(movement),
-                        new ForeverAction(outtake::backgroundIter),
+                        foreverAction(movement),
+                        foreverAction(outtake::backgroundIter),
                         intake.pickUpAction()
                     )
                 );

@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
-import static org.firstinspires.ftc.teamcode.util.customactions.RobotActions.pathAction;
-import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.futureAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.pathAction;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -23,10 +26,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.util.BulkReads;
 import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.FutureAction;
-import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
-import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
+import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.vision.Sample;
@@ -148,7 +148,7 @@ public class AutoRed extends LinearOpMode {
             ),
             new SequentialAction(
                     vision.findSample(sample),
-                    new FutureAction( () ->
+                    futureAction( () ->
                             RobotActions.reachSample(sample.pose, intake, follower)
                     ),
                     new SleepAction(0.5),
@@ -170,9 +170,9 @@ public class AutoRed extends LinearOpMode {
         runBlocking(
                 new RaceAction(
                         path,
-                        new ForeverAction(bulkreads::readManual),
-                        new ForeverAction(follower::update),
-                        new TriggerAction(()->!opModeIsActive())
+                        foreverAction(bulkreads::readManual),
+                        foreverAction(follower::update),
+                        triggerAction(()->!opModeIsActive())
                 )
         );
         while (opModeIsActive());

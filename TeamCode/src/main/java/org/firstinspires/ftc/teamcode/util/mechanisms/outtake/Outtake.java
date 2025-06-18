@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.mechanisms.outtake;
 
+import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
@@ -11,8 +14,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.MirrorMotor;
 import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.OuttakeSlide;
 
@@ -78,8 +79,8 @@ public class Outtake {
 
     public Action slideWaitAction(){
         return new RaceAction(
-                new ForeverAction(this::backgroundIter),
-                new TriggerAction(() -> slide.within_error)
+                foreverAction(this::backgroundIter),
+                triggerAction(() -> slide.within_error)
         );
     }
     public Action readySpecimenAction(){
