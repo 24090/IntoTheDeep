@@ -17,10 +17,10 @@ import org.firstinspires.ftc.teamcode.util.linearslides.MirrorMotor;
 import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
 @Config
 public class Outtake {
-    public static  double HANG_UP = 1600;
-    public static  double HANG_DOWN = 1300;
-    public static double READY_SPECIMEN = 450;
-    private final MirrorMotor mirror_slide;
+    public static int HANG_UP = 1600;
+    public static int HANG_DOWN = 1300;
+    public static int READY_SPECIMEN = 450;
+    public final MirrorMotor mirror_slide;
     public OuttakeSlide slide;
     public OuttakeClaw claw;
     public Outtake(HardwareMap hwmap) {
@@ -46,10 +46,10 @@ public class Outtake {
         slide.up();
         claw.toSamplePos();
     }
-    public void standby(){
-        slide.down();
-        claw.toStandbyPos();
-    }
+//    public void standby(){
+//        slide.down();
+//        claw.toStandbyPos();
+//    }
     public void readyHang(){
         claw.toTransferPos();
         slide.goTo(HANG_UP);
@@ -65,11 +65,11 @@ public class Outtake {
         slide.goTo(READY_SPECIMEN);
         claw.readySpecimen();
     }
-    public Action scoreSpecimen(){
+    public Action scoreSpecimenAction(){
         return new SequentialAction(
                 new InstantAction(claw::scoreSpecimen),
                 new SleepAction(0.5),
-                new InstantAction(claw::toStandbyPos),
+                new InstantAction(claw::toTransferPos),
                 new InstantAction(slide::down)
         );
 
@@ -99,7 +99,7 @@ public class Outtake {
     }
     public Action standbyAction(){
         return new SequentialAction(
-                new InstantAction(this::standby),
+                new InstantAction(this::readyTransfer),
                 slideWaitAction()
         );
     }
@@ -120,7 +120,7 @@ public class Outtake {
         return new SequentialAction(
                 readySampleAction(),
                 openClawAction(),
-                new InstantAction(this::standby)
+                new InstantAction(this::readyTransfer)
         );
     }
     public Action fullScoreAction(){

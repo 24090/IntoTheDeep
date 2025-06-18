@@ -15,14 +15,13 @@ public class TurretVision extends LinearOpMode{
 
         Claw claw = new Claw(hardwareMap);
         Vision vision = new Vision(telemetry, hardwareMap);
-        double angle = 0;
         waitForStart();
         while (opModeIsActive()) {
             ArrayList<Triple<Double, Double, Double>> data = vision.pipeline.getAnalysis();
             if (!data.isEmpty()) {
-                angle = data.get(0).getThird();
+                claw.turret_angle = data.get(0).getThird();
             }
-            claw.rotate(angle);
+            claw.wrist_ready();
         }
 
     }

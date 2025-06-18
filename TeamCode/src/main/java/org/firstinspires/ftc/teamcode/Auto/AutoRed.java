@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.util.GameMap;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
-import org.firstinspires.ftc.teamcode.util.RobotActions;
+import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 import org.firstinspires.ftc.teamcode.util.customactions.FutureAction;
 import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
@@ -44,7 +44,7 @@ public class AutoRed extends LinearOpMode {
     Outtake outtake;
     Vision vision;
 
-    Action move_line_action(Pose a, Pose b) {
+    Action moveLineAction(Pose a, Pose b) {
         PathChain path = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(a), new Point(b)))
                 .setLinearHeadingInterpolation(a.getHeading(), b.getHeading())
@@ -60,12 +60,12 @@ public class AutoRed extends LinearOpMode {
         follower.setStartingPose(start_pose);
 
         final Pose inner_sample = new Pose(48-1.75, 121.75, 0);
-        final Pose score_pose = new Pose(20,144-20, -PI / 4);
-        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0.75, 0);
-        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 0.5, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX() - 1, inner_sample.getY() + 20.5, 0.7);
+        final Pose score_pose = new Pose(19.25,144-19.25, -PI / 4);
+        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance + 1.5, inner_sample.getY() + 0.75, 0);
+        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance + 2.5, inner_sample.getY() + 10, 0);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX() + 2, inner_sample.getY() + 22.5, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 100, -PI/2);
-        final Vector outer_offset = new Vector(Intake.MaxDistance - 0.5, 0.7);
+        final Vector outer_offset = new Vector(Intake.MaxDistance + 0.5, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
         PathChain submersible_path = follower.pathBuilder()
                 .addPath(new BezierCurve(
@@ -85,13 +85,13 @@ public class AutoRed extends LinearOpMode {
         intake = new Intake(hardwareMap);
         outtake = new Outtake(hardwareMap);
         // real init
-        outtake.standby();
+        outtake.readyTransfer();
         outtake.claw.grab();
         // Path Init
         Action path = new SequentialAction(
             // Preload
             new ParallelAction(
-                move_line_action(start_pose, score_pose),
+                moveLineAction(start_pose, score_pose),
                 outtake.readySampleAction()
             ),
             new ParallelAction(
@@ -101,7 +101,7 @@ public class AutoRed extends LinearOpMode {
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
-                move_line_action(score_pose, inner_grab_pose)
+                moveLineAction(score_pose, inner_grab_pose)
             ),
             intake.pickUpAction(),
             new ParallelAction(
@@ -109,7 +109,7 @@ public class AutoRed extends LinearOpMode {
                     RobotActions.fullTransferAction(intake, outtake),
                     outtake.readySampleAction()
                 ),
-                move_line_action(inner_grab_pose, score_pose)
+                moveLineAction(inner_grab_pose, score_pose)
             ),
             new ParallelAction(
                 outtake.scoreAction(),
@@ -118,7 +118,7 @@ public class AutoRed extends LinearOpMode {
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
-                move_line_action(score_pose, center_grab_pose)
+                moveLineAction(score_pose, center_grab_pose)
             ),
             intake.pickUpAction(),
             new ParallelAction(
@@ -126,7 +126,7 @@ public class AutoRed extends LinearOpMode {
                         RobotActions.fullTransferAction(intake, outtake),
                         outtake.readySampleAction()
                 ),
-                move_line_action(center_grab_pose, score_pose)
+                moveLineAction(center_grab_pose, score_pose)
             ),
             new ParallelAction(
                 outtake.scoreAction(),
@@ -135,7 +135,7 @@ public class AutoRed extends LinearOpMode {
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
-                move_line_action(score_pose, outer_grab_pose)
+                moveLineAction(score_pose, outer_grab_pose)
             ),
             intake.pickUpAction(),
             new ParallelAction(
@@ -143,7 +143,7 @@ public class AutoRed extends LinearOpMode {
                         RobotActions.fullTransferAction(intake, outtake),
                         outtake.readySampleAction()
                 ),
-                move_line_action(outer_grab_pose, score_pose)
+                moveLineAction(outer_grab_pose, score_pose)
             ),
             outtake.scoreAction(),
             new ParallelAction(
@@ -172,7 +172,6 @@ public class AutoRed extends LinearOpMode {
         BulkReads bulkreads = new BulkReads(hardwareMap);
         waitForStart();
         bulkreads.setCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        while (!opModeIsActive()){};
         runBlocking(
                 new RaceAction(
                         path,
@@ -181,6 +180,7 @@ public class AutoRed extends LinearOpMode {
                         new TriggerAction(()->!opModeIsActive())
                 )
         );
+        while (opModeIsActive());
         PoseStorer.pose = follower.getPose();
     }
 }

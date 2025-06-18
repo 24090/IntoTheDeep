@@ -1,19 +1,25 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
-import static org.firstinspires.ftc.teamcode.util.RobotActions.fullTransferAction;
+import static org.firstinspires.ftc.teamcode.util.customactions.RobotActions.fullTransferAction;
+import static org.firstinspires.ftc.teamcode.util.customactions.PathAction.moveLineAction;
 import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
+
+import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.RaceAction;  
+import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
+import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -35,15 +41,16 @@ public class Controlled extends LinearOpMode{
     public void runOpMode(){
         double last_time = 0;
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        follower.setStartingPose(PoseStorer.pose);
         boolean old_right_bumper = false;
         intake = new Intake(hardwareMap);
         intake.claw.toReadyGrabPos();
         outtake = new Outtake(hardwareMap);
         InstantAction movement = new InstantAction(() -> {
                 follower.setTeleOpMovementVectors(
-                            -gamepad1.left_stick_y - gamepad2.left_stick_y/5,
-                            -gamepad1.left_stick_x - gamepad2.left_stick_x/5,
-                            -gamepad1.right_stick_x - gamepad2.right_stick_x/5
+                            -gamepad1.left_stick_y - gamepad2.left_stick_y/7,
+                            -gamepad1.left_stick_x - gamepad2.left_stick_x/7,
+                            -gamepad1.right_stick_x - gamepad2.right_stick_x/7
                 );
                 follower.update();
             }
@@ -55,14 +62,40 @@ public class Controlled extends LinearOpMode{
             outtake.backgroundIter();
             intake.linear_slide.movementLoop();
             movement.getF().run();
+            if (gamepad1.dpad_down){
+                runBlocking(
+                    new RaceAction(
+                        new TriggerAction(() -> !gamepad1.dpad_down),
+                        new ParallelAction(
+
+                            moveLineAction(
+                                    follower,
+                                    follower.getPose(),
+                                    new Pose(19.25,144-19.25, -PI / 4)
+                            ),
+                            outtake.readySampleAction()
+                        )
+                    )
+                );
+            }
             if (gamepad1.right_bumper && !old_right_bumper){
                 old_right_bumper = true;
                 if (state == State.NORMAL){
-                    runBlocking(outtake.readySpecimenAction());
+                    runBlocking(
+                        new RaceAction(
+                            new ForeverAction(movement),
+                            outtake.readySpecimenAction()
+                        )
+                    );
                     state = State.SPECIMENSCORING;
                 }
                 else if (state == State.SPECIMENSCORING){
-                    runBlocking(outtake.scoreSpecimen());
+                    runBlocking(
+                            new RaceAction(
+                                    new ForeverAction(movement),
+                                    outtake.scoreSpecimenAction()
+                            )
+                    );
                     state = State.NORMAL;
                 }
             } else {
@@ -72,27 +105,30 @@ public class Controlled extends LinearOpMode{
                 outtake.readySample();
                 state = State.SAMPLESCORING;
             } else if (gamepad1.a){
-                outtake.standby();
+                outtake.readyTransfer();
                 state = State.NORMAL;
             } else if (gamepad1.b){
                 outtake.claw.open();
             }
-
-
             if (gamepad2.right_bumper){
-                runBlocking(fullTransferAction(intake, outtake));
+                runBlocking(
+                    new RaceAction(
+                        new ForeverAction(movement),
+                        fullTransferAction(intake, outtake)
+                    )
+                );
                 state = State.NORMAL;
             }
             if (gamepad2.right_stick_button){
+                intake.claw.turret_angle = 0;
                 intake.readyGrab(
-                        Intake.MaxDistance,
-                        0 // TODO: Claw rotation
+                        Intake.MaxDistance
                 );
                 state = State.IN_GRAB;
             }
             intake.linear_slide.goTo(intake.linear_slide.trimTicks(
                     intake.linear_slide.target_pos +
-                    ((gamepad2.dpad_up? 1 : (gamepad2.dpad_down? -1 :0)) * 70 * (time - last_time))
+                    (int) ((gamepad2.dpad_up? 1 : (gamepad2.dpad_down? -1 :0)) * 70 * (time - last_time))
             ));
             if (gamepad2.a){
                 runBlocking(
@@ -107,9 +143,11 @@ public class Controlled extends LinearOpMode{
                 intake.claw.open();
             }
             if (gamepad2.b){
-                intake.claw.rotate(0);
+                intake.claw.turret_angle = 0;
+                intake.claw.wrist_ready();
             } else if (gamepad2.x){
-                intake.claw.rotate(Math.PI/2);
+                intake.claw.turret_angle = PI/2;
+                intake.claw.wrist_ready();
             }
             last_time = time;
         }

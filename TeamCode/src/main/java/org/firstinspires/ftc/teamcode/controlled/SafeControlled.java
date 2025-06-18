@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
-import org.firstinspires.ftc.teamcode.util.RobotActions;
+import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 
 import pedroPathing.constants.FConstants;
@@ -38,19 +38,19 @@ public class SafeControlled extends LinearOpMode {
         InstantAction intake_update = new InstantAction(() -> {
             if (Math.abs(gamepad1.left_stick_y) > 0.5) {
                 intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 100 * Math.signum(gamepad1.left_stick_y)),
+                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 100 * (int) Math.signum(gamepad1.left_stick_y)),
                         50
                 );
                 intake.linear_slide.setMotorPower(-gamepad1.left_stick_y * 2 + Math.signum(gamepad1.left_stick_y));
             } else if (gamepad1.dpad_up) {
                 intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() + 200 * (last_time - time)),
+                        intake.linear_slide.trimTicks((int) (intake.linear_slide.getPosition() + 200 * (last_time - time))),
                         50
                 );
                 intake.linear_slide.setMotorPower(0.1);
             } else if (gamepad1.dpad_down) {
                 intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 200 * (last_time - time)),
+                        intake.linear_slide.trimTicks((int) (intake.linear_slide.getPosition() - 200 * (last_time - time))),
                         50
                 );
                 intake.linear_slide.setMotorPower(-0.1);
@@ -87,7 +87,6 @@ public class SafeControlled extends LinearOpMode {
         follower.startTeleopDrive();
         waitForStart();
         while (opModeIsActive()){
-            double turret_angle = 0;
             outtake.backgroundIter();
             telemetry.addData("loop time after outtake", (time - last_time) * 1000);
             intake_update.getF().run();
@@ -133,16 +132,16 @@ public class SafeControlled extends LinearOpMode {
                 intake.claw.toggleGrab();
             }
             if (gamepad1.dpad_left) {
-                turret_angle += (time-last_time);
-                intake.claw.rotate(turret_angle);
+                intake.claw.turret_angle += (time-last_time);
+                intake.claw.wrist_ready();
             } else if (gamepad1.dpad_right){
-                turret_angle -= (time-last_time);
-                intake.claw.rotate(turret_angle);
+                intake.claw.turret_angle -= (time-last_time);
+                intake.claw.wrist_ready();
             }
             old_a = gamepad1.a;
             old_b = gamepad1.b;
             telemetry.addData("loop time (ms))", (time - last_time) * 1000);
-            telemetry.addData("turret angle (deg)", turret_angle/PI * 180);
+            telemetry.addData("turret angle (deg)", intake.claw.turret_angle/PI * 180);
             last_time = time;
             telemetry.update();
         }

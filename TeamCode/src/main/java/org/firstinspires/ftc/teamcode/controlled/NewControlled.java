@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.util.Intake;
 import org.firstinspires.ftc.teamcode.util.Outtake;
-import org.firstinspires.ftc.teamcode.util.RobotActions;
+import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -22,7 +22,6 @@ import pedroPathing.constants.LConstants;
 public class NewControlled extends LinearOpMode {
     FtcDashboard dash = FtcDashboard.getInstance();
     double last_time = 0;
-    double turret_angle = 0;
     public void runOpMode(){
         Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         Intake intake;
@@ -33,7 +32,7 @@ public class NewControlled extends LinearOpMode {
         InstantAction intake_update = new InstantAction(() -> {
             if (Math.abs(gamepad1.left_stick_y) > 0.5) {
                 intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 100 * Math.signum(gamepad1.left_stick_y)),
+                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 100 * (int) Math.signum(gamepad1.left_stick_y)),
                         50
                 );
                 intake.linear_slide.setMotorPower(-gamepad1.left_stick_y/4);
@@ -56,8 +55,8 @@ public class NewControlled extends LinearOpMode {
         boolean old_b = false;
         follower.startTeleopDrive();
         waitForStart();
-        outtake.standby();
-        intake.readyGrab(0, turret_angle);
+        outtake.readyTransfer();
+        intake.readyGrab(0);
         while (opModeIsActive()){
             outtake.backgroundIter();
             telemetry.addData("loop time after outtake", (time - last_time) * 1000);
@@ -72,7 +71,7 @@ public class NewControlled extends LinearOpMode {
                         new ForeverAction(outtake::backgroundIter),
                         new SequentialAction(
                             RobotActions.fullTransferAction(intake, outtake),
-                            new InstantAction(() -> intake.claw.toReadyGrabPos(turret_angle))
+                            new InstantAction(() -> intake.claw.toReadyGrabPos())
                         )
                     )
                 );
@@ -89,7 +88,7 @@ public class NewControlled extends LinearOpMode {
             if (gamepad1.x) {
                 outtake.readySample();
             } else if (gamepad1.y) {
-                outtake.standby();
+                outtake.readyTransfer();
             }
             if (gamepad1.a && !old_a){
                 outtake.claw.toggleGrab();
@@ -98,13 +97,13 @@ public class NewControlled extends LinearOpMode {
                 intake.claw.toggleGrab();
             }
             if (gamepad2.left_stick_button) {
-                turret_angle = atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
+                intake.claw.turret_angle = atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
             }
-            intake.claw.rotate(turret_angle - follower.getPose().getHeading());
+            intake.claw.wrist_ready();
             old_a = gamepad1.a;
             old_b = gamepad1.b;
             telemetry.addData("loop time (ms))", (time - last_time) * 1000);
-            telemetry.addData("turret angle (deg)", turret_angle/PI * 180);
+            telemetry.addData("turret angle (deg)", intake.claw.turret_angle/PI * 180);
             last_time = time;
             telemetry.update();
         }

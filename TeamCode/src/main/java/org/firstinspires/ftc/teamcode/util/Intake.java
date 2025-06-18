@@ -19,27 +19,26 @@ public class Intake {
 
     public IntakeSlide linear_slide;
     public Claw claw;
-
+    public double claw_rotation = 0;
     public Intake(HardwareMap hwmap){
         this.linear_slide = new IntakeSlide(hwmap);
         this.claw = new Claw(hwmap);
     }
 
     public void readyTransfer(){
-        claw.grab();
+        claw.loose();
         claw.toTransferPos();
         linear_slide.moveIn();
     }
 
-    public void readyGrab(double linear_slide_to_in, double claw_rotation){
+    public void readyGrab(double linear_slide_to_in){
         claw.toReadyGrabPos();
-        claw.rotate(claw_rotation);
+        claw.wrist_ready();
         linear_slide.goTo(linear_slide.inToTicks(linear_slide_to_in));
     }
-
     public Action pickUpAction(){
         return new SequentialAction(
-                new InstantAction(claw::toGrabPos),
+                new InstantAction(() -> claw.toGrabPos()),
                 new SleepAction(0.1),
                 new InstantAction(claw::grab),
                 new SleepAction(0.3),
@@ -48,17 +47,30 @@ public class Intake {
     public Action readyGrabAction(double linear_slide_to_in, double claw_rotation){
         return new ParallelAction(
                     new SleepAction(0.5), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
-                    new InstantAction(() -> readyGrab(linear_slide_to_in, claw_rotation)),
+                    new InstantAction(
+                        () -> {
+                            claw.turret_angle = claw_rotation;
+                            readyGrab(linear_slide_to_in);
+                        }
+                    ),
                     new InstantAction(claw::open),
                     linear_slide.loopUntilDone()
                 );
     }
 
     public Action readyTransferAction(){
-        return new ParallelAction(
-                new SleepAction(0.5), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
+        return new SequentialAction(
                 new InstantAction(this::readyTransfer),
-                linear_slide.loopUntilDone()
+                new ParallelAction(
+                        new SequentialAction(
+                                new SleepAction(0.4), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
+                                new InstantAction(this.claw::grab),
+                                new SleepAction(0.1)
+                        ),
+                        linear_slide.loopUntilDone()
+                )
+
+
         );
     }
 }

@@ -1,16 +1,22 @@
 package org.firstinspires.ftc.teamcode.vision;
 
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.Point;
+import com.pedropathing.pathgen.Vector;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.Intake;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 import kotlin.Triple;
 
@@ -50,13 +56,24 @@ public class Vision {
     }
     public Action findSample(Sample out) {
         return (telemetry_packet) -> {
+            Triple<Double, Double, Double> sample_triple;
             if (pipeline.getAnalysis().isEmpty()) {
                 return true;
             }
-            Triple<Double, Double, Double>  sample_triple = pipeline.getAnalysis().get(0);
-            out.pose = new Pose(sample_triple.getSecond() - 1.0, sample_triple.getFirst(), sample_triple.getThird());
+            Stream<Triple<Double, Double, Double>> filtered_samples = pipeline.getAnalysis().stream().filter(
+                (a) ->
+                    Intake.MinDistance < new Vector(new Point(a.getFirst(), a.getSecond())).getMagnitude() &&
+                    Intake.MaxDistance > new Vector(new Point(a.getFirst(), a.getSecond())).getMagnitude()
+            );
+            try {
+                sample_triple = filtered_samples.findFirst().get();
+            }
+            catch(NoSuchElementException e) {
+                return true;
+            }
+            out.pose = new Pose(sample_triple.getSecond(), sample_triple.getFirst(), sample_triple.getThird());
             telemetry_packet.addLine("Sample X" + sample_triple.getFirst());
-            telemetry_packet.addLine("Sample Y" + (sample_triple.getSecond() - 1.0));
+            telemetry_packet.addLine("Sample Y" + (sample_triple.getSecond()));
             telemetry_packet.addLine("Sample Heading" + sample_triple.getThird());
             return false;
         };

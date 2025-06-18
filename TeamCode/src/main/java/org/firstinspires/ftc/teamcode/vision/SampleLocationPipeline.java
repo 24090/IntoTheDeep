@@ -86,9 +86,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(greyscale,greyscale, Imgproc.COLOR_RGB2GRAY);
         Core.bitwise_not(greyscale, greyscale);
         Imgproc.Sobel(greyscale, horizontal_edges, CvType.CV_8U, 0, 1);
-        Imgproc.Sobel(greyscale, vertical_edges, CvType.CV_8U, 0, 1);
         Core.subtract(greyscale, horizontal_edges, greyscale);
-        Core.subtract(greyscale, vertical_edges, greyscale);
         Imgproc.findContours(greyscale, dst, hierarchy, Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE );
     }
 

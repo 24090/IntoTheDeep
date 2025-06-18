@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.linearslides;
 
-import static java.lang.Double.max;
-import static java.lang.Double.min;
+import static java.lang.Integer.max;
+import static java.lang.Integer.min;
 
 import androidx.annotation.NonNull;
 
@@ -14,12 +14,12 @@ import org.firstinspires.ftc.teamcode.util.Intake;
 public abstract class LinearSlide {
     protected DcMotor motor;
 
-    private final double min_extend;
-    private final double max_extend;
+    private final int min_extend;
+    private final int max_extend;
     private double zero_pos;
     public double max_error;
 
-    public double target_pos;
+    public int target_pos;
     public Boolean within_error = false;
 
     /**
@@ -30,7 +30,7 @@ public abstract class LinearSlide {
      * @param max_error the initial allowed distance (in ticks) from the target position
      * @param target_pos target_pos the initial encoder position to target
      */
-    public LinearSlide(DcMotor motor, double min_extend, double max_extend, double target_pos, double max_error) {
+    public LinearSlide(DcMotor motor, int min_extend, int max_extend, int target_pos, double max_error) {
         assert(max_extend > min_extend);
         this.motor = motor;
         this.min_extend = min_extend;
@@ -40,7 +40,7 @@ public abstract class LinearSlide {
         this.max_error = max_error;
     }
 
-    public double trimTicks(double ticks){
+    public int trimTicks(int ticks){
         return max(min(ticks, max_extend), min_extend);
     }
 
@@ -86,8 +86,8 @@ public abstract class LinearSlide {
      * Gets the position of the slide, adjusted based on runtime-set zero position
      * @return the position of the slide
      */
-    public double getPosition(){
-        return (motor.getCurrentPosition() - zero_pos);
+    public int getPosition(){
+        return (int) (motor.getCurrentPosition() - zero_pos);
     }
 
     /**
@@ -95,12 +95,13 @@ public abstract class LinearSlide {
      * @param pos the position to run to, in ticks
      * @param err the acceptable error, in ticks.
      */
-    public void goTo(double pos, double err){
+    public void goTo(int pos, double err){
         target_pos = pos;
+        motor.setTargetPosition(pos);
         max_error = err;
     }
 
-    public void goTo(double pos){
+    public void goTo(int pos){
         target_pos = pos;
     }
 

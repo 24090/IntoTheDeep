@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
-
-import static org.firstinspires.ftc.teamcode.util.customactions.PathAction.pathAction;
+package org.firstinspires.ftc.teamcode.util.customactions;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
@@ -12,38 +10,30 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierPoint;
 import com.pedropathing.pathgen.Path;
-import com.pedropathing.pathgen.Point;
-import com.pedropathing.pathgen.Vector;
 
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
+import org.firstinspires.ftc.teamcode.util.Intake;
+import org.firstinspires.ftc.teamcode.util.Outtake;
 
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
         return new RaceAction(
             new ForeverAction(follower::update),
             new SequentialAction(
-                pathAction( follower,
+                new InstantAction(()->follower.followPath(
                     follower.pathBuilder()
                         .addPath(new Path(new BezierPoint(follower.getPose())))
                         .setConstantHeadingInterpolation(
                             follower.getPose().getHeading()
                           + relative_sample.getVector().getTheta()
                         )
-                        .build()
-                ),
-                new InstantAction( () ->
-                    intake.linear_slide.goTo(
-                        intake.linear_slide.inToTicks(
-                            intake.linear_slide.trimIn(relative_sample.getVector().getMagnitude())
-                        )
+                        .build(),
+                        true
                     )
                 ),
                 intake.readyGrabAction(
-                        Intake.MinDistance,
+                        intake.linear_slide.trimIn(relative_sample.getVector().getMagnitude() + 2),
                         relative_sample.getHeading() - relative_sample.getVector().getTheta()
-                ),
-                intake.linear_slide.loopUntilDone()
+                )
             )
         );
     }
@@ -51,10 +41,8 @@ public class RobotActions {
         return new SequentialAction(
                 new ParallelAction(
                         intake.readyTransferAction(),
-                        new InstantAction(outtake::standby)
+                        outtake.readyTransferAction()
                 ),
-                new SleepAction(0.4),
-                outtake.readyTransferAction(),
                 new InstantAction(outtake.claw::grab),
                 new SleepAction(0.3),
                 new InstantAction(intake.claw::open)
