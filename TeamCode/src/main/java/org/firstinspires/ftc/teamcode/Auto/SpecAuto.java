@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
-import static org.firstinspires.ftc.teamcode.util.customactions.PathAction.pathAction;
+import static org.firstinspires.ftc.teamcode.util.customactions.RobotActions.pathAction;
 import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
 import static java.lang.Math.PI;
 
@@ -22,11 +22,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.BulkReads;
 import org.firstinspires.ftc.teamcode.util.GameMap;
-import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
+import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
+import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.vision.Sample;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
@@ -41,20 +42,10 @@ public class SpecAuto extends LinearOpMode {
     Outtake outtake;
     Vision vision;
 
-    Action move_line_action(Pose a, Pose b) {
-        PathChain path = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(a), new Point(b)))
-                .setLinearHeadingInterpolation(a.getHeading(), b.getHeading())
-                .build();
-        return pathAction(follower, path);
+    Action moveLineAction(Pose a, Pose b) {
+        return RobotActions.moveLineAction(follower, a, b);
     }
-    Action turn_action(Pose a, double turn_angle){
-        PathChain path = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(a), new Point(a)))
-                .setLinearHeadingInterpolation(a.getHeading(), a.getHeading() + turn_angle)
-                .build();
-        return pathAction(follower, path);
-    }
+
     @Override
     public void runOpMode() {
         vision = new Vision(telemetry, hardwareMap);
@@ -85,23 +76,23 @@ public class SpecAuto extends LinearOpMode {
         outtake = new Outtake(hardwareMap);
         // same as meepmeep
         Action path = new SequentialAction(
-                move_line_action(start_pose, score_pose),
+                moveLineAction(start_pose, score_pose),
                 new InstantAction(outtake::readySpecimen),
                 outtake.scoreSpecimenAction(),
                 new ParallelAction(pathAction(follower, preload_to_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
                 new InstantAction(() -> {telemetry.addLine("Done"); telemetry.update();}),
                 intake.pickUpAction(),
-                move_line_action(inner_sample_sweep, new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2)),
+                moveLineAction(inner_sample_sweep, new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2)),
                 new InstantAction(intake.claw::open),
-                new ParallelAction(move_line_action(new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2), center_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
+                new ParallelAction(moveLineAction(new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2), center_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
                 intake.pickUpAction(),
-                move_line_action(center_sample_sweep, new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2)),
+                moveLineAction(center_sample_sweep, new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2)),
                 new InstantAction(intake.claw::open),
-                new ParallelAction(move_line_action(new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2), outer_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
+                new ParallelAction(moveLineAction(new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2), outer_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
                 intake.pickUpAction(),
-                move_line_action(outer_sample_sweep, new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2)),
+                moveLineAction(outer_sample_sweep, new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2)),
                 new InstantAction(intake.claw::open),
-                move_line_action(new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2), grab_pose)
+                moveLineAction(new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2), grab_pose)
 
         );
         // these lines ≠ meepmeep

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.linearslides;
+package org.firstinspires.ftc.teamcode.util.mechanisms.linearslides;
 
 import static java.lang.Double.max;
 import static java.lang.Double.min;
@@ -7,8 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.util.GameMap;
-import org.firstinspires.ftc.teamcode.util.Intake;
+import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 
 public class IntakeSlide extends LinearSlide {
     public static final int MAX_EXTEND = 300;

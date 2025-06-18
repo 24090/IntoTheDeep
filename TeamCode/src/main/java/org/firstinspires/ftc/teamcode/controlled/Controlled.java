@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
 import static org.firstinspires.ftc.teamcode.util.customactions.RobotActions.fullTransferAction;
-import static org.firstinspires.ftc.teamcode.util.customactions.PathAction.moveLineAction;
+import static org.firstinspires.ftc.teamcode.util.customactions.RobotActions.moveLineAction;
 import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
-
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -15,11 +14,11 @@ import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
+import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
+import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -60,14 +59,13 @@ public class Controlled extends LinearOpMode{
         while (opModeIsActive()){
             double turret_angle = 0;
             outtake.backgroundIter();
-            intake.linear_slide.movementLoop();
+            intake.slide.movementLoop();
             movement.getF().run();
             if (gamepad1.dpad_down){
                 runBlocking(
                     new RaceAction(
                         new TriggerAction(() -> !gamepad1.dpad_down),
                         new ParallelAction(
-
                             moveLineAction(
                                     follower,
                                     follower.getPose(),
@@ -126,8 +124,8 @@ public class Controlled extends LinearOpMode{
                 );
                 state = State.IN_GRAB;
             }
-            intake.linear_slide.goTo(intake.linear_slide.trimTicks(
-                    intake.linear_slide.target_pos +
+            intake.slide.goTo(intake.slide.trimTicks(
+                    intake.slide.target_pos +
                     (int) ((gamepad2.dpad_up? 1 : (gamepad2.dpad_down? -1 :0)) * 70 * (time - last_time))
             ));
             if (gamepad2.a){

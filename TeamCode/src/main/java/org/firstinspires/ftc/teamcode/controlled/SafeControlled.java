@@ -14,10 +14,11 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.pathgen.Vector;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.Outtake;
-import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
+
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
+import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
+import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -37,28 +38,28 @@ public class SafeControlled extends LinearOpMode {
 
         InstantAction intake_update = new InstantAction(() -> {
             if (Math.abs(gamepad1.left_stick_y) > 0.5) {
-                intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 100 * (int) Math.signum(gamepad1.left_stick_y)),
+                intake.slide.goTo(
+                        intake.slide.trimTicks(intake.slide.getPosition() - 100 * (int) Math.signum(gamepad1.left_stick_y)),
                         50
                 );
-                intake.linear_slide.setMotorPower(-gamepad1.left_stick_y * 2 + Math.signum(gamepad1.left_stick_y));
+                intake.slide.setMotorPower(-gamepad1.left_stick_y * 2 + Math.signum(gamepad1.left_stick_y));
             } else if (gamepad1.dpad_up) {
-                intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks((int) (intake.linear_slide.getPosition() + 200 * (last_time - time))),
+                intake.slide.goTo(
+                        intake.slide.trimTicks((int) (intake.slide.getPosition() + 200 * (last_time - time))),
                         50
                 );
-                intake.linear_slide.setMotorPower(0.1);
+                intake.slide.setMotorPower(0.1);
             } else if (gamepad1.dpad_down) {
-                intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks((int) (intake.linear_slide.getPosition() - 200 * (last_time - time))),
+                intake.slide.goTo(
+                        intake.slide.trimTicks((int) (intake.slide.getPosition() - 200 * (last_time - time))),
                         50
                 );
-                intake.linear_slide.setMotorPower(-0.1);
+                intake.slide.setMotorPower(-0.1);
             } else {
                 if (gamepad1.left_stick_button) {
-                    intake.linear_slide.moveOut();
+                    intake.slide.moveOut();
                 }
-                intake.linear_slide.movementLoop();
+                intake.slide.movementLoop();
             }
         });
 

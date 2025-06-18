@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.mechanisms.intake;
 
 import static java.lang.Math.PI;
-import static java.lang.Math.floorMod;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;

@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
-import static org.firstinspires.ftc.teamcode.util.customactions.PathAction.pathAction;
+import static org.firstinspires.ftc.teamcode.util.customactions.RobotActions.pathAction;
 import static org.firstinspires.ftc.teamcode.util.customactions.RunBlocking.runBlocking;
 import static java.lang.Math.PI;
 
@@ -13,7 +13,6 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
-import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.pathgen.Vector;
@@ -23,13 +22,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.util.BulkReads;
 import org.firstinspires.ftc.teamcode.util.GameMap;
-import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
-import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 import org.firstinspires.ftc.teamcode.util.customactions.FutureAction;
+import org.firstinspires.ftc.teamcode.util.customactions.RobotActions;
 import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
+import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
+import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.vision.Sample;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
@@ -45,11 +44,7 @@ public class AutoRed extends LinearOpMode {
     Vision vision;
 
     Action moveLineAction(Pose a, Pose b) {
-        PathChain path = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(a), new Point(b)))
-                .setLinearHeadingInterpolation(a.getHeading(), b.getHeading())
-                .build();
-        return pathAction(follower, path);
+        return RobotActions.moveLineAction(follower, a, b);
     }
     @Override
     public void runOpMode() {

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.mechanisms.outtake;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
@@ -13,8 +13,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
-import org.firstinspires.ftc.teamcode.util.linearslides.MirrorMotor;
-import org.firstinspires.ftc.teamcode.util.linearslides.OuttakeSlide;
+import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.MirrorMotor;
+import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.OuttakeSlide;
+
 @Config
 public class Outtake {
     public static int HANG_UP = 1600;

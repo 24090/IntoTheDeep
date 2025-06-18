@@ -8,11 +8,14 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.BezierPoint;
 import com.pedropathing.pathgen.Path;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.pathgen.Point;
 
-import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.Outtake;
+import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
+import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
@@ -31,7 +34,7 @@ public class RobotActions {
                     )
                 ),
                 intake.readyGrabAction(
-                        intake.linear_slide.trimIn(relative_sample.getVector().getMagnitude() + 2),
+                        intake.slide.trimIn(relative_sample.getVector().getMagnitude() + 2),
                         relative_sample.getHeading() - relative_sample.getVector().getTheta()
                 )
             )
@@ -47,5 +50,18 @@ public class RobotActions {
                 new SleepAction(0.3),
                 new InstantAction(intake.claw::open)
         );
+    }
+    public static Action pathAction(Follower follower, PathChain path){
+        return new SequentialAction(
+                new InstantAction(()->follower.followPath(path, true)),
+                new TriggerAction(()->(!follower.isBusy())&&(follower.getVelocityMagnitude()<2)&&(follower.getHeadingError()<0.04))
+        );
+    }
+    public static Action moveLineAction(Follower follower, Pose a, Pose b) {
+        PathChain path = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(a), new Point(b)))
+                .setLinearHeadingInterpolation(a.getHeading(), b.getHeading())
+                .build();
+        return pathAction(follower, path);
     }
 }

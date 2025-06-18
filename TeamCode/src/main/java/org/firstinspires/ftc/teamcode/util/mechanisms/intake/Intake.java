@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.mechanisms.intake;
 
 import static org.firstinspires.ftc.teamcode.util.GameMap.RobotLength;
 
@@ -10,31 +10,31 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.util.linearslides.IntakeSlide;
+import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.IntakeSlide;
 
 @Config
 public class Intake {
     public static double MaxDistance = 13.5 + RobotLength/2;
     public static double MinDistance = 0.75 + RobotLength/2;
 
-    public IntakeSlide linear_slide;
+    public IntakeSlide slide;
     public Claw claw;
-    public double claw_rotation = 0;
+
     public Intake(HardwareMap hwmap){
-        this.linear_slide = new IntakeSlide(hwmap);
+        this.slide = new IntakeSlide(hwmap);
         this.claw = new Claw(hwmap);
     }
 
     public void readyTransfer(){
         claw.loose();
         claw.toTransferPos();
-        linear_slide.moveIn();
+        slide.moveIn();
     }
 
     public void readyGrab(double linear_slide_to_in){
         claw.toReadyGrabPos();
         claw.wrist_ready();
-        linear_slide.goTo(linear_slide.inToTicks(linear_slide_to_in));
+        slide.goTo(slide.inToTicks(linear_slide_to_in));
     }
     public Action pickUpAction(){
         return new SequentialAction(
@@ -54,7 +54,7 @@ public class Intake {
                         }
                     ),
                     new InstantAction(claw::open),
-                    linear_slide.loopUntilDone()
+                    slide.loopUntilDone()
                 );
     }
 
@@ -67,7 +67,7 @@ public class Intake {
                                 new InstantAction(this.claw::grab),
                                 new SleepAction(0.1)
                         ),
-                        linear_slide.loopUntilDone()
+                        slide.loopUntilDone()
                 )
 
 

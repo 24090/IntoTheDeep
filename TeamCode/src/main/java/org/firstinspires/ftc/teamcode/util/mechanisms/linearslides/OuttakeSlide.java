@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.linearslides;
+package org.firstinspires.ftc.teamcode.util.mechanisms.linearslides;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
