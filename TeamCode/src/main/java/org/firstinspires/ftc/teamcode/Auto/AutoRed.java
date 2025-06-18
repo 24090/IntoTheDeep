@@ -142,24 +142,45 @@ public class AutoRed extends LinearOpMode {
             ),
             outtake.scoreAction(),
             new ParallelAction(
+                outtake.slideWaitAction(),
+                // SUB 1
+                pathAction(follower, submersible_path)
+            ),
+            new SequentialAction(
+                vision.findSample(sample),
+                futureAction( () ->
+                    RobotActions.reachSample(sample.pose, intake, follower)
+                ),
+                new SleepAction(0.5),
+                intake.pickUpAction()
+            ),
+            new ParallelAction(
+                new SequentialAction(
+                    RobotActions.fullTransferAction(intake, outtake),
+                    outtake.readySampleAction()
+                ),
+                pathAction(follower, sub_to_score)
+            ),
+            outtake.scoreAction(),
+            new ParallelAction(
                     outtake.slideWaitAction(),
-            // SUB 1
+            // SUB 2
                     pathAction(follower, submersible_path)
             ),
             new SequentialAction(
-                    vision.findSample(sample),
-                    futureAction( () ->
-                            RobotActions.reachSample(sample.pose, intake, follower)
-                    ),
-                    new SleepAction(0.5),
-                    intake.pickUpAction()
+                vision.findSample(sample),
+                futureAction( () ->
+                    RobotActions.reachSample(sample.pose, intake, follower)
+                ),
+                new SleepAction(0.5),
+                intake.pickUpAction()
             ),
             new ParallelAction(
-                    new SequentialAction(
-                            RobotActions.fullTransferAction(intake, outtake),
-                            outtake.readySampleAction()
-                    ),
-                    pathAction(follower, sub_to_score)
+                new SequentialAction(
+                    RobotActions.fullTransferAction(intake, outtake),
+                    outtake.readySampleAction()
+                ),
+                pathAction(follower, sub_to_score)
             ),
             outtake.fullScoreAction()
 
