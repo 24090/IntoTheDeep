@@ -37,7 +37,7 @@ public class RobotActions {
                     )
                 ),
                 intake.readyGrabAction(
-                        intake.slide.trimIn(relative_sample.getVector().getMagnitude() + 2),
+                        intake.slide.trimIn(relative_sample.getVector().getMagnitude()),
                         relative_sample.getHeading() - relative_sample.getVector().getTheta()
                 )
             )
