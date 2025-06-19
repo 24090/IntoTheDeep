@@ -20,18 +20,21 @@ public class Claw {
     public static double CLAW_LOOSE = 0.6;
     public static double CLAW_GRAB = 1;
 
-    public static int ELBOW_LEFT_IN = 800;
-    public static int ELBOW_LEFT_OUT = 2200;
-    public static int ELBOW_RIGHT_IN = 2500;
-    public static int ELBOW_RIGHT_OUT = 1300;
+    public static double ELBOW_LEFT_IN = 0.52;
+    public static double ELBOW_LEFT_READY = 0.66;
+    public static double ELBOW_LEFT_OUT = 0.98;
 
-    public static double WRIST_LEFT_IN = 1;
+    public static double ELBOW_RIGHT_IN = 0.82;
+    public static double ELBOW_RIGHT_READY = 0.75;
+    public static double ELBOW_RIGHT_OUT = 0.6;
+
+    public static double WRIST_LEFT_IN = 0.93;
     public static double WRIST_LEFT_OUT_0 = 0.35;
     public static double WRIST_LEFT_OUT_90 = 0.6;
     public static double WRIST_LEFT_READY_0 = 0.42;
     public static double WRIST_LEFT_READY_90 = 0.67;
 
-    public static double WRIST_RIGHT_IN = 0;
+    public static double WRIST_RIGHT_IN = 0.07;
     public static double WRIST_RIGHT_OUT_0 = 0.65;
     public static double WRIST_RIGHT_OUT_90 = 0.9;
     public static double WRIST_RIGHT_READY_0 = 0.58;
@@ -45,9 +48,9 @@ public class Claw {
         wrist_servo_left = hardwareMap.get(ServoImplEx.class, "wrist_servo_left");
             wrist_servo_left.setPwmRange(new PwmControl.PwmRange(500, 2500));
         elbow_servo_left = hardwareMap.get(ServoImplEx.class, "elbow_servo_left");
-            elbow_servo_left.setPwmRange(new PwmControl.PwmRange(ELBOW_LEFT_IN, ELBOW_LEFT_OUT));
+            elbow_servo_left.setPwmRange(new PwmControl.PwmRange(500, 2500));
         elbow_servo_right = hardwareMap.get(ServoImplEx.class, "elbow_servo_right");
-            elbow_servo_right.setPwmRange(new PwmControl.PwmRange(ELBOW_RIGHT_OUT, ELBOW_RIGHT_IN));
+            elbow_servo_right.setPwmRange(new PwmControl.PwmRange(500, 2500));
     }
 
 
@@ -98,8 +101,8 @@ public class Claw {
     }
 
     public void toReadyGrabPos(double angle) {
-        elbow_servo_left.setPosition(0.75);
-        elbow_servo_right.setPosition(0.25);
+        elbow_servo_left.setPosition(ELBOW_LEFT_READY);
+        elbow_servo_right.setPosition(ELBOW_RIGHT_READY);
         turret_angle = angle;
         wrist_ready();
     }
@@ -107,16 +110,16 @@ public class Claw {
         toReadyGrabPos(0);
     }
     public void toTransferPos() {
-        elbow_servo_left.setPosition(0.3);
-        elbow_servo_right.setPosition(0.7);
+        elbow_servo_left.setPosition(ELBOW_LEFT_IN);
+        elbow_servo_right.setPosition(ELBOW_RIGHT_IN);
         wrist_servo_left.setPosition(WRIST_LEFT_IN-0.05);
         wrist_servo_right.setPosition(WRIST_RIGHT_IN+0.05);
     }
 
 
     public void toGrabPos() {
-        elbow_servo_left.setPosition(1);
-        elbow_servo_right.setPosition(0);
+        elbow_servo_left.setPosition(ELBOW_LEFT_OUT);
+        elbow_servo_right.setPosition(ELBOW_RIGHT_OUT);
         wrist_grab();
         open();
     }

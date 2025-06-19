@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.InstantFunction;
 
 import java.util.function.Supplier;
@@ -35,7 +36,7 @@ public class CustomActions {
     }
 
     public static Action foreverAction(InstantFunction f){
-        return foreverAction(f);
+        return foreverAction(new InstantAction(f));
     }
 
     public static Action futureAction(Supplier<Action> supplier){

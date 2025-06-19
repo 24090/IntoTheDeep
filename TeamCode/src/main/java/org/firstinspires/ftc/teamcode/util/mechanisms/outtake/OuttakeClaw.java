@@ -13,21 +13,21 @@ public class OuttakeClaw {
 
     public static double LEFT_SAMPLE = 1;
     public static double LEFT_SPECIMEN = 1;
-    public static double LEFT_TRANSFER = 0.66;
+    public static double LEFT_TRANSFER = 0.58;
 //    public static double LEFT_STANDBY = 0.71;
 
-    public static double RIGHT_TRANSFER = 0.44;
+    public static double RIGHT_TRANSFER = 0.42;
     public static double RIGHT_SAMPLE = 0;
     public static double RIGHT_SPECIMEN = 0;
 //    public static double RIGHT_STANDBY = 0.39;
 
-    public static double WRIST_TRANSFER = 0.53;
+    public static double WRIST_TRANSFER = 0.3;
     public static double WRIST_READY_SPECIMEN = 0.45;
     public static double WRIST_SPECIMEN = 0.45;
-    public static double WRIST_SAMPLE = 0.4;
+    public static double WRIST_SAMPLE = 0.35;
 
-    public static double CLAW_OPEN = 0.1;
-    public static double CLAW_CLOSED = 0.5;
+    public static double CLAW_OPEN = 0.3;
+    public static double CLAW_CLOSED = 0.45;
 
     public OuttakeClaw(HardwareMap hardwareMap){
         claw_servo = hardwareMap.get(ServoImplEx.class, "outtake_claw_servo");
@@ -62,13 +62,6 @@ public class OuttakeClaw {
         wrist_servo.setPosition(WRIST_TRANSFER);
         claw_servo.setPosition(CLAW_OPEN);
     }
-
-//    public void toStandbyPos(){
-//        left_servo.setPosition(LEFT_STANDBY);
-//        right_servo.setPosition(RIGHT_STANDBY);
-//        wrist_servo.setPosition(WRIST_TRANSFER);
-//        claw_servo.setPosition(CLAW_OPEN);
-//    }
 
     public void toSamplePos(){
         left_servo.setPosition(LEFT_SAMPLE);

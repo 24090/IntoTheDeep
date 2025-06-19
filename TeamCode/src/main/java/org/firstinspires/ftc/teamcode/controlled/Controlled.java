@@ -45,6 +45,7 @@ public class Controlled extends LinearOpMode{
         intake = new Intake(hardwareMap);
         intake.claw.toReadyGrabPos();
         outtake = new Outtake(hardwareMap);
+        outtake.readyTransfer();
         InstantAction movement = new InstantAction(() -> {
                 follower.setTeleOpMovementVectors(
                             -gamepad1.left_stick_y - gamepad2.left_stick_y/7,
