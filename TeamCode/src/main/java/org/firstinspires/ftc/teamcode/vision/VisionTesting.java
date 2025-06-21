@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
 
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
@@ -34,27 +35,33 @@ public class VisionTesting extends LinearOpMode {
         while (opModeIsActive()){
             Sample sample = new Sample();
             runBlocking(
-                    new ParallelAction(
-                        new SequentialAction(
-                            vision.findSample(sample),
-                            futureAction( () ->
-                                RobotActions.reachSample(sample.pose, intake, follower)
-                            ),
-                            new SleepAction(0.5),
-                            intake.pickUpAction(),
-                            RobotActions.fullTransferAction(intake, outtake),
-                            triggerAction(() -> gamepad1.a)
-                        ),
-                        foreverAction(() -> {
-                            if (sample.pose != null) {
-                                telemetry.addData("sample x", sample.pose.getX());
-                                telemetry.addData("sample y", sample.pose.getY());
-                                telemetry.addData("sample Θ", sample.pose.getHeading());
-                                telemetry.update();
-                            }
+                    new RaceAction(
+                            triggerAction(() -> !opModeIsActive()),
+                            new ParallelAction(
+                                    foreverAction(
+                                        new SequentialAction(
+                                            vision.findSample(sample),
+                                            futureAction( () ->
+                                                    RobotActions.reachSample(sample.pose, intake, follower)
+                                            ),
+                                            new SleepAction(0.5),
+                                            intake.pickUpAction(),
+                                            RobotActions.fullTransferAction(intake, outtake),
+                                            triggerAction(() -> gamepad1.a)
+                                        )
+                                    ),
+                                    foreverAction(() -> {
+                                        if (sample.pose != null) {
+                                            telemetry.addData("sample x", sample.pose.getX());
+                                            telemetry.addData("sample y", sample.pose.getY());
+                                            telemetry.addData("sample Θ", sample.pose.getHeading());
+                                            telemetry.update();
+                                        }
 
-                        })
+                                    })
+                            )
                     )
+
 
             );
         }

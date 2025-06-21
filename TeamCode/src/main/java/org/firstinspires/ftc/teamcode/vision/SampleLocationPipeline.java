@@ -37,7 +37,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     Mat greyscale = new Mat();
     Mat horizontal_edges = new Mat();
     Mat vertical_edges = new Mat();
-    public ArrayList<Triple<Double, Double, Double>> object_field_coords = new ArrayList<>();
+    public List<Triple<Double, Double, Double>> object_field_coords = new ArrayList<>();
     final double top_distance_weight  = 0.05;
     final double top2_distance_weight = 2.4;
 
@@ -73,8 +73,8 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         // Gets Colors From Image (Binary)
         Core.inRange(input_undistort, color_min, color_max, color_mask);
         //   Erode and dilate
-        Imgproc.erode(color_mask, color_mask, empty_mat, new Point(-1, -1), 3);
-        Imgproc.dilate(color_mask, color_mask, empty_mat, new Point(-1, -1), 3);
+        Imgproc.erode(color_mask, color_mask, empty_mat, new Point(-1, -1), 5);
+        Imgproc.dilate(color_mask, color_mask, empty_mat, new Point(-1, -1), 5);
         //   add color when mask is white, add white when mask is black
         Core.bitwise_and(input_undistort, input_undistort, color_filtered_image, color_mask);
         Core.bitwise_not(color_mask, color_mask);
@@ -85,8 +85,6 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(color_filtered_image,greyscale, Imgproc.COLOR_HSV2RGB);
         Imgproc.cvtColor(greyscale,greyscale, Imgproc.COLOR_RGB2GRAY);
         Core.bitwise_not(greyscale, greyscale);
-        Imgproc.Sobel(greyscale, horizontal_edges, CvType.CV_8U, 0, 1);
-        Core.subtract(greyscale, horizontal_edges, greyscale);
         Imgproc.findContours(greyscale, dst, hierarchy, Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE );
     }
 
@@ -142,7 +140,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
 
     @SuppressLint("DefaultLocale")
     public Mat processFrame(Mat input) {
-    	object_field_coords.clear();
+        List<Triple<Double, Double, Double>> new_objects = new ArrayList<>();
         List<MatOfPoint> contours = new ArrayList<>();
         getContours(input, contours);
 
@@ -175,7 +173,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
             if (pose == null) {
                 continue;
             }
-            object_field_coords.add(pose);
+            new_objects.add(pose);
             telemetry.addData("x, y, θ", String.format("%.1f, %.1f, %.2f", pose.getFirst(), pose.getSecond(), pose.getThird()));
         }
         switch(stage){
@@ -195,11 +193,12 @@ public class SampleLocationPipeline extends OpenCvPipeline {
                 Imgproc.cvtColor(input_undistort, output, Imgproc.COLOR_HSV2RGB);
                 break;
         }
+        object_field_coords = new ArrayList<>(new_objects);
         telemetry.update();
         return output;
     }
 
-    public ArrayList<Triple<Double, Double, Double>> getAnalysis(){
+    public List<Triple<Double, Double, Double>> getAnalysis(){
         return object_field_coords;
     }
 }

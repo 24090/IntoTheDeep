@@ -14,13 +14,14 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 import kotlin.Triple;
 
 public class Vision {
-    int STREAM_WIDTH= 640;
+    int STREAM_WIDTH = 640;
     int STREAM_HEIGHT = 480;
     OpenCvWebcam webcam;
     SampleLocationPipeline pipeline;
@@ -56,10 +57,11 @@ public class Vision {
     public Action findSample(Sample out) {
         return (telemetry_packet) -> {
             Triple<Double, Double, Double> sample_triple;
-            if (pipeline.getAnalysis().isEmpty()) {
+            List<Triple<Double, Double, Double>> analysis = pipeline.getAnalysis();
+            if (analysis.isEmpty()) {
                 return true;
             }
-            Stream<Triple<Double, Double, Double>> filtered_samples = pipeline.getAnalysis().stream().filter(
+            Stream<Triple<Double, Double, Double>> filtered_samples = analysis.stream().filter(
                 (a) ->
                     Intake.MinDistance < new Vector(new Point(a.getFirst(), a.getSecond())).getMagnitude() &&
                     Intake.MaxDistance > new Vector(new Point(a.getFirst(), a.getSecond())).getMagnitude()

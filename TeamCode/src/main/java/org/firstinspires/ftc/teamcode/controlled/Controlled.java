@@ -11,6 +11,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -58,24 +59,26 @@ public class Controlled extends LinearOpMode{
         follower.startTeleopDrive();
         waitForStart();
         while (opModeIsActive()){
-            double turret_angle = 0;
             outtake.backgroundIter();
             intake.slide.movementLoop();
             movement.getF().run();
             if (gamepad1.dpad_down){
+                follower.breakFollowing();
                 runBlocking(
                     new RaceAction(
                         triggerAction(() -> !gamepad1.dpad_down),
                         new ParallelAction(
                             moveLineAction(
-                                    follower,
-                                    follower.getPose(),
-                                    new Pose(19.25,144-19.25, -PI / 4)
+                                follower,
+                                follower.getPose(),
+                                new Pose(19.25,144-19.25, -PI / 4)
                             ),
                             outtake.readySampleAction()
                         )
                     )
                 );
+                follower.breakFollowing();
+                follower.startTeleopDrive();
             }
             if (gamepad1.right_bumper && !old_right_bumper){
                 old_right_bumper = true;

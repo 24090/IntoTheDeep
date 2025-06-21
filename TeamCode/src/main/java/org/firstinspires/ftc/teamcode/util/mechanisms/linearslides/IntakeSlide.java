@@ -32,7 +32,7 @@ public class IntakeSlide extends LinearSlide {
 
     public double powerFunction(){
         double distance = target_pos - getPosition();
-        return distance/300.0;
+        return distance/50.0;
     }
 
     public void stop(){

@@ -1,16 +1,17 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
 public class Camera {
-
 	public static Scalar red_min;
 	public static Scalar red_max;
 	public static Scalar blue_min = new Scalar(105, 85, 0);
 	public static Scalar blue_max = new Scalar(125, 255, 255);
-	public static Scalar yellow_min = new Scalar(10, 115, 0);
+	public static Scalar yellow_min = new Scalar(20, 40, 20);
 	public static Scalar yellow_max = new Scalar(40, 255, 255);
 	public static Mat reprojection_matrix = new Mat();
 	public static Mat camera_matrix = new Mat();
@@ -23,8 +24,8 @@ public class Camera {
 		Mat dc = new Mat(1, 5, 6);
 
 		// generated with ReprojectionMatrixCalculator.py
-		rm.put(0, 0,  1.049424e-03); rm.put(0, 1,  1.948261e-04); rm.put(0, 2, -2.298301e-01);
-		rm.put(1, 0,  0.000000e+00); rm.put(1, 1,  8.255489e-04); rm.put(1, 2, -7.766873e-01);
+		rm.put(0, 0,  1.049424e-03); rm.put(0, 1,  1.559786e-04); rm.put(0, 2, -2.547099e-01);
+		rm.put(1, 0,  0.000000e+00); rm.put(1, 1,  3.958721e-04); rm.put(1, 2, -1.051872e+00);
 		rm.put(2, 0, -0.000000e+00); rm.put(2, 1, -5.885984e-05); rm.put(2, 2, -3.769658e-02);
 
 		cm.put(0, 0,  9.529036e+02); cm.put(0, 1,  0.000000e+00); cm.put(0, 2,  3.379052e+02);

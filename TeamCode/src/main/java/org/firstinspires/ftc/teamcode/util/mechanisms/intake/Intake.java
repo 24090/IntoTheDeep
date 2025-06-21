@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.IntakeSlide;
 
 @Config
 public class Intake {
-    public static double MaxDistance = 13.5 + RobotLength/2;
-    public static double MinDistance = 0.75 + RobotLength/2;
+    public static double MaxDistance = 11.25 + RobotLength/2;
+    public static double MinDistance = 2.75 + RobotLength/2;
 
     public IntakeSlide slide;
     public Claw claw;

@@ -7,7 +7,7 @@ focal_length       = (952.90362321, 960.00009409)
 principal_point    = (337.90515333, 165.08917237)
 rotation_xyz_euler = [50, 0, 0]
 degrees            = True
-position           = [-3.31, 2.65 , 15.057 - 1.5]
+position           = [-2.65, 3.31 + 1.34, 15.057 - 1.5]
 distortion         = [ 8.86386337e-04, 1.89532355e+00, -2.82422652e-02, -7.42910733e-03, -1.11640100e+01]
 
 # find intrinsics matrix
