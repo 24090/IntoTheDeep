@@ -70,7 +70,6 @@ public class SpecAuto extends LinearOpMode {
         // HW stuff
         intake = new Intake(hardwareMap);
         outtake = new Outtake(hardwareMap);
-        // same as meepmeep
         Action path = new SequentialAction(
             moveLineAction(follower, start_pose, score_pose, 2, 0.04),
             new InstantAction(outtake::readySpecimen),
