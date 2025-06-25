@@ -30,8 +30,8 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.vision.Sample;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 @Config
 @Autonomous(name = "SpecAuto", group = "auto")

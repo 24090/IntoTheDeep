@@ -11,7 +11,7 @@ public class Camera {
 	public static Scalar red_max;
 	public static Scalar blue_min = new Scalar(105, 85, 0);
 	public static Scalar blue_max = new Scalar(125, 255, 255);
-	public static Scalar yellow_min = new Scalar(20, 40, 20);
+	public static Scalar yellow_min = new Scalar(15, 15, 0);
 	public static Scalar yellow_max = new Scalar(40, 255, 255);
 	public static Mat reprojection_matrix = new Mat();
 	public static Mat camera_matrix = new Mat();

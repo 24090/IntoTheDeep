@@ -11,7 +11,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -21,8 +20,8 @@ import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 /**
  * TODO:
@@ -44,7 +43,7 @@ public class Controlled extends LinearOpMode{
         follower.setStartingPose(PoseStorer.pose);
         boolean old_right_bumper = false;
         intake = new Intake(hardwareMap);
-        intake.claw.toReadyGrabPos();
+        intake.claw.toReadyGrabPos(0);
         outtake = new Outtake(hardwareMap);
         outtake.readyTransfer();
         InstantAction movement = new InstantAction(() -> {
@@ -146,9 +145,11 @@ public class Controlled extends LinearOpMode{
             }
             if (gamepad2.b){
                 intake.claw.turret_angle = 0;
+                intake.claw.toReadyGrabPos(intake.claw.turret_angle);
                 intake.claw.wrist_ready();
             } else if (gamepad2.x){
                 intake.claw.turret_angle = PI/2;
+                intake.claw.toReadyGrabPos(intake.claw.turret_angle);
                 intake.claw.wrist_ready();
             }
             last_time = time;

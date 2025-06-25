@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.util.CustomActions.futureAction;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -17,8 +18,8 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 @TeleOp(group = "testing")
 public class VisionTesting extends LinearOpMode {
@@ -31,6 +32,7 @@ public class VisionTesting extends LinearOpMode {
                 telemetry,
                 hardwareMap
         );
+        outtake.readyTransfer();
         waitForStart();
         while (opModeIsActive()){
             Sample sample = new Sample();
@@ -38,6 +40,7 @@ public class VisionTesting extends LinearOpMode {
                     new RaceAction(
                             triggerAction(() -> !opModeIsActive()),
                             new ParallelAction(
+                                    foreverAction(follower::update),
                                     foreverAction(
                                         new SequentialAction(
                                             vision.findSample(sample),

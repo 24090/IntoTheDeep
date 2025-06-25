@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.util.mechanisms;
 
 import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+import static java.lang.Math.PI;
+
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -11,33 +13,37 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.pathgen.BezierPoint;
 import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
+import com.pedropathing.pathgen.Vector;
 
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
+        Vector movement_vector = new Vector(relative_sample.getY(), follower.getPose().getHeading()+PI/2);
         return new RaceAction(
             foreverAction(follower::update),
             new SequentialAction(
                 new InstantAction(()->follower.followPath(
                     follower.pathBuilder()
-                        .addPath(new Path(new BezierPoint(follower.getPose())))
-                        .setConstantHeadingInterpolation(
-                            follower.getPose().getHeading()
-                          + relative_sample.getVector().getTheta()
-                        )
-                        .build(),
+                        .addPath(new Path(new BezierLine(
+                            new Point(follower.getPose()),
+                            new Point(
+                                follower.getPose().getX() + movement_vector.getXComponent(),
+                                follower.getPose().getY() + movement_vector.getYComponent()
+                            )
+                        )))
+                            .setConstantHeadingInterpolation(follower.getPose().getHeading())
+                            .build(),
                         true
                     )
                 ),
                 intake.readyGrabAction(
-                        intake.slide.trimIn(relative_sample.getVector().getMagnitude()),
-                        relative_sample.getHeading() - relative_sample.getVector().getTheta()
+                        intake.slide.trimIn(relative_sample.getX()),
+                        relative_sample.getHeading() + PI/2
                 )
             )
         );

@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 @TeleOp(name = "Safe Controlled")
 public class SafeControlled extends LinearOpMode {

@@ -96,7 +96,8 @@ public class Outtake {
     public Action readyTransferAction(){
         return new SequentialAction(
                 new InstantAction(this::readyTransfer),
-                slideWaitAction()
+                slideWaitAction(),
+                new InstantAction(this::openClawAction)
         );
     }
     public Action standbyAction(){

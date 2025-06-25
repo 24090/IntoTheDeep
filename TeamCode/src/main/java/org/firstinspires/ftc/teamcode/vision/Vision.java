@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Action;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.Point;
@@ -28,6 +29,7 @@ public class Vision {
     public Vision(Telemetry telemetry, HardwareMap hwmap){
         WebcamName webcamName = hwmap.get(WebcamName.class, "Webcam");
         webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
+        FtcDashboard.getInstance().startCameraStream(webcam, 0);
         webcam.setViewportRenderingPolicy(
                 OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW
         );
@@ -63,13 +65,12 @@ public class Vision {
             }
             Stream<Triple<Double, Double, Double>> filtered_samples = analysis.stream().filter(
                 (a) ->
-                    Intake.MinDistance < new Vector(new Point(a.getFirst(), a.getSecond())).getMagnitude() &&
-                    Intake.MaxDistance > new Vector(new Point(a.getFirst(), a.getSecond())).getMagnitude()
+                    Intake.MinDistance + 2 < a.getSecond() &&
+                    Intake.MaxDistance + 2 > a.getSecond()
             );
             try {
                 sample_triple = filtered_samples.findFirst().get();
-            }
-            catch(NoSuchElementException e) {
+            } catch(NoSuchElementException e) {
                 return true;
             }
             out.pose = new Pose(sample_triple.getSecond(), sample_triple.getFirst(), sample_triple.getThird());

@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.util.mechanisms.intake;
 
+import static org.firstinspires.ftc.teamcode.util.CustomActions.futureAction;
 import static org.firstinspires.ftc.teamcode.util.GameMap.RobotLength;
+
+import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
@@ -14,7 +17,7 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.IntakeSlide;
 
 @Config
 public class Intake {
-    public static double MaxDistance = 11.25 + RobotLength/2;
+    public static double MaxDistance = 12.75 + RobotLength/2;
     public static double MinDistance = 2.75 + RobotLength/2;
 
     public IntakeSlide slide;
@@ -38,32 +41,33 @@ public class Intake {
     }
     public Action pickUpAction(){
         return new SequentialAction(
-                new InstantAction(() -> claw.toGrabPos()),
+                new InstantAction(claw::toGrabPos),
                 new SleepAction(0.25),
                 new InstantAction(claw::grab),
                 new SleepAction(0.15),
-                new InstantAction(claw::toReadyGrabPos));
+                new InstantAction(() -> claw.toReadyGrabPos(0)));
     }
     public Action readyGrabAction(double linear_slide_to_in, double claw_rotation){
         return new ParallelAction(
-                    new SleepAction(0.5), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
-                    new InstantAction(
-                        () -> {
-                            claw.turret_angle = claw_rotation;
-                            readyGrab(linear_slide_to_in);
-                        }
-                    ),
-                    new InstantAction(claw::open),
-                    slide.loopUntilDone()
-                );
+            new SleepAction(0.5), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
+            new InstantAction(() -> {
+                claw.turret_angle = claw_rotation;
+                readyGrab(linear_slide_to_in);
+            }),
+            new InstantAction(claw::open),
+            slide.loopUntilDone()
+        );
     }
 
     public Action readyTransferAction(){
         return new SequentialAction(
                 new InstantAction(this::readyTransfer),
+
                 new ParallelAction(
                         new SequentialAction(
-                                new SleepAction(0.4), // TODO: Get better estimate of servo movement time (maybe even calculated at runtime)
+                                futureAction(
+                                        () -> new SleepAction((claw.turret_angle == PI/2)? 0.6: 0.4)
+                                ),
                                 new InstantAction(this.claw::grab),
                                 new SleepAction(0.1)
                         ),

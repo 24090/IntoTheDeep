@@ -32,8 +32,8 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 import org.firstinspires.ftc.teamcode.vision.Sample;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 @Config
 @Autonomous(name = "AutoRed", group = "auto")
@@ -56,13 +56,13 @@ public class AutoRed extends LinearOpMode {
 
         final Pose inner_sample = new Pose(48-1.75, 121.75, 0);
         final Pose score_pose = new Pose(19.25,144-19.25, -PI / 4);
-        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0.75, 0);
-        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX(), inner_sample.getY() + 20.5, 0.7);
+        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1.5, inner_sample.getY() + 1.5, 0);
+        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1.5, inner_sample.getY() + 10, 0);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX() - 2.5 , inner_sample.getY() + 21, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 100, -PI/2);
         final Vector outer_offset = new Vector(Intake.MaxDistance + 0.5, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
-        PathChain submersible_path = follower.pathBuilder()
+        final PathChain score_to_sub = follower.pathBuilder()
                 .addPath(new BezierCurve(
                     new Point(score_pose),
                     new Point(72, 124),
@@ -70,7 +70,7 @@ public class AutoRed extends LinearOpMode {
                 ))
                 .setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
                 .build();
-        PathChain sub_to_score = follower.pathBuilder()
+        final PathChain sub_to_score = follower.pathBuilder()
                 .addPath(new BezierCurve(
                     new Point(submersible_pose),
                     new Point(72, 124),
@@ -144,7 +144,15 @@ public class AutoRed extends LinearOpMode {
             new ParallelAction(
                 outtake.slideWaitAction(),
                 // SUB 1
-                pathAction(follower, submersible_path)
+                pathAction(follower, follower.pathBuilder()
+                        .addPath(new BezierCurve(
+                                new Point(score_pose),
+                                new Point(96, 124),
+                                new Point(submersible_pose)
+                        ))
+                        .setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
+                        .build()
+                )
             ),
             new SequentialAction(
                 vision.findSample(sample),
@@ -165,7 +173,7 @@ public class AutoRed extends LinearOpMode {
             new ParallelAction(
                     outtake.slideWaitAction(),
             // SUB 2
-                    pathAction(follower, submersible_path)
+                    pathAction(follower, score_to_sub)
             ),
             new SequentialAction(
                 vision.findSample(sample),

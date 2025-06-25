@@ -1,4 +1,4 @@
-package pedroPathing.constants;
+package org.firstinspires.ftc.teamcode.pedroPathing.constants;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.localization.GoBildaPinpointDriver;

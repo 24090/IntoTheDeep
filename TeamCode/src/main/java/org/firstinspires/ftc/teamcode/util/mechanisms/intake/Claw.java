@@ -22,21 +22,21 @@ public class Claw {
 
     public static double ELBOW_LEFT_IN = 0.47;
     public static double ELBOW_LEFT_READY = 0.66;
-    public static double ELBOW_LEFT_OUT = 0.98;
+    public static double ELBOW_LEFT_OUT = 0.83;
 
     public static double ELBOW_RIGHT_IN = 0.82;
     public static double ELBOW_RIGHT_READY = 0.75;
     public static double ELBOW_RIGHT_OUT = 0.6;
 
     public static double WRIST_LEFT_IN = 1;
-    public static double WRIST_LEFT_OUT_0 = 0.26;
-    public static double WRIST_LEFT_OUT_90 = 0.46;
+    public static double WRIST_LEFT_OUT_0 = 0.33;
+    public static double WRIST_LEFT_OUT_90 = 0.58;
     public static double WRIST_LEFT_READY_0 = 0.45;
     public static double WRIST_LEFT_READY_90 = 0.75;
 
     public static double WRIST_RIGHT_IN = 0;
-    public static double WRIST_RIGHT_OUT_0 = 0.6;
-    public static double WRIST_RIGHT_OUT_90 = 0.8;
+    public static double WRIST_RIGHT_OUT_0 = 0.51;
+    public static double WRIST_RIGHT_OUT_90 = 0.84;
     public static double WRIST_RIGHT_READY_0 = 0.49;
     public static double WRIST_RIGHT_READY_90 = 0.67;
 
@@ -93,16 +93,16 @@ public class Claw {
             grab();
         }
     }
-
+    public void toReadyGrabPos() {
+        toReadyGrabPos(turret_angle);
+    }
     public void toReadyGrabPos(double angle) {
         elbow_servo_left.setPosition(ELBOW_LEFT_READY);
         elbow_servo_right.setPosition(ELBOW_RIGHT_READY);
         turret_angle = angle;
         wrist_ready();
     }
-    public void toReadyGrabPos() {
-        toReadyGrabPos(0);
-    }
+
     public void toTransferPos() {
         elbow_servo_left.setPosition(ELBOW_LEFT_IN);
         elbow_servo_right.setPosition(ELBOW_RIGHT_IN);

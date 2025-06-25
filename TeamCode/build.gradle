@@ -10,10 +10,24 @@
 
 
 // Custom definitions may go here
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://repo.dairy.foundation/releases"
+        }
+    }
+    dependencies {
+        classpath "dev.frozenmilk:Load:0.2.1"
+    }
+}
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
+apply plugin: 'dev.frozenmilk.sinister.sloth.load'
+
+
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
@@ -32,11 +46,12 @@ android {
 repositories {
     maven {
         url = 'https://maven.brott.dev/'
+        url = "https://repo.dairy.foundation/releases"
     }
 }
-
 dependencies {
     implementation project(':FtcRobotController')
     implementation "com.acmerobotics.roadrunner:actions:1.0.1"
     implementation 'androidx.annotation:annotation-jvm:1.9.1'
+    implementation("dev.frozenmilk.sinister:Sloth:0.2.2")
 }
