@@ -62,11 +62,10 @@ public class Intake {
     public Action readyTransferAction(){
         return new SequentialAction(
                 new InstantAction(this::readyTransfer),
-
                 new ParallelAction(
                         new SequentialAction(
                                 futureAction(
-                                        () -> new SleepAction((claw.turret_angle == PI/2)? 0.6: 0.4)
+                                        () -> new SleepAction((claw.turret_angle == PI/2)? 0.8: 0.4)
                                 ),
                                 new InstantAction(this.claw::grab),
                                 new SleepAction(0.1)

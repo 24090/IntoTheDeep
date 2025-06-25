@@ -65,15 +65,15 @@ public class Vision {
             }
             Stream<Triple<Double, Double, Double>> filtered_samples = analysis.stream().filter(
                 (a) ->
-                    Intake.MinDistance + 2 < a.getSecond() &&
-                    Intake.MaxDistance + 2 > a.getSecond()
+                    Intake.MinDistance < a.getSecond() &&
+                    Intake.MaxDistance > a.getSecond()
             );
             try {
                 sample_triple = filtered_samples.findFirst().get();
             } catch(NoSuchElementException e) {
                 return true;
             }
-            out.pose = new Pose(sample_triple.getSecond(), sample_triple.getFirst(), sample_triple.getThird());
+            out.pose = new Pose(sample_triple.getSecond(), sample_triple.getFirst() + 1, sample_triple.getThird());
             telemetry_packet.addLine("Sample X" + sample_triple.getFirst());
             telemetry_packet.addLine("Sample Y" + (sample_triple.getSecond()));
             telemetry_packet.addLine("Sample Heading" + sample_triple.getThird());

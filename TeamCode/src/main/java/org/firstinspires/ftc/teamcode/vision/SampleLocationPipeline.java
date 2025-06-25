@@ -39,7 +39,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     Mat vertical_edges = new Mat();
     public List<Triple<Double, Double, Double>> object_field_coords = new ArrayList<>();
     final double top_distance_weight  = 0.05;
-    final double top2_distance_weight = 2.4;
+    final double top2_distance_weight = 1;
 
     public SampleLocationPipeline(Camera.Colors color, Telemetry telemetry) {
         Camera.init();
@@ -74,7 +74,8 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         Core.inRange(input_undistort, color_min, color_max, color_mask);
         //   Erode and dilate
         Imgproc.erode(color_mask, color_mask, empty_mat, new Point(-1, -1), 5);
-        Imgproc.dilate(color_mask, color_mask, empty_mat, new Point(-1, -1), 5);
+        Imgproc.dilate(color_mask, color_mask, empty_mat, new Point(-1, -1), 10);
+        Imgproc.erode(color_mask, color_mask, empty_mat, new Point(-1, -1), 5);
         //   add color when mask is white, add white when mask is black
         Core.bitwise_and(input_undistort, input_undistort, color_filtered_image, color_mask);
         Core.bitwise_not(color_mask, color_mask);
@@ -125,7 +126,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
                         + Math.pow(world_point_b.y - world_point_a.y,2)
         );
 
-        if (Math.abs(distance - 1.5) > 0.5 && Math.abs(distance - 3.5) > 0.5) {
+        if (Math.abs(distance - 1.5) > 0.5 && Math.abs(distance - 3.5) > 0.75) {
             telemetry.addData("out of range", distance);
             return null;
         }
@@ -134,7 +135,7 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         double multiplier = (short_side ? 1.5/2: 3.5/2) * (world_point_a.x < world_point_b.x ? 1: -1);
         double world_x = (world_point_a.x + world_point_b.x)/2 + (world_point_a.y - world_point_b.y)/distance * multiplier;
         double world_y = (world_point_a.y + world_point_b.y)/2 - (world_point_a.x - world_point_b.x)/distance * multiplier;
-
+        telemetry.addData("detected_length", distance);
         return new Triple<>(world_x, world_y, angle);
     }
 

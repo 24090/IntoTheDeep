@@ -11,7 +11,7 @@ public class Camera {
 	public static Scalar red_max;
 	public static Scalar blue_min = new Scalar(105, 85, 0);
 	public static Scalar blue_max = new Scalar(125, 255, 255);
-	public static Scalar yellow_min = new Scalar(15, 15, 0);
+	public static Scalar yellow_min = new Scalar(20, 20, 0);
 	public static Scalar yellow_max = new Scalar(40, 255, 255);
 	public static Mat reprojection_matrix = new Mat();
 	public static Mat camera_matrix = new Mat();
@@ -24,9 +24,9 @@ public class Camera {
 		Mat dc = new Mat(1, 5, 6);
 
 		// generated with ReprojectionMatrixCalculator.py
-		rm.put(0, 0,  1.049424e-03); rm.put(0, 1,  1.559786e-04); rm.put(0, 2, -2.547099e-01);
-		rm.put(1, 0,  0.000000e+00); rm.put(1, 1,  3.958721e-04); rm.put(1, 2, -1.051872e+00);
-		rm.put(2, 0, -0.000000e+00); rm.put(2, 1, -5.885984e-05); rm.put(2, 2, -3.769658e-02);
+		rm.put(0, 0,  1.049424e-03); rm.put(0, 1,  1.505055e-04); rm.put(0, 2, -2.582151e-01);
+		rm.put(1, 0,  0.000000e+00); rm.put(1, 1,  4.054759e-04); rm.put(1, 2, -1.045722e+00);
+		rm.put(2, 0, -0.000000e+00); rm.put(2, 1, -5.679451e-05); rm.put(2, 2, -3.637385e-02);
 
 		cm.put(0, 0,  9.529036e+02); cm.put(0, 1,  0.000000e+00); cm.put(0, 2,  3.379052e+02);
 		cm.put(1, 0,  0.000000e+00); cm.put(1, 1,  9.600001e+02); cm.put(1, 2,  1.650892e+02);

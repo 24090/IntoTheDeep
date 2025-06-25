@@ -36,15 +36,20 @@ public class RobotActions {
                                 follower.getPose().getY() + movement_vector.getYComponent()
                             )
                         )))
-                            .setConstantHeadingInterpolation(follower.getPose().getHeading())
-                            .build(),
+                        .setZeroPowerAccelerationMultiplier(6)
+                        .setConstantHeadingInterpolation(follower.getPose().getHeading())
+                        .build(),
                         true
                     )
                 ),
-                intake.readyGrabAction(
-                        intake.slide.trimIn(relative_sample.getX()),
-                        relative_sample.getHeading() + PI/2
+                new ParallelAction(
+                        triggerAction(()->!follower.isBusy()),
+                        intake.readyGrabAction(
+                                intake.slide.trimIn(relative_sample.getX()),
+                                relative_sample.getHeading() + PI/2
+                        )
                 )
+
             )
         );
     }
