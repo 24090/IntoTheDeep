@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Auto;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.moveLineAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.pathAction;
 import static java.lang.Math.PI;
 
@@ -41,10 +42,6 @@ public class SpecAuto extends LinearOpMode {
     Outtake outtake;
     Vision vision;
 
-    Action moveLineAction(Pose a, Pose b) {
-        return RobotActions.moveLineAction(follower, a, b);
-    }
-
     @Override
     public void runOpMode() {
         vision = new Vision(telemetry, hardwareMap);
@@ -75,26 +72,64 @@ public class SpecAuto extends LinearOpMode {
         outtake = new Outtake(hardwareMap);
         // same as meepmeep
         Action path = new SequentialAction(
-                moveLineAction(start_pose, score_pose),
-                new InstantAction(outtake::readySpecimen),
-                outtake.scoreSpecimenAction(),
-                new ParallelAction(pathAction(follower, preload_to_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
-                new InstantAction(() -> {telemetry.addLine("Done"); telemetry.update();}),
-                intake.pickUpAction(),
-                moveLineAction(inner_sample_sweep, new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2)),
-                new InstantAction(intake.claw::open),
-                new ParallelAction(moveLineAction(new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2), center_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
-                intake.pickUpAction(),
-                moveLineAction(center_sample_sweep, new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2)),
-                new InstantAction(intake.claw::open),
-                new ParallelAction(moveLineAction(new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2), outer_sample_sweep), intake.readyGrabAction(Intake.MaxDistance,0)),
-                intake.pickUpAction(),
-                moveLineAction(outer_sample_sweep, new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2)),
-                new InstantAction(intake.claw::open),
-                moveLineAction(new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2), grab_pose)
-
+            moveLineAction(follower, start_pose, score_pose, 2, 0.04),
+            new InstantAction(outtake::readySpecimen),
+            outtake.scoreSpecimenAction(),
+            new ParallelAction(
+                pathAction(follower, preload_to_sample_sweep, 2, 0.04),
+                intake.readyGrabAction(Intake.MaxDistance,0)
+            ),
+            new InstantAction(() -> {telemetry.addLine("Done"); telemetry.update();}),
+            intake.pickUpAction(),
+            moveLineAction(
+                follower,
+                inner_sample_sweep,
+                new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2),
+                2, 0.04
+            ),
+            new InstantAction(intake.claw::open),
+            new ParallelAction(
+                moveLineAction(
+                    follower,
+                    new Pose(inner_sample_sweep.getX()-3, inner_sample_sweep.getY()-3, inner_sample_sweep.getHeading() - PI/2),
+                    center_sample_sweep,
+                    2, 0.04
+                ),
+                intake.readyGrabAction(Intake.MaxDistance,0)
+            ),
+            intake.pickUpAction(),
+            moveLineAction(
+                follower,
+                center_sample_sweep,
+                new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2),
+                2, 0.04
+            ),
+            new InstantAction(intake.claw::open),
+            new ParallelAction(
+                moveLineAction(
+                    follower,
+                    new Pose(center_sample_sweep.getX()-3, center_sample_sweep.getY()-3, center_sample_sweep.getHeading() - PI/2),
+                    outer_sample_sweep,
+                2, 0.04
+                ),
+                intake.readyGrabAction(Intake.MaxDistance,0)
+            ),
+            intake.pickUpAction(),
+            moveLineAction(
+                follower,
+                outer_sample_sweep,
+                new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2),
+                2, 0.04
+            ),
+            new InstantAction(intake.claw::open),
+            moveLineAction(
+                follower,
+                new Pose(outer_sample_sweep.getX()-3, outer_sample_sweep.getY()-3, outer_sample_sweep.getHeading() - PI/2),
+                grab_pose,
+                2, 0.04
+            )
         );
-        // these lines ≠ meepmeep
+
         BulkReads bulkreads = new BulkReads(hardwareMap);
         waitForStart();
         bulkreads.setCachingMode(LynxModule.BulkCachingMode.MANUAL);

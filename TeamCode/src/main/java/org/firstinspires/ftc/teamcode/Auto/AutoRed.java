@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.futureAction;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.moveLineAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.pathAction;
 import static java.lang.Math.PI;
 
@@ -43,9 +44,6 @@ public class AutoRed extends LinearOpMode {
     Outtake outtake;
     Vision vision;
 
-    Action moveLineAction(Pose a, Pose b) {
-        return RobotActions.moveLineAction(follower, a, b);
-    }
     @Override
     public void runOpMode() {
         vision = new Vision(telemetry, hardwareMap);
@@ -86,7 +84,7 @@ public class AutoRed extends LinearOpMode {
         Action path = new SequentialAction(
             // Preload
             new ParallelAction(
-                moveLineAction(start_pose, score_pose),
+                moveLineAction(follower, start_pose, score_pose, 2, 0.04),
                 outtake.readySampleAction()
             ),
             new ParallelAction(
@@ -96,7 +94,7 @@ public class AutoRed extends LinearOpMode {
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
-                moveLineAction(score_pose, inner_grab_pose)
+                moveLineAction(follower, score_pose, inner_grab_pose, 2, 0.04)
             ),
             intake.pickUpAction(),
             new ParallelAction(
@@ -104,7 +102,7 @@ public class AutoRed extends LinearOpMode {
                     RobotActions.fullTransferAction(intake, outtake),
                     outtake.readySampleAction()
                 ),
-                moveLineAction(inner_grab_pose, score_pose)
+                moveLineAction(follower, inner_grab_pose, score_pose, 2, 0.04)
             ),
             new ParallelAction(
                 outtake.scoreAction(),
@@ -113,7 +111,7 @@ public class AutoRed extends LinearOpMode {
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
-                moveLineAction(score_pose, center_grab_pose)
+                moveLineAction(follower, score_pose, center_grab_pose, 2, 0.04)
             ),
             intake.pickUpAction(),
             new ParallelAction(
@@ -121,7 +119,7 @@ public class AutoRed extends LinearOpMode {
                         RobotActions.fullTransferAction(intake, outtake),
                         outtake.readySampleAction()
                 ),
-                moveLineAction(center_grab_pose, score_pose)
+                moveLineAction(follower, center_grab_pose, score_pose, 2, 0.04)
             ),
             new ParallelAction(
                 outtake.scoreAction(),
@@ -130,7 +128,7 @@ public class AutoRed extends LinearOpMode {
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
-                moveLineAction(score_pose, outer_grab_pose)
+                moveLineAction(follower, score_pose, outer_grab_pose, 2, 0.04)
             ),
             intake.pickUpAction(),
             new ParallelAction(
@@ -138,7 +136,7 @@ public class AutoRed extends LinearOpMode {
                         RobotActions.fullTransferAction(intake, outtake),
                         outtake.readySampleAction()
                 ),
-                moveLineAction(outer_grab_pose, score_pose)
+                moveLineAction(follower, outer_grab_pose, score_pose, 2, 0.04)
             ),
             outtake.scoreAction(),
             new ParallelAction(
@@ -152,6 +150,7 @@ public class AutoRed extends LinearOpMode {
                         ))
                         .setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
                         .build()
+                        , 2, 0.04
                 )
             ),
             new SequentialAction(
@@ -167,13 +166,13 @@ public class AutoRed extends LinearOpMode {
                     RobotActions.fullTransferAction(intake, outtake),
                     outtake.readySampleAction()
                 ),
-                pathAction(follower, sub_to_score)
+                pathAction(follower, sub_to_score, 2, 0.04)
             ),
             outtake.scoreAction(),
             new ParallelAction(
                     outtake.slideWaitAction(),
             // SUB 2
-                    pathAction(follower, score_to_sub)
+                    pathAction(follower, score_to_sub, 2, 0.04)
             ),
             new SequentialAction(
                 vision.findSample(sample),
@@ -188,7 +187,7 @@ public class AutoRed extends LinearOpMode {
                     RobotActions.fullTransferAction(intake, outtake),
                     outtake.readySampleAction()
                 ),
-                pathAction(follower, sub_to_score)
+                pathAction(follower, sub_to_score, 2, 0.04)
             ),
             outtake.fullScoreAction()
 

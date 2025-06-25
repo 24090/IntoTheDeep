@@ -44,7 +44,7 @@ public class VisionTesting extends LinearOpMode {
                                     foreverAction(
                                         new SequentialAction(
                                             vision.findSample(sample),
-                                            futureAction( () ->
+                                            futureAction(() ->
                                                     RobotActions.reachSample(sample.pose, intake, follower)
                                             ),
                                             new SleepAction(0.5),

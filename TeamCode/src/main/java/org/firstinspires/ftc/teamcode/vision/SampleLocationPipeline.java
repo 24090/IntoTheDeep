@@ -123,16 +123,17 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     private Triple<Double, Double, Double> calculateSamplePose(Point world_point_a, Point world_point_b){
         double distance = Math.sqrt(
                 Math.pow(world_point_b.x - world_point_a.x,2)
-                        + Math.pow(world_point_b.y - world_point_a.y,2)
+                + Math.pow(world_point_b.y - world_point_a.y,2)
         );
 
         if (Math.abs(distance - 1.5) > 0.5 && Math.abs(distance - 3.5) > 0.75) {
             telemetry.addData("out of range", distance);
             return null;
         }
+
         boolean short_side = (distance < 2);
         double angle = Math.atan((world_point_a.y - world_point_b.y)/(world_point_b.x - world_point_a.x)) + (short_side ? PI/2: 0);
-        double multiplier = (short_side ? 1.5/2: 3.5/2) * (world_point_a.x < world_point_b.x ? 1: -1);
+        double multiplier = (short_side ? 3.5/2: 1.5/2) * (world_point_a.x < world_point_b.x ? -1: 1);
         double world_x = (world_point_a.x + world_point_b.x)/2 + (world_point_a.y - world_point_b.y)/distance * multiplier;
         double world_y = (world_point_a.y + world_point_b.y)/2 - (world_point_a.x - world_point_b.x)/distance * multiplier;
         telemetry.addData("detected_length", distance);
@@ -171,9 +172,13 @@ public class SampleLocationPipeline extends OpenCvPipeline {
             Imgproc.drawMarker(color_filtered_image, point_b, new Scalar(120+5*n,255,255));
 
             Triple<Double, Double, Double> pose = calculateSamplePose(world_point_a, world_point_b);
+
             if (pose == null) {
                 continue;
             }
+            Point screen_point = Camera.worldToUV(new Point(pose.component1(), pose.component2()));
+            telemetry.addData("screen point", screen_point);
+            Imgproc.drawMarker(color_filtered_image, screen_point, new Scalar(120+5*n,255,255));
             new_objects.add(pose);
             telemetry.addData("x, y, θ", String.format("%.1f, %.1f, %.2f", pose.getFirst(), pose.getSecond(), pose.getThird()));
         }

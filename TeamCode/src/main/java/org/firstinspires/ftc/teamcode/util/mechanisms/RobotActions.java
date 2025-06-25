@@ -75,17 +75,17 @@ public class RobotActions {
                 new InstantAction(intake.claw::open)
         );
     }
-    public static Action pathAction(Follower follower, PathChain path){
+    public static Action pathAction(Follower follower, PathChain path, double velocity_tolerance, double heading_tolerance){
         return new SequentialAction(
                 new InstantAction(()->follower.followPath(path, true)),
-                triggerAction(()->(!follower.isBusy())&&(follower.getVelocityMagnitude()<2)&&(follower.getHeadingError()<0.04))
+                triggerAction(()->(!follower.isBusy())&&(follower.getVelocityMagnitude()<velocity_tolerance)&&(follower.getHeadingError()<heading_tolerance))
         );
     }
-    public static Action moveLineAction(Follower follower, Pose a, Pose b) {
+    public static Action moveLineAction(Follower follower, Pose a, Pose b,  double velocity_tolerance, double heading_tolerance) {
         PathChain path = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(a), new Point(b)))
                 .setLinearHeadingInterpolation(a.getHeading(), b.getHeading())
                 .build();
-        return pathAction(follower, path);
+        return pathAction(follower, path, velocity_tolerance, heading_tolerance);
     }
 }
