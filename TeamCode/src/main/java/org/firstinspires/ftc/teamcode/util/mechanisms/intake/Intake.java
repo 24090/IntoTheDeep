@@ -76,4 +76,20 @@ public class Intake {
 
         );
     }
+    public Action firmReadyTransferAction(){
+        return new SequentialAction(
+                new InstantAction(this::readyTransfer),
+                new InstantAction(this.claw::grab),
+                new ParallelAction(
+                        new SequentialAction(
+                                futureAction(
+                                        () -> new SleepAction((claw.turret_angle == PI/2)? 0.8: 0.4)
+                                )
+                        ),
+                        slide.loopUntilDone()
+                )
+
+
+        );
+    }
 }

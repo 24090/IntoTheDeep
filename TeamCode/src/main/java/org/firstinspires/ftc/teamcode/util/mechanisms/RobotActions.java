@@ -64,6 +64,17 @@ public class RobotActions {
                 new InstantAction(intake.claw::open)
         );
     }
+    public static Action firmFullTransferAction(Intake intake, Outtake outtake){
+        return new SequentialAction(
+                new ParallelAction(
+                        intake.firmReadyTransferAction(),
+                        outtake.readyTransferAction()
+                ),
+                new InstantAction(outtake.claw::grab),
+                new SleepAction(0.3),
+                new InstantAction(intake.claw::open)
+        );
+    }
     public static Action pathAction(Follower follower, PathChain path){
         return new SequentialAction(
                 new InstantAction(()->follower.followPath(path, true)),

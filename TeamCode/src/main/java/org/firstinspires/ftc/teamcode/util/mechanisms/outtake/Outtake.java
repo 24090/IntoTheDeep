@@ -21,7 +21,8 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.OuttakeSlide;
 public class Outtake {
     public static int HANG_UP = 1600;
     public static int HANG_DOWN = 1300;
-    public static int READY_SPECIMEN = 450;
+    public static int SCORE_SPECIMEN = 1250;
+    public static int READY_SPECIMEN = 500;
     public final MirrorMotor mirror_slide;
     public OuttakeSlide slide;
     public OuttakeClaw claw;
@@ -69,7 +70,11 @@ public class Outtake {
     }
     public Action scoreSpecimenAction(){
         return new SequentialAction(
-                new InstantAction(claw::scoreSpecimen),
+                new InstantAction(() -> slide.goTo(SCORE_SPECIMEN)),
+                new RaceAction(
+                        foreverAction(this::backgroundIter),
+                        triggerAction(() -> this.slide.within_error)
+                ),
                 new SleepAction(0.5),
                 new InstantAction(claw::toTransferPos),
                 new InstantAction(slide::down)

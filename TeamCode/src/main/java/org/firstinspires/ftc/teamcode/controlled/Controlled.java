@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.controlled;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.firmFullTransferAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.fullTransferAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.moveLineAction;
 import static java.lang.Math.PI;
@@ -126,6 +127,15 @@ public class Controlled extends LinearOpMode{
                         Intake.MaxDistance
                 );
                 state = State.IN_GRAB;
+            }
+            if (gamepad2.dpad_up){
+                runBlocking(
+                        new RaceAction(
+                                foreverAction(movement),
+                                firmFullTransferAction(intake, outtake)
+                        )
+                );
+                state = State.NORMAL;
             }
             intake.slide.goTo(intake.slide.trimTicks(
                     intake.slide.target_pos +
