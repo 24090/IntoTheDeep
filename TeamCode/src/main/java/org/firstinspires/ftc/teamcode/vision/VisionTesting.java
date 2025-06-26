@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -15,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
+import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Claw;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
@@ -27,6 +29,7 @@ public class VisionTesting extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         Intake intake = new Intake(hardwareMap);
+        boolean[] has_sample = {false};
         Outtake outtake = new Outtake(hardwareMap);
         Vision vision = new Vision(
                 telemetry,
@@ -36,36 +39,29 @@ public class VisionTesting extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
             Sample sample = new Sample();
+
             runBlocking(
-                    new RaceAction(
-                            triggerAction(() -> !opModeIsActive()),
-                            new ParallelAction(
-                                    foreverAction(follower::update),
-                                    foreverAction(
-                                        new SequentialAction(
-                                            vision.findSample(sample),
-                                            futureAction(() ->
-                                                    RobotActions.reachSample(sample.pose, intake, follower)
-                                            ),
-                                            new SleepAction(0.5),
-                                            intake.pickUpAction(),
-                                            RobotActions.fullTransferAction(intake, outtake),
-                                            triggerAction(() -> gamepad1.a)
-                                        )
-                                    ),
-                                    foreverAction(() -> {
-                                        if (sample.pose != null) {
-                                            telemetry.addData("sample x", sample.pose.getX());
-                                            telemetry.addData("sample y", sample.pose.getY());
-                                            telemetry.addData("sample Θ", sample.pose.getHeading());
-                                            telemetry.update();
-                                        }
-
-                                    })
-                            )
+                new RaceAction(
+                    foreverAction(follower::update),
+                    triggerAction(() -> !opModeIsActive()),
+                    new SequentialAction(
+                        new RaceAction(
+                            triggerAction(()->has_sample[0]),
+                            foreverAction(new SequentialAction(
+                                vision.findSample(sample),
+                                futureAction(() ->
+                                        RobotActions.reachSample(sample.pose, intake, follower)
+                                ),
+                                new SleepAction(0.5),
+                                intake.pickUpAction(),
+                                new InstantAction(() ->
+                                    has_sample[0] = (intake.claw.getSensedColor() == Claw.ColorSensorOut.YELLOW)
+                                )
+                            ))
+                        ),
+                        RobotActions.fullTransferAction(intake, outtake)
                     )
-
-
+                )
             );
         }
     }

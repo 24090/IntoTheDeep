@@ -2,8 +2,13 @@ package org.firstinspires.ftc.teamcode.util.mechanisms.intake;
 
 import static java.lang.Math.PI;
 
+import android.graphics.Color;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
@@ -15,6 +20,13 @@ public class Claw {
     ServoImplEx elbow_servo_left;
     ServoImplEx elbow_servo_right;
 
+    public NormalizedColorSensor color_sensor;
+    public enum ColorSensorOut {
+        RED,
+        YELLOW,
+        BLUE,
+        NONE
+    }
     public double turret_angle;
     public static double CLAW_OPEN = 0;
     public static double CLAW_LOOSE = 0.57;
@@ -51,8 +63,8 @@ public class Claw {
             elbow_servo_left.setPwmRange(new PwmControl.PwmRange(500, 2500));
         elbow_servo_right = hardwareMap.get(ServoImplEx.class, "elbow_servo_right");
             elbow_servo_right.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        color_sensor = hardwareMap.get(NormalizedColorSensor.class, "normalized_color_sensor");
     }
-
 
     public void wrist_ready(){
         turret_angle = (turret_angle%(PI) + PI)%(PI);
@@ -116,5 +128,24 @@ public class Claw {
         elbow_servo_right.setPosition(ELBOW_RIGHT_OUT);
         wrist_grab();
         open();
+    }
+
+    public ColorSensorOut getSensedColor(){
+        int color_int =  color_sensor.getNormalizedColors().toColor();
+        float[] hsv = new float[3];
+        Color.colorToHSV(color_int, hsv);
+        if (hsv[1] < 0.5){
+            return ColorSensorOut.NONE;
+        }
+        if (hsv[0] < 10 || hsv[0] > 340) {
+            return ColorSensorOut.RED;
+        }
+        if (hsv[0] > 40 && hsv[0] < 70) {
+            return ColorSensorOut.YELLOW;
+        }
+        if (hsv[0] > 210 && hsv[0] < 250) {
+            return ColorSensorOut.BLUE;
+        }
+        return ColorSensorOut.NONE;
     }
 }
