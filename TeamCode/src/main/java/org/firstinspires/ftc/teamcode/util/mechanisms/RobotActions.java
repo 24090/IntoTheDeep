@@ -24,6 +24,10 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
         Vector movement_vector = new Vector(relative_sample.getY(), follower.getPose().getHeading()+PI/2);
+        Point target_point = new Point(
+                follower.getPose().getX() + movement_vector.getXComponent(),
+                follower.getPose().getY() + movement_vector.getYComponent()
+        );
         return new RaceAction(
             foreverAction(follower::update),
             new SequentialAction(
@@ -31,10 +35,7 @@ public class RobotActions {
                     follower.pathBuilder()
                         .addPath(new Path(new BezierLine(
                             new Point(follower.getPose()),
-                            new Point(
-                                follower.getPose().getX() + movement_vector.getXComponent(),
-                                follower.getPose().getY() + movement_vector.getYComponent()
-                            )
+                            target_point
                         )))
                         .setZeroPowerAccelerationMultiplier(6)
                         .setConstantHeadingInterpolation(follower.getPose().getHeading())
@@ -43,7 +44,10 @@ public class RobotActions {
                     )
                 ),
                 new ParallelAction(
-                        triggerAction(()->!follower.isBusy()),
+                        triggerAction(()->(
+                            !follower.isBusy() &&
+                            follower.atPoint(target_point,1.5, 1.5)
+                        )),
                         intake.readyGrabAction(
                                 intake.slide.trimIn(relative_sample.getX()),
                                 relative_sample.getHeading() + PI/2

@@ -30,6 +30,7 @@ import org.firstinspires.ftc.teamcode.util.PoseStorer;
 import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
+import org.firstinspires.ftc.teamcode.vision.Camera;
 import org.firstinspires.ftc.teamcode.vision.Sample;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
@@ -46,7 +47,7 @@ public class AutoRed extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        vision = new Vision(telemetry, hardwareMap);
+        vision = new Vision(telemetry, hardwareMap, new Camera.Colors[]{Camera.Colors.RED, Camera.Colors.YELLOW});
         Sample sample = new Sample();
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         final Pose start_pose = new Pose(GameMap.RobotWidth/2, 120.5 - GameMap.RobotLength / 2, -PI/2);

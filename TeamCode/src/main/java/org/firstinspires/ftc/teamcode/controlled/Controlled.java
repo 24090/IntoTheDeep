@@ -43,6 +43,7 @@ public class Controlled extends LinearOpMode{
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(PoseStorer.pose);
         boolean old_right_bumper = false;
+        boolean old_sweep = false;
         intake = new Intake(hardwareMap);
         intake.claw.toReadyGrabPos(0);
         outtake = new Outtake(hardwareMap);
@@ -82,7 +83,6 @@ public class Controlled extends LinearOpMode{
                 follower.startTeleopDrive();
             }
             if (gamepad1.right_bumper && !old_right_bumper){
-                old_right_bumper = true;
                 if (state == State.NORMAL){
                     runBlocking(
                         new RaceAction(
@@ -101,8 +101,6 @@ public class Controlled extends LinearOpMode{
                     );
                     state = State.NORMAL;
                 }
-            } else {
-                old_right_bumper = false;
             }
             if (gamepad1.y){
                 outtake.readySample();
@@ -129,12 +127,15 @@ public class Controlled extends LinearOpMode{
                 );
                 state = State.IN_GRAB;
             }
+            if (gamepad2.back && !old_sweep){
+                intake.sweeper.toggle();
+            }
             if (gamepad2.dpad_up){
                 runBlocking(
-                        new RaceAction(
-                                foreverAction(movement),
-                                firmFullTransferAction(intake, outtake)
-                        )
+                    new RaceAction(
+                        foreverAction(movement),
+                        firmFullTransferAction(intake, outtake)
+                    )
                 );
                 state = State.NORMAL;
             }
@@ -164,6 +165,7 @@ public class Controlled extends LinearOpMode{
                 intake.claw.wrist_ready();
             }
             last_time = time;
+            old_sweep = gamepad2.back;
         }
     }
 }

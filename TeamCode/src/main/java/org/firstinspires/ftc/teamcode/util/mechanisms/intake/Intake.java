@@ -12,6 +12,8 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.IntakeSlide;
 
@@ -20,14 +22,16 @@ public class Intake {
     public static double MaxDistance = 20.87;
     public static double MinDistance = 2 + RobotLength/2;
 
+
     public IntakeSlide slide;
     public Claw claw;
+    public Sweeper sweeper;
 
     public Intake(HardwareMap hwmap){
         this.slide = new IntakeSlide(hwmap);
         this.claw = new Claw(hwmap);
+        this.sweeper = new Sweeper(hwmap);
     }
-
     public void readyTransfer(){
         claw.loose();
         claw.toTransferPos();

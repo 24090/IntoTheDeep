@@ -26,14 +26,14 @@ public class Vision {
     int STREAM_HEIGHT = 480;
     OpenCvWebcam webcam;
     SampleLocationPipeline pipeline;
-    public Vision(Telemetry telemetry, HardwareMap hwmap){
+    public Vision(Telemetry telemetry, HardwareMap hwmap, Camera.Colors[] allowed_colors){
         WebcamName webcamName = hwmap.get(WebcamName.class, "Webcam");
         webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
         FtcDashboard.getInstance().startCameraStream(webcam, 0);
         webcam.setViewportRenderingPolicy(
                 OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW
         );
-        pipeline = new SampleLocationPipeline(Camera.Colors.BLUE, telemetry);
+        pipeline = new SampleLocationPipeline(allowed_colors, telemetry);
         webcam.setPipeline(pipeline);
         webcam.openCameraDeviceAsync(
                 new OpenCvCamera.AsyncCameraOpenListener() {

@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.futureAction;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.fullTransferAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.reachSample;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Action;
@@ -26,46 +28,43 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 @TeleOp(group = "testing")
 public class VisionTesting extends LinearOpMode {
+    Follower follower;
+    Intake intake;
+    Outtake outtake;
+    Vision vision;
     Sample sample = new Sample();
-
+    Action action(){
+        return new SequentialAction(
+            new RaceAction(
+                vision.findSample(sample),
+                foreverAction(follower::update)
+            ),
+            futureAction(() -> reachSample(sample.pose, intake, follower)),
+            new RaceAction(
+                new SequentialAction(
+                        intake.pickUpAction(),
+                        fullTransferAction(intake, outtake)
+                ),
+                foreverAction(follower::update)
+            )
+        );
+    }
     @Override
     public void runOpMode() throws InterruptedException {
-        Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
-        Intake intake = new Intake(hardwareMap);
-        boolean[] has_sample = {false};
-        Outtake outtake = new Outtake(hardwareMap);
-        Vision vision = new Vision(
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        intake = new Intake(hardwareMap);
+        outtake = new Outtake(hardwareMap);
+        vision = new Vision(
                 telemetry,
-                hardwareMap
+                hardwareMap,
+                new Camera.Colors[]{Camera.Colors.BLUE, Camera.Colors.YELLOW, Camera.Colors.RED}
         );
         outtake.readyTransfer();
-        Action action = new SequentialAction(
-                new InstantAction(() -> sample.pose = null),
-                vision.findSample(sample),
-                futureAction(() ->
-                        RobotActions.reachSample(sample.pose, intake, follower)
-                ),
-                new SleepAction(0.5),
-                intake.pickUpAction(),
-                new InstantAction(() ->
-                        has_sample[0] = (intake.claw.getSensedColor() != Claw.ColorSensorOut.NONE)
-                ),
-                RobotActions.fullTransferAction(intake, outtake)
-        );
-        waitForStart();
-        while (opModeIsActive()){
-            if (!has_sample[0]) {
-                runBlocking(
-                        new RaceAction(
-                            foreverAction(follower::update),
-                            triggerAction(() -> !opModeIsActive()),
-                            action
-                        )
-                );
-            } else {
-                break;
-            }
 
+        waitForStart();
+        do {
+            runBlocking(action());
         }
+        while (opModeIsActive() && (intake.claw.getSensedColor() == Claw.ColorSensorOut.NONE));
     }
 }

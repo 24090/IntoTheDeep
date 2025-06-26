@@ -7,7 +7,6 @@ import android.annotation.SuppressLint;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
@@ -23,63 +22,54 @@ import kotlin.Pair;
 import kotlin.Triple;
 
 public class SampleLocationPipeline extends OpenCvPipeline {
+    final Camera.Colors[] allowed_colors;
     Telemetry telemetry;
-    public Scalar color_min;
-    public Scalar color_max;
-    public boolean is_red;
-    public int stage = 5;
+    public int stage = 4;
     Mat input_undistort = new Mat();
-    Mat color_mask_upper;
+    Mat color_mask_upper = new Mat();
     Mat color_mask = new Mat();
     Mat color_filtered_image = new Mat();
     Mat output = new Mat();
     final Mat empty_mat = new Mat();
     Mat hierarchy = new Mat();
-    Mat lines = new Mat();
     Mat greyscale = new Mat();
-    Mat horizontal_edges = new Mat();
-    Mat vertical_edges = new Mat();
     public List<Triple<Double, Double, Double>> object_field_coords = new ArrayList<>();
     final double top_distance_weight  = 0.05;
     final double top2_distance_weight = 1;
-
-    public SampleLocationPipeline(Camera.Colors color, Telemetry telemetry) {
+    public SampleLocationPipeline(Telemetry telemetry) {
         Camera.init();
+        this.allowed_colors = new Camera.Colors[]{Camera.Colors.RED, Camera.Colors.YELLOW, Camera.Colors.BLUE};
         this.telemetry = telemetry;
-        switch (color){
-            case RED:
-                this.color_min = Camera.ColorValues.red_min;
-                this.color_max = Camera.ColorValues.red_max;
-                is_red = true;
-                break;
-            case BLUE:
-                this.color_min = Camera.ColorValues.blue_min;
-                this.color_max = Camera.ColorValues.blue_max;
-                is_red = false;
-                break;
-            case YELLOW:
-                this.color_min = Camera.ColorValues.yellow_min;
-                this.color_max = Camera.ColorValues.yellow_max;
-                is_red = false;
-                break;
-        }
     }
-
-    private void getContours(Mat input, List<MatOfPoint> dst){
-        empty_mat.copyTo(color_filtered_image);
+    public SampleLocationPipeline(Camera.Colors[] allowed_colors, Telemetry telemetry) {
+        Camera.init();
+        this.allowed_colors = allowed_colors;
+        this.telemetry = telemetry;
+    }
+    void initialProcessing(Mat input, Mat input_undistort){
         // Undistort
         Calib3d.undistort(input, input_undistort, Camera.camera_matrix, Camera.distortion_coefficients);
         // Input RGB -> HSV
         Imgproc.cvtColor(input_undistort, input_undistort, Imgproc.COLOR_RGB2HSV);
-        // Gets Colors From Image (Binary)
-        if (is_red){
-            Core.inRange(input_undistort, new Scalar(0,0,0), color_max, color_mask);
-            Core.inRange(input_undistort, color_min, new Scalar(255,255,255), color_mask_upper);
-            Core.bitwise_or(color_mask, color_mask_upper, color_mask);
-        } else {
-            Core.inRange(input_undistort, color_min, color_max, color_mask);
+    }
+    void filterColors(Camera.Colors color, Mat input_undistort, Mat color_mask){
+        empty_mat.copyTo(color_mask);
+        switch (color) {
+            case RED:
+                Core.inRange(input_undistort, new Scalar(0,0,0), Camera.ColorValues.red_max, color_mask);
+                Core.inRange(input_undistort, Camera.ColorValues.red_min, new Scalar(255,255,255), color_mask_upper);
+                Core.bitwise_or(color_mask, color_mask_upper, color_mask);
+                break;
+            case BLUE:
+                Core.inRange(input_undistort, Camera.ColorValues.blue_min, Camera.ColorValues.blue_max, color_mask);
+                break;
+            case YELLOW:
+                Core.inRange(input_undistort, Camera.ColorValues.yellow_min, Camera.ColorValues.yellow_max, color_mask);
+                break;
         }
-
+    }
+    void getContours(Mat color_mask, Mat input_undistort, Mat color_filtered_image, List<MatOfPoint> dst){
+        empty_mat.copyTo(color_filtered_image);
         //   Erode and dilate
         Imgproc.erode(color_mask, color_mask, empty_mat, new Point(-1, -1), 5);
         Imgproc.dilate(color_mask, color_mask, empty_mat, new Point(-1, -1), 10);
@@ -91,13 +81,13 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(color_mask, color_mask, Imgproc.COLOR_RGB2HSV);
         Core.add(color_mask, color_filtered_image, color_filtered_image);
         // Find contours
-        Imgproc.cvtColor(color_filtered_image,greyscale, Imgproc.COLOR_HSV2RGB);
-        Imgproc.cvtColor(greyscale,greyscale, Imgproc.COLOR_RGB2GRAY);
+        Imgproc.cvtColor(color_filtered_image, greyscale, Imgproc.COLOR_HSV2RGB);
+        Imgproc.cvtColor(greyscale, greyscale, Imgproc.COLOR_RGB2GRAY);
         Core.bitwise_not(greyscale, greyscale);
         Imgproc.findContours(greyscale, dst, hierarchy, Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE );
     }
 
-    private Pair<Point, Point> getTopPoints(MatOfPoint2f points2f) {
+    Pair<Point, Point> getTopPoints(MatOfPoint2f points2f) {
         double top_x = 0;
         double max_primary_score = Double.NEGATIVE_INFINITY;
         double max_secondary_score = Double.NEGATIVE_INFINITY;
@@ -128,14 +118,14 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         return new Pair<>(primary_top_point, secondary_top_point);
     }
 
-    private Triple<Double, Double, Double> calculateSamplePose(Point world_point_a, Point world_point_b){
+    Triple<Double, Double, Double> calculateSamplePose(Point world_point_a, Point world_point_b){
         double distance = Math.sqrt(
                 Math.pow(world_point_b.x - world_point_a.x,2)
                 + Math.pow(world_point_b.y - world_point_a.y,2)
         );
 
         if (Math.abs(distance - 1.5) > 0.5 && Math.abs(distance - 3.5) > 0.75) {
-            telemetry.addData("out of range", distance);
+            telemetry.addData("too long or short", distance);
             return null;
         }
 
@@ -152,8 +142,15 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         List<Triple<Double, Double, Double>> new_objects = new ArrayList<>();
         List<MatOfPoint> contours = new ArrayList<>();
-        getContours(input, contours);
 
+        initialProcessing(input, input_undistort);
+
+        for (Camera.Colors color: allowed_colors){
+            List<MatOfPoint> new_contours = new ArrayList<>();
+            filterColors(color, input_undistort, color_mask);
+            getContours(color_mask, input_undistort, color_filtered_image, new_contours);
+            contours.addAll(new_contours);
+        }
         // Get coords + rotation for each contour
         int n = 0;
         for (MatOfPoint points: contours){
@@ -163,21 +160,15 @@ public class SampleLocationPipeline extends OpenCvPipeline {
             List<MatOfPoint > list_points2f = new ArrayList<>();
             list_points2f.add(new MatOfPoint(points2f.toArray()));
 
-            Imgproc.drawContours(color_filtered_image, list_points2f, -1, new Scalar(60,255,255), 1);
+            Imgproc.drawContours(input_undistort, list_points2f, -1, new Scalar(60,255,255), 1);
 
             Pair<Point, Point> top_points = getTopPoints(points2f);
             Point point_a = top_points.component1();
             Point point_b = top_points.component2();
             Point world_point_a = Camera.uvToWorld(point_a);
             Point world_point_b = Camera.uvToWorld(point_b);
-
-            telemetry.addLine(String.format("w1 %.2f, %.2f", world_point_a.x, world_point_a.y));
-            telemetry.addLine(String.format("c1 %.2f, %.2f", point_a.x, point_a.y));
-            telemetry.addLine(String.format("w2 %.2f, %.2f", world_point_b.x, world_point_b.y));
-            telemetry.addLine(String.format("c2 %.2f, %.2f", point_b.x, point_b.y));
-
-            Imgproc.drawMarker(color_filtered_image, point_a, new Scalar(0,255,255));
-            Imgproc.drawMarker(color_filtered_image, point_b, new Scalar(120+5*n,255,255));
+            Imgproc.drawMarker(input_undistort, point_a, new Scalar(0,255,255));
+            Imgproc.drawMarker(input_undistort, point_b, new Scalar(120+5*n,255,255));
 
             Triple<Double, Double, Double> pose = calculateSamplePose(world_point_a, world_point_b);
 
@@ -185,20 +176,16 @@ public class SampleLocationPipeline extends OpenCvPipeline {
                 continue;
             }
             Point screen_point = Camera.worldToUV(new Point(pose.component1(), pose.component2()));
-            telemetry.addData("screen point", screen_point);
-            Imgproc.drawMarker(color_filtered_image, screen_point, new Scalar(120+5*n,255,255));
+            Imgproc.drawMarker(input_undistort, screen_point, new Scalar(120+5*n,255,255));
             new_objects.add(pose);
             telemetry.addData("x, y, θ", String.format("%.1f, %.1f, %.2f", pose.getFirst(), pose.getSecond(), pose.getThird()));
         }
         switch(stage){
-            case 5:
+            case 4:
                 Imgproc.cvtColor(color_filtered_image, output, Imgproc.COLOR_HSV2RGB);
                 break;
-            case 4:
-                Imgproc.cvtColor(greyscale, output, Imgproc.COLOR_GRAY2RGB);
-                break;
             case 3:
-                Imgproc.cvtColor(horizontal_edges, output, Imgproc.COLOR_GRAY2RGB);
+                Imgproc.cvtColor(greyscale, output, Imgproc.COLOR_GRAY2RGB);
                 break;
             case 2:
                 Imgproc.cvtColor(color_mask, output, Imgproc.COLOR_HSV2RGB);
