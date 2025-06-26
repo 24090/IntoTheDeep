@@ -41,13 +41,13 @@ public class Claw {
     public static double ELBOW_RIGHT_OUT = 0.6;
 
     public static double WRIST_LEFT_IN = 1;
-    public static double WRIST_LEFT_OUT_0 = 0.33;
+    public static double WRIST_LEFT_OUT_0 = 0;
     public static double WRIST_LEFT_OUT_90 = 0.58;
     public static double WRIST_LEFT_READY_0 = 0.45;
     public static double WRIST_LEFT_READY_90 = 0.75;
 
     public static double WRIST_RIGHT_IN = 0;
-    public static double WRIST_RIGHT_OUT_0 = 0.51;
+    public static double WRIST_RIGHT_OUT_0 = 0.6;
     public static double WRIST_RIGHT_OUT_90 = 0.84;
     public static double WRIST_RIGHT_READY_0 = 0.49;
     public static double WRIST_RIGHT_READY_90 = 0.67;
@@ -63,7 +63,8 @@ public class Claw {
             elbow_servo_left.setPwmRange(new PwmControl.PwmRange(500, 2500));
         elbow_servo_right = hardwareMap.get(ServoImplEx.class, "elbow_servo_right");
             elbow_servo_right.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        color_sensor = hardwareMap.get(NormalizedColorSensor.class, "normalized_color_sensor");
+        color_sensor = hardwareMap.get(NormalizedColorSensor.class, "color_sensor");
+        color_sensor.setGain(0);
     }
 
     public void wrist_ready(){
@@ -134,16 +135,16 @@ public class Claw {
         int color_int =  color_sensor.getNormalizedColors().toColor();
         float[] hsv = new float[3];
         Color.colorToHSV(color_int, hsv);
-        if (hsv[1] < 0.5){
+        if (hsv[1] < 0.65){
             return ColorSensorOut.NONE;
         }
-        if (hsv[0] < 10 || hsv[0] > 340) {
+        if (hsv[0] >= 5 && hsv[0] <= 35) {
             return ColorSensorOut.RED;
         }
-        if (hsv[0] > 40 && hsv[0] < 70) {
+        if (hsv[0] >= 55 && hsv[0] <= 85) {
             return ColorSensorOut.YELLOW;
         }
-        if (hsv[0] > 210 && hsv[0] < 250) {
+        if (hsv[0] >= 200 && hsv[0] <= 250) {
             return ColorSensorOut.BLUE;
         }
         return ColorSensorOut.NONE;

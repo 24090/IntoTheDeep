@@ -7,12 +7,15 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
 public class Camera {
-	public static Scalar red_min;
-	public static Scalar red_max;
-	public static Scalar blue_min = new Scalar(105, 85, 0);
-	public static Scalar blue_max = new Scalar(125, 255, 255);
-	public static Scalar yellow_min = new Scalar(15, 15, 0);
-	public static Scalar yellow_max = new Scalar(40, 255, 255);
+	@Config
+	static class ColorValues {
+		public static Scalar red_min;
+		public static Scalar red_max;
+		public static Scalar blue_min = new Scalar(105, 85, 0);
+		public static Scalar blue_max = new Scalar(125, 255, 255);
+		public static Scalar yellow_min = new Scalar(15, 15, 0);
+		public static Scalar yellow_max = new Scalar(40, 255, 255);
+	}
 	public static Mat projection_matrix = new Mat();
 	public static Mat reprojection_matrix = new Mat();
 	public static Mat camera_matrix = new Mat();

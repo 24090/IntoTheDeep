@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
@@ -25,6 +26,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 @TeleOp(group = "testing")
 public class VisionTesting extends LinearOpMode {
+    Sample sample = new Sample();
+
     @Override
     public void runOpMode() throws InterruptedException {
         Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
@@ -36,33 +39,33 @@ public class VisionTesting extends LinearOpMode {
                 hardwareMap
         );
         outtake.readyTransfer();
+        Action action = new SequentialAction(
+                new InstantAction(() -> sample.pose = null),
+                vision.findSample(sample),
+                futureAction(() ->
+                        RobotActions.reachSample(sample.pose, intake, follower)
+                ),
+                new SleepAction(0.5),
+                intake.pickUpAction(),
+                new InstantAction(() ->
+                        has_sample[0] = (intake.claw.getSensedColor() != Claw.ColorSensorOut.NONE)
+                ),
+                RobotActions.fullTransferAction(intake, outtake)
+        );
         waitForStart();
         while (opModeIsActive()){
-            Sample sample = new Sample();
-
-            runBlocking(
-                new RaceAction(
-                    foreverAction(follower::update),
-                    triggerAction(() -> !opModeIsActive()),
-                    new SequentialAction(
+            if (!has_sample[0]) {
+                runBlocking(
                         new RaceAction(
-                            triggerAction(()->has_sample[0]),
-                            foreverAction(new SequentialAction(
-                                vision.findSample(sample),
-                                futureAction(() ->
-                                        RobotActions.reachSample(sample.pose, intake, follower)
-                                ),
-                                new SleepAction(0.5),
-                                intake.pickUpAction(),
-                                new InstantAction(() ->
-                                    has_sample[0] = (intake.claw.getSensedColor() == Claw.ColorSensorOut.YELLOW)
-                                )
-                            ))
-                        ),
-                        RobotActions.fullTransferAction(intake, outtake)
-                    )
-                )
-            );
+                            foreverAction(follower::update),
+                            triggerAction(() -> !opModeIsActive()),
+                            action
+                        )
+                );
+            } else {
+                break;
+            }
+
         }
     }
 }

@@ -33,7 +33,7 @@ public class Vision {
         webcam.setViewportRenderingPolicy(
                 OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW
         );
-        pipeline = new SampleLocationPipeline(telemetry);
+        pipeline = new SampleLocationPipeline(Camera.Colors.BLUE, telemetry);
         webcam.setPipeline(pipeline);
         webcam.openCameraDeviceAsync(
                 new OpenCvCamera.AsyncCameraOpenListener() {

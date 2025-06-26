@@ -26,8 +26,10 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     Telemetry telemetry;
     public Scalar color_min;
     public Scalar color_max;
+    public boolean is_red;
     public int stage = 5;
     Mat input_undistort = new Mat();
+    Mat color_mask_upper;
     Mat color_mask = new Mat();
     Mat color_filtered_image = new Mat();
     Mat output = new Mat();
@@ -46,22 +48,21 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         this.telemetry = telemetry;
         switch (color){
             case RED:
-                this.color_min = Camera.red_min;
-                this.color_max = Camera.red_max;
+                this.color_min = Camera.ColorValues.red_min;
+                this.color_max = Camera.ColorValues.red_max;
+                is_red = true;
                 break;
             case BLUE:
-                this.color_min = Camera.blue_min;
-                this.color_max = Camera.blue_max;
+                this.color_min = Camera.ColorValues.blue_min;
+                this.color_max = Camera.ColorValues.blue_max;
+                is_red = false;
                 break;
             case YELLOW:
-                this.color_min = Camera.yellow_min;
-                this.color_max = Camera.yellow_max;
+                this.color_min = Camera.ColorValues.yellow_min;
+                this.color_max = Camera.ColorValues.yellow_max;
+                is_red = false;
                 break;
         }
-    }
-
-    public SampleLocationPipeline(Telemetry telemetry){
-        this(Camera.Colors.YELLOW, telemetry);
     }
 
     private void getContours(Mat input, List<MatOfPoint> dst){
@@ -71,7 +72,14 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         // Input RGB -> HSV
         Imgproc.cvtColor(input_undistort, input_undistort, Imgproc.COLOR_RGB2HSV);
         // Gets Colors From Image (Binary)
-        Core.inRange(input_undistort, color_min, color_max, color_mask);
+        if (is_red){
+            Core.inRange(input_undistort, new Scalar(0,0,0), color_max, color_mask);
+            Core.inRange(input_undistort, color_min, new Scalar(255,255,255), color_mask_upper);
+            Core.bitwise_or(color_mask, color_mask_upper, color_mask);
+        } else {
+            Core.inRange(input_undistort, color_min, color_max, color_mask);
+        }
+
         //   Erode and dilate
         Imgproc.erode(color_mask, color_mask, empty_mat, new Point(-1, -1), 5);
         Imgproc.dilate(color_mask, color_mask, empty_mat, new Point(-1, -1), 10);
