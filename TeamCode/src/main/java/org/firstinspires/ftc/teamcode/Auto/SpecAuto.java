@@ -69,25 +69,35 @@ public class SpecAuto extends LinearOpMode {
                 .addPath(
                     new BezierLine(
                         new Point(48.000, 24.000, Point.CARTESIAN),
-                        new Point(7, 24, Point.CARTESIAN)
+                        new Point(20, 22, Point.CARTESIAN)
                     )
                 )
                 .setConstantHeadingInterpolation(-PI)
                 .addPath(
-                    new BezierCurve(
-                        new Point(12, 24, Point.CARTESIAN),
-                        new Point(89.000, 27.000, Point.CARTESIAN),
-                        new Point(62.000, 18.000, Point.CARTESIAN)
-                    )
-                )
-                .setConstantHeadingInterpolation(-PI)
-                .addPath(
-                        new BezierLine(
-                                new Point(62.000, 15.000, Point.CARTESIAN),
-                                new Point(12, 18, Point.CARTESIAN)
+                        new BezierCurve(
+                                new Point(89.000, 27.000, Point.CARTESIAN),
+                                new Point(62.000, 8.000, Point.CARTESIAN),
+                                new Point(20.000, 13.000, Point.CARTESIAN)
                         )
                 )
-                .setConstantHeadingInterpolation(-PI)
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .addPath(
+                        new BezierCurve(
+                                new Point(77.000, 16.000, Point.CARTESIAN),
+                                new Point(80.000, 6.000, Point.CARTESIAN),
+                                new Point(20.000, 6.000, Point.CARTESIAN)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .addPath(
+                        new BezierCurve(
+                                new Point(10.000, 6.000, Point.CARTESIAN),
+                                new Point(45.000, 33.000, Point.CARTESIAN),
+                                new Point(29.000, 53.000, Point.CARTESIAN),
+                                new Point(10.000, 34.000, Point.CARTESIAN)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-135))
                 .build();
         final Pose grab_pose = new Pose(GameMap.RobotLength/2,36, 0);
         // HW stuff
