@@ -39,13 +39,10 @@ public class Controlled extends LinearOpMode{
     Follower follower;
     Intake intake;
     Outtake outtake;
-    public enum State{IN_GRAB, NORMAL, SAMPLESCORING, SPECIMENSCORING}
-    State state = State.NORMAL;
     public void runOpMode(){
         double last_time = 0;
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(PoseStorer.pose);
-        boolean old_right_bumper = false;
         boolean old_sweep = false;
         intake = new Intake(hardwareMap);
         intake.claw.toReadyGrabPos(0);
@@ -84,32 +81,13 @@ public class Controlled extends LinearOpMode{
                 follower.breakFollowing();
                 follower.startTeleopDrive();
             }
-            if (gamepad1.right_bumper && !old_right_bumper){
-                if (state == State.NORMAL){
-                    runBlocking(
-                        new RaceAction(
-                            foreverAction(movement::run),
-                            outtake.readySpecimenAction()
-                        )
-                    );
-                    state = State.SPECIMENSCORING;
-                }
-                else if (state == State.SPECIMENSCORING){
-                    runBlocking(
-                            new RaceAction(
-                                    foreverAction(movement::run),
-                                    outtake.scoreSpecimenAction()
-                            )
-                    );
-                    state = State.NORMAL;
-                }
+            if (gamepad1.right_bumper){
+                outtake.readySpecimen();
             }
             if (gamepad1.y){
                 outtake.readySample();
-                state = State.SAMPLESCORING;
             } else if (gamepad1.a){
                 outtake.readyTransfer();
-                state = State.NORMAL;
             } else if (gamepad1.b){
                 outtake.claw.open();
             }
@@ -120,14 +98,12 @@ public class Controlled extends LinearOpMode{
                         fullTransferAction(intake, outtake)
                     )
                 );
-                state = State.NORMAL;
             }
             if (gamepad2.right_stick_button){
                 intake.claw.turret_angle = 0;
                 intake.readyGrab(
                         Intake.MaxDistance
                 );
-                state = State.IN_GRAB;
             }
             if (gamepad2.back && !old_sweep){
                 intake.sweeper.toggle();
@@ -139,7 +115,6 @@ public class Controlled extends LinearOpMode{
                         firmFullTransferAction(intake, outtake)
                     )
                 );
-                state = State.NORMAL;
             }
             intake.slide.goTo(intake.slide.trimTicks(
                     intake.slide.target_pos +
