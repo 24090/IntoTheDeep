@@ -55,50 +55,63 @@ public class SpecAuto extends LinearOpMode {
         final Pose center_sample = new Pose(inner_sample.getX(), inner_sample.getY()-10, 0);
         final Pose outer_sample = new Pose(inner_sample.getX(), center_sample.getY()-10, 0);
         final Pose score_pose = new Pose(start_pose.getX() + 40, start_pose.getY(),-PI);
-        final PathChain sweep = follower.pathBuilder()
+        final PathChain sweep1 = follower.pathBuilder()
                 .addPath(
                     new BezierCurve(
                         new Point(37, 67, Point.CARTESIAN),
-                        new Point(18.000, 5.000, Point.CARTESIAN),
+                        new Point(7, 0, Point.CARTESIAN),
                         new Point(66.000, 64.000, Point.CARTESIAN),
                         new Point(74.000, 21.000, Point.CARTESIAN),
-                        new Point(54.000, 24.000, Point.CARTESIAN)
+                        new Point(54.000, 20.000, Point.CARTESIAN)
                     )
                 )
                 .setConstantHeadingInterpolation(-PI)
                 .addPath(
                     new BezierLine(
-                        new Point(48.000, 24.000, Point.CARTESIAN),
-                        new Point(20, 22, Point.CARTESIAN)
+                        new Point(48.000, 20.000, Point.CARTESIAN),
+                        new Point(20, 20, Point.CARTESIAN)
                     )
                 )
                 .setConstantHeadingInterpolation(-PI)
-                .addPath(
-                        new BezierCurve(
-                                new Point(89.000, 27.000, Point.CARTESIAN),
-                                new Point(62.000, 8.000, Point.CARTESIAN),
-                                new Point(20.000, 13.000, Point.CARTESIAN)
-                        )
-                )
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .addPath(
-                        new BezierCurve(
-                                new Point(77.000, 16.000, Point.CARTESIAN),
-                                new Point(80.000, 6.000, Point.CARTESIAN),
-                                new Point(20.000, 6.000, Point.CARTESIAN)
-                        )
-                )
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .addPath(
-                        new BezierCurve(
-                                new Point(10.000, 6.000, Point.CARTESIAN),
-                                new Point(45.000, 33.000, Point.CARTESIAN),
-                                new Point(29.000, 53.000, Point.CARTESIAN),
-                                new Point(10.000, 34.000, Point.CARTESIAN)
-                        )
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-135))
                 .build();
+
+        final PathChain sweep2 = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Point(10.000, 22.000, Point.CARTESIAN),
+                                new Point(81.000, 59.000, Point.CARTESIAN),
+                                new Point(56.000, 6.000, Point.CARTESIAN),
+                                new Point(57.000, 8.000, Point.CARTESIAN)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .addPath(
+                        new BezierLine(
+                                new Point(48, 8, Point.CARTESIAN),
+                                new Point(20, 8, Point.CARTESIAN)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
+
+        final PathChain sweep3 = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Point(80.000, 43.000, Point.CARTESIAN),
+                                new Point(62.000, 4.000, Point.CARTESIAN),
+                                new Point(55.000, 6.000, Point.CARTESIAN)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .addPath(
+                        new BezierLine(
+                                new Point(48, 6, Point.CARTESIAN),
+                                new Point(20, 6, Point.CARTESIAN)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
+
         final Pose grab_pose = new Pose(GameMap.RobotLength/2,36, 0);
         // HW stuff
         intake = new Intake(hardwareMap);
@@ -118,7 +131,11 @@ public class SpecAuto extends LinearOpMode {
             ),
             new ParallelAction(
                 outtake.readyTransferAction(),
-                pathAction(follower, sweep, 2, 0.04)
+                new SequentialAction(
+                        pathAction(follower, sweep1, 2, 0.04),
+                        pathAction(follower, sweep2, 2, 0.04),
+                        pathAction(follower, sweep3, 2, 0.04)
+                )
             )
         );
         BulkReads bulkreads = new BulkReads(hardwareMap);
