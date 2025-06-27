@@ -10,6 +10,7 @@ import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.pedropathing.follower.Follower;
@@ -23,6 +24,8 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
+
+import java.util.function.Supplier;
 
 /**
  * TODO:
@@ -48,21 +51,20 @@ public class Controlled extends LinearOpMode{
         intake.claw.toReadyGrabPos(0);
         outtake = new Outtake(hardwareMap);
         outtake.readyTransfer();
-        InstantAction movement = new InstantAction(() -> {
-                follower.setTeleOpMovementVectors(
-                            -gamepad1.left_stick_y - gamepad2.left_stick_y/7,
-                            -gamepad1.left_stick_x - gamepad2.left_stick_x/7,
-                            -gamepad1.right_stick_x - gamepad2.right_stick_x/7
-                );
-                follower.update();
-            }
-        );
+        Runnable movement = () -> {
+            follower.setTeleOpMovementVectors(
+                    -gamepad1.left_stick_y - gamepad2.left_stick_y / 7,
+                    -gamepad1.left_stick_x - gamepad2.left_stick_x / 7,
+                    -gamepad1.right_stick_x - gamepad2.right_stick_x / 7
+            );
+            follower.update();
+        };
         follower.startTeleopDrive();
         waitForStart();
         while (opModeIsActive()){
             outtake.backgroundIter();
             intake.slide.movementLoop();
-            movement.getF().run();
+            movement.run();
             if (gamepad1.dpad_down){
                 follower.breakFollowing();
                 runBlocking(
@@ -86,7 +88,7 @@ public class Controlled extends LinearOpMode{
                 if (state == State.NORMAL){
                     runBlocking(
                         new RaceAction(
-                            foreverAction(movement),
+                            foreverAction(movement::run),
                             outtake.readySpecimenAction()
                         )
                     );
@@ -95,7 +97,7 @@ public class Controlled extends LinearOpMode{
                 else if (state == State.SPECIMENSCORING){
                     runBlocking(
                             new RaceAction(
-                                    foreverAction(movement),
+                                    foreverAction(movement::run),
                                     outtake.scoreSpecimenAction()
                             )
                     );
@@ -114,7 +116,7 @@ public class Controlled extends LinearOpMode{
             if (gamepad2.right_bumper){
                 runBlocking(
                     new RaceAction(
-                        foreverAction(movement),
+                        foreverAction(movement::run),
                         fullTransferAction(intake, outtake)
                     )
                 );
@@ -133,7 +135,7 @@ public class Controlled extends LinearOpMode{
             if (gamepad2.dpad_up){
                 runBlocking(
                     new RaceAction(
-                        foreverAction(movement),
+                        foreverAction(movement::run),
                         firmFullTransferAction(intake, outtake)
                     )
                 );
@@ -146,7 +148,7 @@ public class Controlled extends LinearOpMode{
             if (gamepad2.a){
                 runBlocking(
                         new RaceAction(
-                                foreverAction(movement),
+                                foreverAction(movement::run),
                                 foreverAction(outtake::backgroundIter),
                                 intake.pickUpAction()
                         )

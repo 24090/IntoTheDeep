@@ -28,15 +28,21 @@ public class CustomActions {
         }
     }
 
-    public static Action foreverAction(Action a){
-        return telemetryPacket -> {
-            a.run(telemetryPacket);
-            return true;
+    public static Action foreverAction(Supplier<Action> action_supplier){
+        return new Action() {
+            Action current = action_supplier.get();
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!current.run(telemetryPacket)) {
+                    current = action_supplier.get();
+                }
+                return true;
+            }
         };
     }
 
-    public static Action foreverAction(InstantFunction f){
-        return foreverAction(new InstantAction(f));
+    public static Action foreverAction(Runnable f){
+        return foreverAction(() -> new InstantAction(f::run));
     }
 
     public static Action futureAction(Supplier<Action> supplier){

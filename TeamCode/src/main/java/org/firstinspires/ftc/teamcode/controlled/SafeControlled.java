@@ -63,7 +63,7 @@ public class SafeControlled extends LinearOpMode {
             }
         });
 
-        InstantAction movement = new InstantAction(() -> {
+        Runnable movement = () -> {
             Vector vel = new Vector(new Point(-gamepad1.right_stick_y, -gamepad1.right_stick_x));
             vel.rotateVector(follower.getPose().getHeading());
             if (follower.getPose().getX() > 11) {
@@ -81,8 +81,7 @@ public class SafeControlled extends LinearOpMode {
             vel.rotateVector(-follower.getPose().getHeading());
             follower.setTeleOpMovementVectors(vel.getXComponent(), vel.getYComponent(), -gamepad1.left_stick_x);
             follower.update();
-        }
-        );
+        };
         boolean old_a = false;
         boolean old_b = false;
         follower.startTeleopDrive();
@@ -92,7 +91,7 @@ public class SafeControlled extends LinearOpMode {
             telemetry.addData("loop time after outtake", (time - last_time) * 1000);
             intake_update.getF().run();
             telemetry.addData("loop time after intake+outtake", (time - last_time) * 1000);
-            movement.getF().run();
+            movement.run();
             telemetry.addData("loop time after intake+outtake+movement", (time - last_time) * 1000);
             if (gamepad1.left_bumper){
                 runBlocking(

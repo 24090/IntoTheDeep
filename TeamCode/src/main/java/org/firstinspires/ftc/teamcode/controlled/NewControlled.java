@@ -45,14 +45,14 @@ public class NewControlled extends LinearOpMode {
                 intake.slide.movementLoop();
             }
         });
-        InstantAction movement = new InstantAction(() -> {
+        Runnable movement = () -> {
             if (intake.slide.getPosition() > 200 || gamepad1.right_stick_button) {
                 follower.setTeleOpMovementVectors(-gamepad1.right_stick_y/3, -gamepad1.right_stick_x/3, -gamepad1.left_stick_x/3);
             } else {
                 follower.setTeleOpMovementVectors(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x);
             }
             follower.update();
-        });
+        };
         boolean old_a = false;
         boolean old_b = false;
         follower.startTeleopDrive();
@@ -64,7 +64,7 @@ public class NewControlled extends LinearOpMode {
             telemetry.addData("loop time after outtake", (time - last_time) * 1000);
             intake_update.getF().run();
             telemetry.addData("loop time after intake+outtake", (time - last_time) * 1000);
-            movement.getF().run();
+            movement.run();
             telemetry.addData("loop time after intake+outtake+movement", (time - last_time) * 1000);
             if (gamepad1.left_bumper){
                 runBlocking(
