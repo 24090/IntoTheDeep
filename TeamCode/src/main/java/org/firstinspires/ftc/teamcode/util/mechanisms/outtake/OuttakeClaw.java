@@ -13,9 +13,9 @@ public class OuttakeClaw {
 
     public static double LEFT_SAMPLE = 1;
     public static double LEFT_SPECIMEN = 1;
-    public static double LEFT_TRANSFER = 0.57;
+    public static double LEFT_TRANSFER = 0.6;
 
-    public static double RIGHT_TRANSFER = 0.42;
+    public static double RIGHT_TRANSFER = 0.43;
     public static double RIGHT_SAMPLE = 0;
     public static double RIGHT_SPECIMEN = 0;
 
