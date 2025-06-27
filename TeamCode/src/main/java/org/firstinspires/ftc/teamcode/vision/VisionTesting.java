@@ -7,18 +7,14 @@ import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.fullTransferAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.reachSample;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Claw;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
@@ -33,7 +29,8 @@ public class VisionTesting extends LinearOpMode {
     Outtake outtake;
     Vision vision;
     Sample sample = new Sample();
-    Action action(){
+    boolean end = false;
+    Action getAction(){
         return new SequentialAction(
             new RaceAction(
                 vision.findSample(sample),
@@ -46,6 +43,9 @@ public class VisionTesting extends LinearOpMode {
                         fullTransferAction(intake, outtake)
                 ),
                 foreverAction(follower::update)
+            ),
+            new InstantAction(() ->
+                    end = intake.claw.getSensedColor() != Claw.ColorSensorOut.NONE
             )
         );
     }
@@ -62,9 +62,9 @@ public class VisionTesting extends LinearOpMode {
         outtake.readyTransfer();
 
         waitForStart();
-        do {
-            runBlocking(action());
-        }
-        while (opModeIsActive() && (intake.claw.getSensedColor() == Claw.ColorSensorOut.NONE));
+        runBlocking(new RaceAction(
+            triggerAction(() -> end),
+            foreverAction(this::getAction)
+        ));
     }
 }
