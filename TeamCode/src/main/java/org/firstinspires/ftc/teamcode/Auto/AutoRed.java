@@ -42,7 +42,6 @@ import org.firstinspires.ftc.teamcode.vision.Vision;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
-@Config
 @Autonomous(name = "AutoRed", group = "auto")
 public class AutoRed extends LinearOpMode {
     Follower follower;
@@ -50,7 +49,7 @@ public class AutoRed extends LinearOpMode {
     Outtake outtake;
     Vision vision;
     Sample sample = new Sample();
-    boolean found_sample;
+    boolean found_sample = false;
     Action getSampleAction(){
         return new SequentialAction(
                 new RaceAction(
@@ -78,7 +77,7 @@ public class AutoRed extends LinearOpMode {
         follower.setStartingPose(start_pose);
 
         final Pose inner_sample = new Pose(48-1.75, 121.75, 0);
-        final Pose score_pose = new Pose(19.25,144-19.25, -PI / 4);
+        final Pose score_pose = new Pose(18.75,144-18.75, -PI / 4);
         final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1.5, inner_sample.getY() + 1.5, 0);
         final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1.5, inner_sample.getY() + 10, 0);
         final Pose outer_grab_pose = new Pose(inner_sample.getX() - 2.5 , inner_sample.getY() + 21, 0.7);
@@ -179,8 +178,8 @@ public class AutoRed extends LinearOpMode {
                 )
             ),
             new RaceAction(
-                    triggerAction(() -> found_sample),
-                    foreverAction(this::getSampleAction)
+                triggerAction(() -> found_sample),
+                foreverAction(this::getSampleAction)
             ),
             new InstantAction(() -> found_sample = false),
             new ParallelAction(

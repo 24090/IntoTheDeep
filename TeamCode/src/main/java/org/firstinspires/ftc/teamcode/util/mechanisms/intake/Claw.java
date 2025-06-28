@@ -28,9 +28,9 @@ public class Claw {
         NONE
     }
     public double turret_angle;
-    public static double CLAW_OPEN = 0;
-    public static double CLAW_LOOSE = 0.57;
-    public static double CLAW_GRAB = 0.7;
+    public static double CLAW_OPEN = 0.65;
+    public static double CLAW_LOOSE = 0.4;
+    public static double CLAW_GRAB = 0.35;
 
     public static double ELBOW_LEFT_IN = 0.47;
     public static double ELBOW_LEFT_READY = 0.66;

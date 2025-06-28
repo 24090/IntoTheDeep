@@ -4,6 +4,8 @@ import static java.lang.Math.PI;
 
 import android.annotation.SuppressLint;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
@@ -22,9 +24,14 @@ import kotlin.Pair;
 import kotlin.Triple;
 
 public class SampleLocationPipeline extends OpenCvPipeline {
-    final Camera.Colors[] allowed_colors;
+    @Config
+    public static class AllowedColors{
+        public static boolean red;
+        public static boolean yellow;
+        public static boolean blue;
+    }
     Telemetry telemetry;
-    public int stage = 4;
+    public int stage = 0;
     Mat input_undistort = new Mat();
     Mat color_mask_upper = new Mat();
     Mat color_mask = new Mat();
@@ -38,12 +45,6 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     final double top2_distance_weight = 1;
     public SampleLocationPipeline(Telemetry telemetry) {
         Camera.init();
-        this.allowed_colors = new Camera.Colors[]{Camera.Colors.RED, Camera.Colors.YELLOW, Camera.Colors.BLUE};
-        this.telemetry = telemetry;
-    }
-    public SampleLocationPipeline(Camera.Colors[] allowed_colors, Telemetry telemetry) {
-        Camera.init();
-        this.allowed_colors = allowed_colors;
         this.telemetry = telemetry;
     }
     void initialProcessing(Mat input, Mat input_undistort){
@@ -137,7 +138,12 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         telemetry.addData("detected_length", distance);
         return new Triple<>(world_x, world_y, angle);
     }
-
+    void fullColorProcess(Camera.Colors color, List<MatOfPoint> contours){
+        List<MatOfPoint> new_contours = new ArrayList<>();
+        filterColors(color, input_undistort, color_mask);
+        getContours(color_mask, input_undistort, color_filtered_image, new_contours);
+        contours.addAll(new_contours);
+    }
     @SuppressLint("DefaultLocale")
     public Mat processFrame(Mat input) {
         List<Triple<Double, Double, Double>> new_objects = new ArrayList<>();
@@ -145,12 +151,16 @@ public class SampleLocationPipeline extends OpenCvPipeline {
 
         initialProcessing(input, input_undistort);
 
-        for (Camera.Colors color: allowed_colors){
-            List<MatOfPoint> new_contours = new ArrayList<>();
-            filterColors(color, input_undistort, color_mask);
-            getContours(color_mask, input_undistort, color_filtered_image, new_contours);
-            contours.addAll(new_contours);
+        if (AllowedColors.red){
+            fullColorProcess(Camera.Colors.RED, contours);
         }
+        if (AllowedColors.yellow){
+            fullColorProcess(Camera.Colors.YELLOW, contours);
+        }
+        if (AllowedColors.blue){
+            fullColorProcess(Camera.Colors.BLUE, contours);
+        }
+
         // Get coords + rotation for each contour
         int n = 0;
         for (MatOfPoint points: contours){

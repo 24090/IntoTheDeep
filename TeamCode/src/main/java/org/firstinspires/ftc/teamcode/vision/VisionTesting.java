@@ -44,9 +44,11 @@ public class VisionTesting extends LinearOpMode {
                 ),
                 foreverAction(follower::update)
             ),
-            new InstantAction(() ->
-                    end = intake.claw.getSensedColor() != Claw.ColorSensorOut.NONE
-            )
+            new InstantAction(() -> {
+                telemetry.addData("query", intake.claw.getSensedColor());
+                telemetry.update();
+                end = intake.claw.getSensedColor() != Claw.ColorSensorOut.NONE;
+            })
         );
     }
     @Override
