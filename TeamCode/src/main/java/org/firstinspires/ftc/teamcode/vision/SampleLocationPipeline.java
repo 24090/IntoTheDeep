@@ -50,16 +50,14 @@ public class SampleLocationPipeline extends OpenCvPipeline {
     void initialProcessing(Mat input, Mat input_undistort){
         // Undistort
         Calib3d.undistort(input, input_undistort, Camera.camera_matrix, Camera.distortion_coefficients);
-        // Input RGB -> HSV
-        Imgproc.cvtColor(input_undistort, input_undistort, Imgproc.COLOR_RGB2HSV);
+        // Input RGB -> YcRcB
+        Imgproc.cvtColor(input_undistort, input_undistort, Imgproc.COLOR_RGB2YCrCb);
     }
     void filterColors(Camera.Colors color, Mat input_undistort, Mat color_mask){
         empty_mat.copyTo(color_mask);
         switch (color) {
             case RED:
-                Core.inRange(input_undistort, new Scalar(0,0,0), Camera.ColorValues.red_max, color_mask);
-                Core.inRange(input_undistort, Camera.ColorValues.red_min, new Scalar(255,255,255), color_mask_upper);
-                Core.bitwise_or(color_mask, color_mask_upper, color_mask);
+                Core.inRange(input_undistort, Camera.ColorValues.red_min, Camera.ColorValues.red_max, color_mask);
                 break;
             case BLUE:
                 Core.inRange(input_undistort, Camera.ColorValues.blue_min, Camera.ColorValues.blue_max, color_mask);
@@ -79,10 +77,10 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         Core.bitwise_and(input_undistort, input_undistort, color_filtered_image, color_mask);
         Core.bitwise_not(color_mask, color_mask);
         Imgproc.cvtColor(color_mask, color_mask, Imgproc.COLOR_GRAY2RGB);
-        Imgproc.cvtColor(color_mask, color_mask, Imgproc.COLOR_RGB2HSV);
+        Imgproc.cvtColor(color_mask, color_mask, Imgproc.COLOR_RGB2YCrCb);
         Core.add(color_mask, color_filtered_image, color_filtered_image);
         // Find contours
-        Imgproc.cvtColor(color_filtered_image, greyscale, Imgproc.COLOR_HSV2RGB);
+        Imgproc.cvtColor(color_filtered_image, greyscale, Imgproc.COLOR_YCrCb2RGB);
         Imgproc.cvtColor(greyscale, greyscale, Imgproc.COLOR_RGB2GRAY);
         Core.bitwise_not(greyscale, greyscale);
         Imgproc.findContours(greyscale, dst, hierarchy, Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_NONE );
@@ -192,16 +190,16 @@ public class SampleLocationPipeline extends OpenCvPipeline {
         }
         switch(stage){
             case 4:
-                Imgproc.cvtColor(color_filtered_image, output, Imgproc.COLOR_HSV2RGB);
+                Imgproc.cvtColor(color_filtered_image, output, Imgproc.COLOR_YCrCb2RGB);
                 break;
             case 3:
                 Imgproc.cvtColor(greyscale, output, Imgproc.COLOR_GRAY2RGB);
                 break;
             case 2:
-                Imgproc.cvtColor(color_mask, output, Imgproc.COLOR_HSV2RGB);
+                Imgproc.cvtColor(color_mask, output, Imgproc.COLOR_YCrCb2RGB);
                 break;
             default:
-                Imgproc.cvtColor(input_undistort, output, Imgproc.COLOR_HSV2RGB);
+                Imgproc.cvtColor(input_undistort, output, Imgproc.COLOR_YCrCb2RGB);
                 break;
         }
         object_field_coords = new ArrayList<>(new_objects);

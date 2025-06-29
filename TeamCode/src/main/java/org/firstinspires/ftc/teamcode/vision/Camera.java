@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision;
 
 
-
 import com.acmerobotics.dashboard.config.Config;
 
 import org.opencv.core.Mat;
@@ -11,12 +10,12 @@ import org.opencv.core.Scalar;
 public class Camera {
 	@Config
 	static class ColorValues {
-		public static Scalar red_min = new Scalar(150, 20, 0);
-		public static Scalar red_max = new Scalar(5, 255, 255);
-		public static Scalar blue_min = new Scalar(105, 85, 0);
-		public static Scalar blue_max = new Scalar(125, 255, 255);
-		public static Scalar yellow_min = new Scalar(20, 20, 0);
-		public static Scalar yellow_max = new Scalar(40, 255, 255);
+		public static Scalar red_min = new Scalar(0, 150, 80);
+		public static Scalar red_max = new Scalar(255, 255, 255);
+		public static Scalar blue_min =  new Scalar(0, 0, 180);
+		public static Scalar blue_max = new Scalar(255, 255, 255);
+		public static Scalar yellow_min =  new Scalar(0, 0, 0);
+		public static Scalar yellow_max = new Scalar(255, 200, 95);
 	}
 	public static Mat projection_matrix = new Mat();
 	public static Mat reprojection_matrix = new Mat();
