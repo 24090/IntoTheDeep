@@ -126,7 +126,6 @@ public class Outtake {
 
     public Action scoreAction(){
         return new SequentialAction(
-                readySampleAction(),
                 openClawAction(),
                 new InstantAction(this::readyTransfer)
         );

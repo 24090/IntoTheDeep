@@ -21,6 +21,8 @@ import com.pedropathing.pathgen.Vector;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
+import java.util.function.Supplier;
+
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
         Vector movement_vector = new Vector(relative_sample.getY(), follower.getPose().getHeading()+PI/2);
@@ -79,17 +81,26 @@ public class RobotActions {
                 new InstantAction(intake.claw::open)
         );
     }
-    public static Action pathAction(Follower follower, PathChain path, double velocity_tolerance, double heading_tolerance){
+    public static Action pathAction(Follower follower, PathChain path){
+        return pathAction(follower, path, () -> (!follower.isBusy())&&(follower.getVelocityMagnitude()<2)&&(follower.getHeadingError()<0.04));
+    }
+
+    public static Action pathAction(Follower follower, PathChain path, Supplier<Boolean> end_function){
         return new SequentialAction(
                 new InstantAction(()->follower.followPath(path, true)),
-                triggerAction(()->(!follower.isBusy())&&(follower.getVelocityMagnitude()<velocity_tolerance)&&(follower.getHeadingError()<heading_tolerance))
+                triggerAction(end_function)
         );
     }
-    public static Action moveLineAction(Follower follower, Pose a, Pose b,  double velocity_tolerance, double heading_tolerance) {
+
+    public static Action moveLineAction(Follower follower, Pose a, Pose b){
+        return moveLineAction(follower, a, b, () -> (!follower.isBusy())&&(follower.getVelocityMagnitude()<2)&&(follower.getHeadingError()<0.04));
+    }
+
+    public static Action moveLineAction(Follower follower, Pose a, Pose b,  Supplier<Boolean> end_function) {
         PathChain path = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(a), new Point(b)))
                 .setLinearHeadingInterpolation(a.getHeading(), b.getHeading())
                 .build();
-        return pathAction(follower, path, velocity_tolerance, heading_tolerance);
+        return pathAction(follower, path, end_function);
     }
 }

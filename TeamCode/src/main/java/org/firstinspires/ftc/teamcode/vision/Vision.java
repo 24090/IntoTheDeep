@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.vision;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Action;
 import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.Point;
-import com.pedropathing.pathgen.Vector;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -22,11 +20,14 @@ import java.util.stream.Stream;
 import kotlin.Triple;
 
 public class Vision {
+    public interface SampleChecker {
+        boolean run(Triple<Double, Double, Double> sample);
+    }
     int STREAM_WIDTH = 640;
     int STREAM_HEIGHT = 480;
     OpenCvWebcam webcam;
     SampleLocationPipeline pipeline;
-    public Vision(Telemetry telemetry, HardwareMap hwmap, Camera.Colors[] allowed_colors){
+    public Vision(Telemetry telemetry, HardwareMap hwmap){
         WebcamName webcamName = hwmap.get(WebcamName.class, "Webcam");
         webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
         FtcDashboard.getInstance().startCameraStream(webcam, 0);
@@ -56,7 +57,12 @@ public class Vision {
                 }
         );
     }
+
     public Action findSample(Sample out) {
+        return findSample(out, (a) -> true);
+    }
+
+    public Action findSample(Sample out, SampleChecker sample_checker) {
         return (telemetry_packet) -> {
             Triple<Double, Double, Double> sample_triple;
             List<Triple<Double, Double, Double>> analysis = pipeline.getAnalysis();
@@ -66,7 +72,8 @@ public class Vision {
             Stream<Triple<Double, Double, Double>> filtered_samples = analysis.stream().filter(
                 (a) ->
                     Intake.MinDistance < (a.getSecond()) &&
-                    Intake.MaxDistance > (a.getSecond())
+                    Intake.MaxDistance > (a.getSecond()) &&
+                    sample_checker.run(a)
             );
             try {
                 sample_triple = filtered_samples.findFirst().get();

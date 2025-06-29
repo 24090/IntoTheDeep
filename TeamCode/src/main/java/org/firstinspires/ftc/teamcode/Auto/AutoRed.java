@@ -10,14 +10,11 @@ import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.pathAc
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.reachSample;
 import static java.lang.Math.PI;
 
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -35,8 +32,8 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Claw;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
-import org.firstinspires.ftc.teamcode.vision.Camera;
 import org.firstinspires.ftc.teamcode.vision.Sample;
+import org.firstinspires.ftc.teamcode.vision.SampleLocationPipeline;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
@@ -53,7 +50,11 @@ public class AutoRed extends LinearOpMode {
     Action getSampleAction(){
         return new SequentialAction(
                 new RaceAction(
-                        vision.findSample(sample),
+                        vision.findSample(sample, (sample) -> (
+                            sample.getFirst() + follower.getPose().getX() > (49 + GameMap.RobotWidth/2) &&
+                            sample.getFirst() + follower.getPose().getX() < (72 - GameMap.RobotWidth/2)
+                        )
+                        ),
                         foreverAction(follower::update)
                 ),
                 futureAction(() -> reachSample(sample.pose, intake, follower)),
@@ -71,7 +72,10 @@ public class AutoRed extends LinearOpMode {
     }
     @Override
     public void runOpMode() {
-        vision = new Vision(telemetry, hardwareMap, new Camera.Colors[]{Camera.Colors.RED, Camera.Colors.YELLOW});
+        vision = new Vision(telemetry, hardwareMap);
+        SampleLocationPipeline.AllowedColors.yellow = true;
+        SampleLocationPipeline.AllowedColors.blue = true;
+        SampleLocationPipeline.AllowedColors.red = false;
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         final Pose start_pose = new Pose(GameMap.RobotWidth/2, 120.5 - GameMap.RobotLength / 2, -PI/2);
         follower.setStartingPose(start_pose);
@@ -80,7 +84,7 @@ public class AutoRed extends LinearOpMode {
         final Pose score_pose = new Pose(18.75,144-18.75, -PI / 4);
         final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1.5, inner_sample.getY() + 1.5, 0);
         final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1.5, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX() - 2.5 , inner_sample.getY() + 21, 0.7);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX() - 2 , inner_sample.getY() + 22, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 100, -PI/2);
         final Vector outer_offset = new Vector(Intake.MaxDistance + 0.5, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
@@ -108,17 +112,15 @@ public class AutoRed extends LinearOpMode {
         Action path = new SequentialAction(
             // Preload
             new ParallelAction(
-                moveLineAction(follower, start_pose, score_pose, 2, 0.04),
+                moveLineAction(follower, start_pose, score_pose, () -> follower.atPose(score_pose, 3, 3, 0.17)),
                 outtake.readySampleAction()
             ),
+            outtake.openClawAction(),
             new ParallelAction(
-                outtake.scoreAction(),
+                outtake.readyTransferAction(),
             // Inner
-                intake.readyGrabAction(Intake.MaxDistance - 0.5, 0)
-            ),
-            new ParallelAction(
-                outtake.slideWaitAction(),
-                moveLineAction(follower, score_pose, inner_grab_pose, 2, 0.04)
+                intake.readyGrabAction(Intake.MaxDistance - 0.5, 0),
+                moveLineAction(follower, score_pose, inner_grab_pose, () -> follower.atPose(score_pose, 3, 3, 0.04))
             ),
             intake.pickUpAction(),
             new ParallelAction(
@@ -126,7 +128,7 @@ public class AutoRed extends LinearOpMode {
                     RobotActions.fullTransferAction(intake, outtake),
                     outtake.readySampleAction()
                 ),
-                moveLineAction(follower, inner_grab_pose, score_pose, 2, 0.04)
+                moveLineAction(follower, inner_grab_pose, score_pose)
             ),
             new ParallelAction(
                 outtake.scoreAction(),
@@ -135,7 +137,7 @@ public class AutoRed extends LinearOpMode {
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
-                moveLineAction(follower, score_pose, center_grab_pose, 2, 0.04)
+                moveLineAction(follower, score_pose, center_grab_pose)
             ),
             intake.pickUpAction(),
             new ParallelAction(
@@ -143,7 +145,7 @@ public class AutoRed extends LinearOpMode {
                         RobotActions.fullTransferAction(intake, outtake),
                         outtake.readySampleAction()
                 ),
-                moveLineAction(follower, center_grab_pose, score_pose, 2, 0.04)
+                moveLineAction(follower, center_grab_pose, score_pose)
             ),
             new ParallelAction(
                 outtake.scoreAction(),
@@ -152,7 +154,7 @@ public class AutoRed extends LinearOpMode {
             ),
             new ParallelAction(
                 outtake.slideWaitAction(),
-                moveLineAction(follower, score_pose, outer_grab_pose, 2, 0.04)
+                moveLineAction(follower, score_pose, outer_grab_pose)
             ),
             intake.pickUpAction(),
             new ParallelAction(
@@ -160,7 +162,7 @@ public class AutoRed extends LinearOpMode {
                         RobotActions.fullTransferAction(intake, outtake),
                         outtake.readySampleAction()
                 ),
-                moveLineAction(follower, outer_grab_pose, score_pose, 2, 0.04)
+                moveLineAction(follower, outer_grab_pose, score_pose)
             ),
             outtake.scoreAction(),
             new ParallelAction(
@@ -174,7 +176,6 @@ public class AutoRed extends LinearOpMode {
                         ))
                         .setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
                         .build()
-                        , 2, 0.04
                 )
             ),
             new RaceAction(
@@ -184,13 +185,13 @@ public class AutoRed extends LinearOpMode {
             new InstantAction(() -> found_sample = false),
             new ParallelAction(
                 outtake.readySampleAction(),
-                pathAction(follower, sub_to_score, 2, 0.04)
+                pathAction(follower, sub_to_score)
             ),
             outtake.scoreAction(),
             new ParallelAction(
                     outtake.slideWaitAction(),
             // SUB 2
-                    pathAction(follower, score_to_sub, 2, 0.04)
+                    pathAction(follower, score_to_sub)
             ),
             new RaceAction(
                 triggerAction(() -> found_sample),
@@ -199,7 +200,7 @@ public class AutoRed extends LinearOpMode {
             new InstantAction(() -> found_sample = false),
             new ParallelAction(
                     outtake.readySampleAction(),
-                    pathAction(follower, sub_to_score, 2, 0.04)
+                    pathAction(follower, sub_to_score)
             ),
             outtake.fullScoreAction()
         );

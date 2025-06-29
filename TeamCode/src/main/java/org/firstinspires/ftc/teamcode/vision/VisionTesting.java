@@ -58,9 +58,10 @@ public class VisionTesting extends LinearOpMode {
         outtake = new Outtake(hardwareMap);
         vision = new Vision(
                 telemetry,
-                hardwareMap,
-                new Camera.Colors[]{Camera.Colors.BLUE, Camera.Colors.YELLOW, Camera.Colors.RED}
+                hardwareMap
         );
+        SampleLocationPipeline.AllowedColors.yellow = true;
+        SampleLocationPipeline.AllowedColors.blue = true;
         outtake.readyTransfer();
 
         waitForStart();

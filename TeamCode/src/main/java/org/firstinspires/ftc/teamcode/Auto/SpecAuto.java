@@ -132,9 +132,9 @@ public class SpecAuto extends LinearOpMode {
             new ParallelAction(
                 outtake.readyTransferAction(),
                 new SequentialAction(
-                        pathAction(follower, sweep1, 2, 0.04),
-                        pathAction(follower, sweep2, 2, 0.04),
-                        pathAction(follower, sweep3, 2, 0.04)
+                        pathAction(follower, sweep1),
+                        pathAction(follower, sweep2),
+                        pathAction(follower, sweep3)
                 )
             )
         );

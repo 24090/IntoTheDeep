@@ -71,8 +71,7 @@ public class Controlled extends LinearOpMode{
                             moveLineAction(
                                 follower,
                                 follower.getPose(),
-                                new Pose(19.25,144-19.25, -PI / 4),
-                                2, 0.04
+                                new Pose(19.25,144-19.25, -PI / 4)
                             ),
                             outtake.readySampleAction()
                         )
@@ -125,6 +124,7 @@ public class Controlled extends LinearOpMode{
                         new RaceAction(
                                 foreverAction(movement::run),
                                 foreverAction(outtake::backgroundIter),
+                                foreverAction(intake.slide::movementLoop),
                                 intake.pickUpAction()
                         )
                 );
