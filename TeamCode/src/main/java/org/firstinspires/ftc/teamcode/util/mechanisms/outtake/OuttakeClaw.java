@@ -78,4 +78,10 @@ public class OuttakeClaw {
         right_servo.setPosition(RIGHT_SPECIMEN);
         wrist_servo.setPosition(WRIST_SPECIMEN);
     }
+    public void disableClaw(){
+        claw_servo.setPwmDisable();
+        left_servo.setPwmDisable();
+        right_servo.setPwmDisable();
+        wrist_servo.setPwmDisable();
+    }
 }

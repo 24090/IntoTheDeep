@@ -148,4 +148,11 @@ public class Claw {
         }
         return ColorSensorOut.NONE;
     }
+    public void disableClaw(){
+        claw_servo.setPwmDisable();
+        wrist_servo_left.setPwmDisable();
+        wrist_servo_right.setPwmDisable();
+        elbow_servo_right.setPwmDisable();
+        elbow_servo_left.setPwmDisable();
+    }
 }
