@@ -108,7 +108,8 @@ public class SpecAuto extends LinearOpMode {
             false
                 )),
                 triggerAction(()->(follower.getCurrentTValue()>0.3)&&(follower.getVelocityMagnitude()<2)
-                ),  outtake.readySpecimenAction()
+                ),
+                outtake.readySpecimenAction()
             ),
             new InstantAction(outtake.claw::open),
             new InstantAction(follower::breakFollowing),
@@ -171,7 +172,6 @@ public class SpecAuto extends LinearOpMode {
             ),
 
             new ParallelAction(
-                intake.readyGrabAction(Intake.MinDistance, 0),
                 outtake.readySpecTransferAction(),
                 pathAction(follower, follower.pathBuilder().addPath(new Path(new BezierCurve(
                         new Pose(48 - GameMap.RobotLength/2, 72, -PI),
@@ -181,6 +181,7 @@ public class SpecAuto extends LinearOpMode {
                 )
             ),
             // 4
+            intake.readyGrabAction(Intake.MinDistance, 0),
             intake.pickUpAction(),
             new InstantAction(outtake.claw::open),
             new ParallelAction(
@@ -210,6 +211,7 @@ public class SpecAuto extends LinearOpMode {
             path,
             foreverAction(bulkreads::readManual),
             foreverAction(follower::update),
+            foreverAction(intake.slide::movementLoop),
             triggerAction(()->!opModeIsActive())
         ));
         PoseStorer.pose = follower.getPose();

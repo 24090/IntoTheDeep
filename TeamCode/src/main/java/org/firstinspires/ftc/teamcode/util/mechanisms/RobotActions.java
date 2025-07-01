@@ -76,7 +76,8 @@ public class RobotActions {
         return new SequentialAction(
             new ParallelAction(
                 intake.firmReadyTransferAction(),
-                outtake.readySpecTransferAction()
+                outtake.readySpecTransferAction(),
+                new InstantAction(outtake.claw::open)
             ),
             new InstantAction(outtake.claw::grab),
             new SleepAction(0.3),
