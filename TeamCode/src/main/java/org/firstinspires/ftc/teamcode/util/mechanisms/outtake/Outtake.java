@@ -21,8 +21,7 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.OuttakeSlide;
 public class Outtake {
     public static int HANG_UP = 1600;
     public static int HANG_DOWN = 1300;
-    public static int SCORE_SPECIMEN = 1250;
-    public static int READY_SPECIMEN = 500;
+    public static int READY_SPECIMEN = 175;
     public final MirrorMotor mirror_slide;
     public OuttakeSlide slide;
     public OuttakeClaw claw;
@@ -45,14 +44,17 @@ public class Outtake {
         slide.down();
         claw.toTransferPos();
     }
+
+    public void readySpecTransfer(){
+        slide.down();
+        claw.toSpecTransferPos();
+    }
+
     public void readySample(){
         slide.up();
         claw.toSamplePos();
     }
-//    public void standby(){
-//        slide.down();
-//        claw.toStandbyPos();
-//    }
+
     public void readyHang(){
         claw.toTransferPos();
         slide.goTo(HANG_UP);
@@ -67,19 +69,6 @@ public class Outtake {
     public void readySpecimen(){
         slide.goTo(READY_SPECIMEN);
         claw.readySpecimen();
-    }
-    public Action scoreSpecimenAction(){
-        return new SequentialAction(
-                new InstantAction(() -> slide.goTo(SCORE_SPECIMEN)),
-                new RaceAction(
-                        foreverAction(this::backgroundIter),
-                        triggerAction(() -> this.slide.within_error)
-                ),
-                new SleepAction(0.5),
-                new InstantAction(claw::toTransferPos),
-                new InstantAction(slide::down)
-        );
-
     }
 
     public Action slideWaitAction(){
@@ -101,6 +90,13 @@ public class Outtake {
     public Action readyTransferAction(){
         return new SequentialAction(
                 new InstantAction(this::readyTransfer),
+                slideWaitAction(),
+                new InstantAction(this::openClawAction)
+        );
+    }
+    public Action readySpecTransferAction(){
+        return new SequentialAction(
+                new InstantAction(this::readySpecTransfer),
                 slideWaitAction(),
                 new InstantAction(this::openClawAction)
         );

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 @Config
 public class Sweeper {
-    public static double in_pos = 0.25;
+    public static double in_pos = 0.38;
     public static double out_pos = 0.55;
 
     ServoImplEx servo;

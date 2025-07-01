@@ -3,14 +3,12 @@ package org.firstinspires.ftc.teamcode.controlled;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
-import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.firmFullTransferAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.specFullTransferAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.fullTransferAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.moveLineAction;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.pedropathing.follower.Follower;
@@ -24,8 +22,6 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
-
-import java.util.function.Supplier;
 
 /**
  * TODO:
@@ -111,7 +107,7 @@ public class Controlled extends LinearOpMode{
                 runBlocking(
                     new RaceAction(
                         foreverAction(movement::run),
-                        firmFullTransferAction(intake, outtake)
+                        specFullTransferAction(intake, outtake)
                     )
                 );
             }

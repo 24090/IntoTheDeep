@@ -80,7 +80,7 @@ public class Vision {
             } catch(NoSuchElementException e) {
                 return true;
             }
-            out.pose = new Pose(sample_triple.getSecond(), sample_triple.getFirst() + 1.5, sample_triple.getThird());
+            out.pose = new Pose(sample_triple.getSecond(), sample_triple.getFirst()+0.75, sample_triple.getThird());
             telemetry_packet.addLine("Sample X" + sample_triple.getFirst());
             telemetry_packet.addLine("Sample Y" + (sample_triple.getSecond()));
             telemetry_packet.addLine("Sample Heading" + sample_triple.getThird());

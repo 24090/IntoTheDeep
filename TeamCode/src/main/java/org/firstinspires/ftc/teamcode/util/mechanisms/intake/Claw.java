@@ -28,29 +28,29 @@ public class Claw {
         NONE
     }
     public double turret_angle;
-    public static double CLAW_OPEN = 0.25;
-    public static double CLAW_LOOSE = 0.06;
-    public static double CLAW_GRAB = 0;
+    public static double CLAW_OPEN = 0.55;
+    public static double CLAW_LOOSE = 0.25;
+    public static double CLAW_GRAB = 0.25;
 
     public static double ELBOW_LEFT_IN = 0.47;
     public static double ELBOW_LEFT_READY = 0.66;
-    public static double ELBOW_LEFT_OUT = 0.83;
+    public static double ELBOW_LEFT_OUT = 0.77;
 
     public static double ELBOW_RIGHT_IN = 0.82;
     public static double ELBOW_RIGHT_READY = 0.75;
-    public static double ELBOW_RIGHT_OUT = 0.6;
+    public static double ELBOW_RIGHT_OUT = 0.46;
 
     public static double WRIST_LEFT_IN = 1;
-    public static double WRIST_LEFT_OUT_0 = 0.1;
-    public static double WRIST_LEFT_OUT_90 = 0.58;
-    public static double WRIST_LEFT_READY_0 = 0.45;
-    public static double WRIST_LEFT_READY_90 = 0.75;
+    public static double WRIST_LEFT_OUT_0 = 0;
+    public static double WRIST_LEFT_OUT_90 = 0.53;
+    public static double WRIST_LEFT_READY_0 = 0.35;
+    public static double WRIST_LEFT_READY_90 = 0.65;
 
     public static double WRIST_RIGHT_IN = 0;
-    public static double WRIST_RIGHT_OUT_0 = 0.55;
-    public static double WRIST_RIGHT_OUT_90 = 0.84;
-    public static double WRIST_RIGHT_READY_0 = 0.49;
-    public static double WRIST_RIGHT_READY_90 = 0.67;
+    public static double WRIST_RIGHT_OUT_0 = 0.65;
+    public static double WRIST_RIGHT_OUT_90 = 0.89;
+    public static double WRIST_RIGHT_READY_0 = 0.59;
+    public static double WRIST_RIGHT_READY_90 = 0.77;
 
     public Claw(HardwareMap hardwareMap){
         claw_servo = hardwareMap.get(ServoImplEx.class, "claw_servo");
