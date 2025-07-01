@@ -67,7 +67,7 @@ public class AutoRed extends LinearOpMode {
                         foreverAction(follower::update)
                 ),
                 new InstantAction(() ->
-                        found_sample = intake.claw.getSensedColor() != Claw.ColorSensorOut.NONE
+                        found_sample = (intake.claw.getSensedColor() == Claw.ColorSensorOut.BLUE || intake.claw.getSensedColor() == Claw.ColorSensorOut.YELLOW)
                 )
         );
     }
@@ -83,9 +83,9 @@ public class AutoRed extends LinearOpMode {
 
         final Pose inner_sample = new Pose(48-1.75, 121.75, 0);
         final Pose score_pose = new Pose(18.75,144-18.75, -PI / 4);
-        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1, inner_sample.getY(), 0);
+        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1, inner_sample.getY() + 1.5, 0);
         final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX() - 1.5 , inner_sample.getY() + 20, 0.7);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX() - 1.5 , inner_sample.getY() + 20.75, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 100, -PI/2);
         final Vector outer_offset = new Vector(Intake.MaxDistance + 0.5, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));

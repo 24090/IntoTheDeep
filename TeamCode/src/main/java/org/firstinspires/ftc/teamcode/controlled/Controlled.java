@@ -47,7 +47,7 @@ public class Controlled extends LinearOpMode{
         Runnable movement = () -> {
             follower.setTeleOpMovementVectors(
                     -gamepad1.left_stick_y - gamepad2.left_stick_y / 7,
-                    -gamepad1.left_stick_x - gamepad2.left_stick_x / 7,
+                    -gamepad1.left_stick_x - gamepad2.left_stick_x / 4,
                     -gamepad1.right_stick_x - gamepad2.right_stick_x / 7
             );
             follower.update();

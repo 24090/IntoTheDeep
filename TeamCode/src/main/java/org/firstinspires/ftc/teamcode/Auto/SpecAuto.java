@@ -110,6 +110,7 @@ public class SpecAuto extends LinearOpMode {
                 triggerAction(()->(follower.getCurrentTValue()>0.3)&&(follower.getVelocityMagnitude()<2)
                 ),  outtake.readySpecimenAction()
             ),
+            new InstantAction(outtake.claw::open),
             new InstantAction(follower::breakFollowing),
             // 1 Move
             new ParallelAction(
@@ -132,11 +133,14 @@ public class SpecAuto extends LinearOpMode {
                     specFullTransferAction(intake, outtake),
                     outtake.readySpecimenAction()
                 ),
-                pathAction(follower, follower.pathBuilder().addPath(new Path(new BezierCurve(
-                    new Pose(20, 12, -PI),
-                    new Pose(0, 72 - GameMap.RobotWidth/2, -PI),
-                    new Pose(48 - GameMap.RobotLength/2, 72, -PI)
-                ))).setConstantHeadingInterpolation(-PI).build())
+                new SequentialAction(
+                    new SleepAction(1),
+                    pathAction(follower, follower.pathBuilder().addPath(new Path(new BezierCurve(
+                            new Pose(24, 12 - GameMap.RobotLength/2, -PI),
+                            new Pose(0, 72 - GameMap.RobotWidth/2, -PI),
+                            new Pose(48 - GameMap.RobotLength/2, 72, -PI)
+                    ))).setConstantHeadingInterpolation(-PI).build())
+                )
             ),
             new ParallelAction(
                 outtake.readySpecTransferAction(),
@@ -148,19 +152,22 @@ public class SpecAuto extends LinearOpMode {
                 )
             ),
             // 3
+            new InstantAction(outtake.claw::open),
             intake.readyGrabAction(Intake.MinDistance, 0),
             intake.pickUpAction(),
-            new InstantAction(outtake.claw::open),
             new ParallelAction(
-                    new SequentialAction(
-                        specFullTransferAction(intake, outtake),
-                        outtake.readySpecimenAction()
-                    ),
+                new SequentialAction(
+                    specFullTransferAction(intake, outtake),
+                    outtake.readySpecimenAction()
+                ),
+                new SequentialAction(
+                    new SleepAction(1),
                     pathAction(follower, follower.pathBuilder().addPath(new Path(new BezierCurve(
                             new Pose(24, 12 - GameMap.RobotLength/2, -PI),
                             new Pose(0, 72 - GameMap.RobotWidth/2, -PI),
                             new Pose(48 - GameMap.RobotLength/2, 72, -PI)
                     ))).setConstantHeadingInterpolation(-PI).build())
+                )
             ),
 
             new ParallelAction(
@@ -177,15 +184,18 @@ public class SpecAuto extends LinearOpMode {
             intake.pickUpAction(),
             new InstantAction(outtake.claw::open),
             new ParallelAction(
-                    new SequentialAction(
-                            specFullTransferAction(intake, outtake),
-                            outtake.readySpecimenAction()
-                    ),
-                    pathAction(follower, follower.pathBuilder().addPath(new Path(new BezierCurve(
-                            new Pose(24, 12 - GameMap.RobotLength/2, -PI),
-                            new Pose(0, 72 - GameMap.RobotWidth/2, -PI),
-                            new Pose(48 - GameMap.RobotLength/2, 72 - GameMap.RobotWidth/2, -PI)
-                    ))).setConstantHeadingInterpolation(-PI).build())
+                new SequentialAction(
+                        specFullTransferAction(intake, outtake),
+                        outtake.readySpecimenAction()
+                ),
+                new SequentialAction(
+                        new SleepAction(1),
+                        pathAction(follower, follower.pathBuilder().addPath(new Path(new BezierCurve(
+                                new Pose(24, 12 - GameMap.RobotLength/2, -PI),
+                                new Pose(0, 72 - GameMap.RobotWidth/2, -PI),
+                                new Pose(48 - GameMap.RobotLength/2, 72, -PI)
+                        ))).setConstantHeadingInterpolation(-PI).build())
+                )
             )
         );
         BulkReads bulkreads = new BulkReads(hardwareMap);

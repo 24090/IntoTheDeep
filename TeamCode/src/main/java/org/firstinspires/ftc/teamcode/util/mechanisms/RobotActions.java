@@ -39,23 +39,24 @@ public class RobotActions {
                             new Point(follower.getPose()),
                             target_point
                         )))
-                        .setZeroPowerAccelerationMultiplier(6)
+                        .setZeroPowerAccelerationMultiplier(5)
                         .setConstantHeadingInterpolation(follower.getPose().getHeading())
                         .build(),
                         true
                     )
                 ),
-                new ParallelAction(
-                        triggerAction(()->(
-                            !follower.isBusy() &&
-                            follower.atPoint(target_point,1.5, 1.5)
-                        )),
-                        intake.readyGrabAction(
-                                intake.slide.trimIn(relative_sample.getX()),
-                                relative_sample.getHeading() + PI/2
-                        )
+                new InstantAction(() ->{
+                        intake.claw.turret_angle = relative_sample.getHeading() + PI/2;
+                        intake.readyGrab(intake.slide.trimIn(relative_sample.getX()));
+                }),
+                new RaceAction(
+                    foreverAction(intake.slide::movementLoop),
+                    new ParallelAction(triggerAction(()->(
+                        !follower.isBusy() &&
+                        follower.atPoint(target_point,1, 1) &&
+                        intake.slide.within_error
+                    )))
                 )
-
             )
         );
     }
@@ -63,7 +64,8 @@ public class RobotActions {
         return new SequentialAction(
                 new ParallelAction(
                         intake.readyTransferAction(),
-                        outtake.readyTransferAction()
+                        outtake.readyTransferAction(),
+                        new InstantAction(outtake.claw::open)
                 ),
                 new InstantAction(outtake.claw::grab),
                 new SleepAction(0.3),
