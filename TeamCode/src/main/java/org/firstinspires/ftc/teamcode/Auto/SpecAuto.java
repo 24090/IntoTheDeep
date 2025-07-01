@@ -126,6 +126,7 @@ public class SpecAuto extends LinearOpMode {
             // 2
             intake.readyGrabAction(Intake.MinDistance, 0),
             intake.pickUpAction(),
+            new InstantAction(outtake.claw::open),
             new ParallelAction(
                 new SequentialAction(
                     specFullTransferAction(intake, outtake),
@@ -149,6 +150,7 @@ public class SpecAuto extends LinearOpMode {
             // 3
             intake.readyGrabAction(Intake.MinDistance, 0),
             intake.pickUpAction(),
+            new InstantAction(outtake.claw::open),
             new ParallelAction(
                     new SequentialAction(
                         specFullTransferAction(intake, outtake),
@@ -173,6 +175,7 @@ public class SpecAuto extends LinearOpMode {
             ),
             // 4
             intake.pickUpAction(),
+            new InstantAction(outtake.claw::open),
             new ParallelAction(
                     new SequentialAction(
                             specFullTransferAction(intake, outtake),

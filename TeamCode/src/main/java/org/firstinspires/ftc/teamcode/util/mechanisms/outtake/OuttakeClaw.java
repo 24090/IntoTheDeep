@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.teamcode.vision.Camera;
+
 @Config
 public class OuttakeClaw {
     ServoImplEx claw_servo;
@@ -27,7 +29,6 @@ public class OuttakeClaw {
     public static double WRIST_SAMPLE = 0.35;
 
     public static double CLAW_OPEN = 0.15;
-    public static double CLAW_MOVE = 0.35;
     public static double CLAW_CLOSED = 0.45;
 
     public OuttakeClaw(HardwareMap hardwareMap){
@@ -61,14 +62,14 @@ public class OuttakeClaw {
         left_servo.setPosition(LEFT_TRANSFER);
         right_servo.setPosition(RIGHT_TRANSFER);
         wrist_servo.setPosition(WRIST_TRANSFER);
-        claw_servo.setPosition(CLAW_MOVE);
+        claw_servo.setPosition(CLAW_CLOSED);
     }
 
     public void toSpecTransferPos(){
         left_servo.setPosition(LEFT_SPECIMEN_TRANSFER);
         right_servo.setPosition(RIGHT_SPECIMEN_TRANSFER);
         wrist_servo.setPosition(WRIST_SPECIMEN_TRANSFER);
-        claw_servo.setPosition(CLAW_MOVE);
+        claw_servo.setPosition(CLAW_CLOSED);
     }
 
     public void toSamplePos(){

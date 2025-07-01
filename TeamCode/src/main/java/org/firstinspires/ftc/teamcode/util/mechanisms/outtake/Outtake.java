@@ -90,15 +90,13 @@ public class Outtake {
     public Action readyTransferAction(){
         return new SequentialAction(
                 new InstantAction(this::readyTransfer),
-                slideWaitAction(),
-                new InstantAction(this::openClawAction)
+                slideWaitAction()
         );
     }
     public Action readySpecTransferAction(){
         return new SequentialAction(
                 new InstantAction(this::readySpecTransfer),
-                slideWaitAction(),
-                new InstantAction(this::openClawAction)
+                slideWaitAction()
         );
     }
     public Action standbyAction(){

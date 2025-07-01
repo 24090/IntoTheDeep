@@ -75,9 +75,8 @@ public class Intake {
                                 new SleepAction(0.1)
                         ),
                         slide.loopUntilDone()
-                )
-
-
+                ),
+                new InstantAction(this.claw::open)
         );
     }
     public Action firmReadyTransferAction(){

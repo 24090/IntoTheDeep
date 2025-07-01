@@ -99,6 +99,7 @@ public class Controlled extends LinearOpMode{
                 intake.readyGrab(
                         Intake.MaxDistance
                 );
+                outtake.claw.open();
             }
             if (gamepad2.back && !old_sweep){
                 intake.sweeper.toggle();
@@ -132,10 +133,12 @@ public class Controlled extends LinearOpMode{
                 intake.claw.turret_angle = 0;
                 intake.claw.toReadyGrabPos(intake.claw.turret_angle);
                 intake.claw.wrist_ready();
+                outtake.claw.open();
             } else if (gamepad2.x){
                 intake.claw.turret_angle = PI/2;
                 intake.claw.toReadyGrabPos(intake.claw.turret_angle);
                 intake.claw.wrist_ready();
+                outtake.claw.open();
             }
             last_time = time;
             old_sweep = gamepad2.back;

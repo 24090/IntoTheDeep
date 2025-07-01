@@ -61,6 +61,7 @@ public class AutoRed extends LinearOpMode {
                 new RaceAction(
                         new SequentialAction(
                                 intake.pickUpAction(),
+                                new InstantAction(outtake.claw::open),
                                 fullTransferAction(intake, outtake)
                         ),
                         foreverAction(follower::update)
@@ -123,6 +124,7 @@ public class AutoRed extends LinearOpMode {
                 moveLineAction(follower, score_pose, inner_grab_pose)
             ),
             intake.pickUpAction(),
+            new InstantAction(outtake.claw::open),
             new ParallelAction(
                 new SequentialAction(
                     RobotActions.fullTransferAction(intake, outtake),
@@ -140,6 +142,7 @@ public class AutoRed extends LinearOpMode {
                 moveLineAction(follower, score_pose, center_grab_pose)
             ),
             intake.pickUpAction(),
+            new InstantAction(outtake.claw::open),
             new ParallelAction(
                 new SequentialAction(
                         RobotActions.fullTransferAction(intake, outtake),
@@ -157,6 +160,7 @@ public class AutoRed extends LinearOpMode {
                 moveLineAction(follower, score_pose, outer_grab_pose)
             ),
             intake.pickUpAction(),
+            new InstantAction(outtake.claw::open),
             new ParallelAction(
                 new SequentialAction(
                         RobotActions.fullTransferAction(intake, outtake),
