@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -51,16 +52,19 @@ public class AutoRed extends LinearOpMode {
         return new SequentialAction(
                 new RaceAction(
                         vision.findSample(sample, (sample) -> (
-                            sample.getFirst() + follower.getPose().getX() > (49 + GameMap.RobotWidth/2) &&
-                            sample.getFirst() + follower.getPose().getX() < (72 - GameMap.RobotWidth/2)
-                        )
-                        ),
+                            sample.getFirst() + follower.getPose().getX() > (47.5 + GameMap.RobotWidth/2) &&
+                            sample.getFirst() + follower.getPose().getX() < (72 - GameMap.RobotWidth/2) &&
+                            follower.getPose().getY() - sample.getSecond() < 86
+                        )),
                         foreverAction(follower::update)
                 ),
                 futureAction(() -> reachSample(sample.pose, intake, follower)),
                 new RaceAction(
                         new SequentialAction(
                                 intake.pickUpAction(),
+                                futureAction(() -> new SleepAction(
+                                    Math.abs((sample.pose.getHeading()%(PI) + PI)%(PI) - PI/2) < PI/4? 0.6: 0.3
+                                )),
                                 new InstantAction(outtake.claw::open),
                                 fullTransferAction(intake, outtake)
                         ),
@@ -83,9 +87,9 @@ public class AutoRed extends LinearOpMode {
 
         final Pose inner_sample = new Pose(48-1.75, 121.75, 0);
         final Pose score_pose = new Pose(18.75,144-18.75, -PI / 4);
-        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1, inner_sample.getY() + 1.5, 0);
-        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance - 1, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX() - 1.5 , inner_sample.getY() + 20.75, 0.7);
+        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0, 0);
+        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10, 0);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX() , inner_sample.getY() + 20, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 100, -PI/2);
         final Vector outer_offset = new Vector(Intake.MaxDistance + 0.5, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));

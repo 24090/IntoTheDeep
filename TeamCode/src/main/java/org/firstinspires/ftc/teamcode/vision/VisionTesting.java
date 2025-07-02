@@ -7,10 +7,13 @@ import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.fullTransferAction;
 import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.reachSample;
 
+import static java.lang.Math.PI;
+
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -39,8 +42,11 @@ public class VisionTesting extends LinearOpMode {
             futureAction(() -> reachSample(sample.pose, intake, follower)),
             new RaceAction(
                 new SequentialAction(
-                        intake.pickUpAction(),
-                        fullTransferAction(intake, outtake)
+                    intake.pickUpAction(),
+                    futureAction(() -> new SleepAction(
+                        Math.abs((sample.pose.getHeading()%(PI) + PI)%(PI)) < PI/4? 0.6: 0.3
+                    )),
+                    fullTransferAction(intake, outtake)
                 ),
                 foreverAction(follower::update)
             ),

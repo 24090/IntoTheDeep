@@ -68,11 +68,9 @@ public class Intake {
                 new InstantAction(this::readyTransfer),
                 new ParallelAction(
                         new SequentialAction(
-                                futureAction(() -> new SleepAction(
-                                    Math.abs((claw.turret_angle%(PI) + PI)%(PI) - PI/2) < PI/4? 0.8: 0.4
-                                )),
+                                new SleepAction(0.4),
                                 new InstantAction(this.claw::grab),
-                                new SleepAction(0.1)
+                                new SleepAction(0.2)
                         ),
                         slide.loopUntilDone()
                 ),
