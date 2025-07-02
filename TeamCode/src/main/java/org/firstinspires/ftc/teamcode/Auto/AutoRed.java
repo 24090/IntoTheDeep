@@ -19,6 +19,7 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
+import com.pedropathing.pathgen.BezierPoint;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.pathgen.Vector;
@@ -50,29 +51,45 @@ public class AutoRed extends LinearOpMode {
     boolean found_sample = false;
     Action getSampleAction(){
         return new SequentialAction(
-                new RaceAction(
-                        vision.findSample(sample, (sample) -> (
-                            sample.getFirst() + follower.getPose().getX() > (47.5 + GameMap.RobotWidth/2) &&
-                            sample.getFirst() + follower.getPose().getX() < (72 - GameMap.RobotWidth/2) &&
-                            follower.getPose().getY() - sample.getSecond() < 86
-                        )),
-                        foreverAction(follower::update)
-                ),
-                futureAction(() -> reachSample(sample.pose, intake, follower)),
-                new RaceAction(
-                        new SequentialAction(
-                                intake.pickUpAction(),
-                                futureAction(() -> new SleepAction(
-                                    Math.abs((sample.pose.getHeading()%(PI) + PI)%(PI) - PI/2) < PI/4? 0.6: 0.3
-                                )),
-                                new InstantAction(outtake.claw::open),
-                                fullTransferAction(intake, outtake)
-                        ),
-                        foreverAction(follower::update)
-                ),
-                new InstantAction(() ->
-                        found_sample = (intake.claw.getSensedColor() == Claw.ColorSensorOut.BLUE || intake.claw.getSensedColor() == Claw.ColorSensorOut.YELLOW)
-                )
+            new RaceAction(
+                vision.findSample(sample, (sample) -> (
+                    sample.getFirst() + follower.getPose().getX() > (46.5 + GameMap.RobotWidth/2) &&
+                    follower.getPose().getY() - sample.getSecond() < 86
+                )),
+                foreverAction(() ->new SequentialAction(
+                    new SleepAction(2),
+                    new InstantAction(intake.sweeper::moveOut),
+                    new SleepAction(0.5),
+                    new InstantAction(intake.sweeper::moveIn),
+                    new SleepAction(1.5),
+                    moveLineAction(
+                        follower,
+                        follower.getPose(),
+                        new Pose(
+                            follower.getPose().getX(),
+                            follower.getPose().getY() + GameMap.RobotWidth/2,
+                            follower.getPose().getHeading())
+                    ),
+                    new SleepAction(2),
+                )),
+                foreverAction(follower::update)
+            ),
+            new InstantAction(intake.sweeper::moveIn);
+            futureAction(() -> reachSample(sample.pose, intake, follower)),
+            new RaceAction(
+                    new SequentialAction(
+                            intake.pickUpAction(),
+                            futureAction(() -> new SleepAction(
+                                Math.abs((sample.pose.getHeading()%(PI) + PI)%(PI) - PI/2) < PI/4? 0.6: 0.3
+                            )),
+                            new InstantAction(outtake.claw::open),
+                            fullTransferAction(intake, outtake)
+                    ),
+                    foreverAction(follower::update)
+            ),
+            new InstantAction(() ->
+                    found_sample = (intake.claw.getSensedColor() == Claw.ColorSensorOut.BLUE || intake.claw.getSensedColor() == Claw.ColorSensorOut.YELLOW)
+            )
         );
     }
     @Override
@@ -87,16 +104,16 @@ public class AutoRed extends LinearOpMode {
 
         final Pose inner_sample = new Pose(48-1.75, 121.75, 0);
         final Pose score_pose = new Pose(18.75,144-18.75, -PI / 4);
-        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0, 0);
+        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0.5, 0);
         final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX() , inner_sample.getY() + 20, 0.7);
-        final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 100, -PI/2);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX() , inner_sample.getY() + 20.5, 0.7);
+        final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 88 - GameMap.RobotLength/2, -PI/2);
         final Vector outer_offset = new Vector(Intake.MaxDistance + 0.5, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
         final PathChain score_to_sub = follower.pathBuilder()
             .addPath(new BezierCurve(
                 new Point(score_pose),
-                new Point(72, 124),
+                new Point(submersible_pose.getX(), score_pose.getY() + 30),
                 new Point(submersible_pose)
             ))
             .setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
@@ -104,7 +121,7 @@ public class AutoRed extends LinearOpMode {
         final PathChain sub_to_score = follower.pathBuilder()
             .addPath(new BezierCurve(
                 new Point(submersible_pose),
-                new Point(72, 124),
+                new Point(submersible_pose.getX(), score_pose.getY()),
                 new Point(score_pose)
             )).setLinearHeadingInterpolation(submersible_pose.getHeading(), score_pose.getHeading())
         .build();
@@ -173,18 +190,13 @@ public class AutoRed extends LinearOpMode {
                 moveLineAction(follower, outer_grab_pose, score_pose)
             ),
             outtake.scoreAction(),
-            new ParallelAction(
-                outtake.slideWaitAction(),
-                // SUB 1
-                pathAction(follower, follower.pathBuilder()
-                        .addPath(new BezierCurve(
-                                new Point(score_pose),
-                                new Point(96, 124),
-                                new Point(submersible_pose)
-                        ))
-                        .setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
-                        .build()
-                )
+            new RaceAction(
+                new ParallelAction(
+                    outtake.slideWaitAction(),
+                    // SUB 1
+                    pathAction(follower, score_to_sub)
+                ),
+                foreverAction(intake.slide::movementLoop)
             ),
             new RaceAction(
                 triggerAction(() -> found_sample),
@@ -192,14 +204,20 @@ public class AutoRed extends LinearOpMode {
             ),
             new InstantAction(() -> found_sample = false),
             new ParallelAction(
-                outtake.readySampleAction(),
+                new SequentialAction(
+                    new SleepAction(1),
+                    outtake.readySampleAction()
+                ),
                 pathAction(follower, sub_to_score)
             ),
             outtake.scoreAction(),
-            new ParallelAction(
+            new RaceAction(
+                new ParallelAction(
                     outtake.slideWaitAction(),
-            // SUB 2
+                    // SUB 2
                     pathAction(follower, score_to_sub)
+                ),
+                foreverAction(intake.slide::movementLoop)
             ),
             new RaceAction(
                 triggerAction(() -> found_sample),
@@ -207,8 +225,11 @@ public class AutoRed extends LinearOpMode {
             ),
             new InstantAction(() -> found_sample = false),
             new ParallelAction(
-                    outtake.readySampleAction(),
-                    pathAction(follower, sub_to_score)
+                new SequentialAction(
+                    new SleepAction(1),
+                    outtake.readySampleAction()
+                ),
+                pathAction(follower, sub_to_score)
             ),
             outtake.fullScoreAction()
         );
