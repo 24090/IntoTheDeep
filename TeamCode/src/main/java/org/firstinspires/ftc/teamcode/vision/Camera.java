@@ -10,12 +10,12 @@ import org.opencv.core.Scalar;
 public class Camera {
 	@Config
 	static class ColorValues {
-		public static Scalar red_min = new Scalar(0, 150, 80);
+		public static Scalar red_min = new Scalar(40, 160, 100);
 		public static Scalar red_max = new Scalar(255, 255, 255);
-		public static Scalar blue_min =  new Scalar(0, 0, 140);
-		public static Scalar blue_max = new Scalar(255, 255, 255);
+		public static Scalar blue_min =  new Scalar(20, 50, 160);
+		public static Scalar blue_max = new Scalar(250, 200, 255);
 		public static Scalar yellow_min =  new Scalar(0, 0, 0);
-		public static Scalar yellow_max = new Scalar(255, 200, 95);
+		public static Scalar yellow_max = new Scalar(250, 230, 100);
 	}
 	public static Mat projection_matrix = new Mat();
 	public static Mat reprojection_matrix = new Mat();

@@ -28,9 +28,9 @@ public class Claw {
         NONE
     }
     public double turret_angle;
-    public static double CLAW_OPEN = 0.55;
-    public static double CLAW_LOOSE = 0.25;
-    public static double CLAW_GRAB = 0.25;
+    public static double CLAW_OPEN = 0.82;
+    public static double CLAW_LOOSE = 0.54;
+    public static double CLAW_GRAB = 0.54;
 
     public static double ELBOW_LEFT_IN = 0.47;
     public static double ELBOW_LEFT_READY = 0.66;
@@ -134,16 +134,16 @@ public class Claw {
         int color_int =  color_sensor.getNormalizedColors().toColor();
         float[] hsv = new float[3];
         Color.colorToHSV(color_int, hsv);
-        if (hsv[1] < 0.65){
+        if (hsv[1] < 0.3){
             return ColorSensorOut.NONE;
         }
-        if (hsv[0] >= 5 && hsv[0] <= 35) {
+        if (hsv[0] <= 45 || hsv[0] > 290) {
             return ColorSensorOut.RED;
         }
-        if (hsv[0] >= 55 && hsv[0] <= 85) {
+        if (hsv[0] >= 45 && hsv[0] <= 160) {
             return ColorSensorOut.YELLOW;
         }
-        if (hsv[0] >= 200 && hsv[0] <= 250) {
+        if (hsv[0] >= 200 && hsv[0] <= 290) {
             return ColorSensorOut.BLUE;
         }
         return ColorSensorOut.NONE;

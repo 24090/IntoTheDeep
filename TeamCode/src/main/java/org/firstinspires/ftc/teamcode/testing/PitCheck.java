@@ -119,7 +119,7 @@ public class PitCheck extends LinearOpMode {
         // motors
         testAction(NullAction::new, "Make sure the motors are all screwed in and don't interfere with side plates"),
         // back pod
-        testAction(NullAction::new, "Make sure the back odo pod is in the right position")
+        testAction(NullAction::new, "Make sure the back odo pod is in the right position, and remember to run run and test motor directions, localization test, and vision testing")
         // pinpoint
         // CONTROLLERS
         ));

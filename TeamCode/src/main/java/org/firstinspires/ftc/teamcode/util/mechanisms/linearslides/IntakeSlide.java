@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 
 public class IntakeSlide extends LinearSlide {
-    public static final int MAX_EXTEND = 320;
+    public static final int MAX_EXTEND = 300;
     public static final int MIN_EXTEND = 0;
     /**
      * Class for using Intake Slide
@@ -27,7 +27,7 @@ public class IntakeSlide extends LinearSlide {
         goTo(pos, 20);
     }
     public void moveOut(){
-        goTo(320);
+        goTo(300);
     }
 
     public double powerFunction(){

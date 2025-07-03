@@ -89,8 +89,8 @@ public abstract class SampleAutoBase extends LinearOpMode {
                             follower,
                             follower.getPose(),
                             new Pose(
-                                follower.getPose().getX(),
-                                follower.getPose().getY() + GameMap.RobotWidth/2,
+                                follower.getPose().getX() + GameMap.RobotWidth/2,
+                                follower.getPose().getY(),
                                 follower.getPose().getHeading())
                         ),
                         new SleepAction(2)
@@ -118,6 +118,7 @@ public abstract class SampleAutoBase extends LinearOpMode {
     }
     @Override
     public void runOpMode() {
+        setParams();
         vision = new Vision(telemetry, hardwareMap);
         SampleLocationPipeline.AllowedColors.yellow = yellow;
         SampleLocationPipeline.AllowedColors.blue = blue;
@@ -130,8 +131,8 @@ public abstract class SampleAutoBase extends LinearOpMode {
         final Pose score_pose = new Pose(18.75,144-18.75, -PI / 4);
         final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0.5, 0);
         final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX() , inner_sample.getY() + 20.5, 0.7);
-        final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 88 - GameMap.RobotLength/2, -PI/2);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX() , inner_sample.getY() + 21.5, 0.7);
+        final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 88 + GameMap.RobotLength/2, -PI/2);
         final Vector outer_offset = new Vector(Intake.MaxDistance + 0.5, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
         final PathChain score_to_sub = follower.pathBuilder()
@@ -229,19 +230,23 @@ public abstract class SampleAutoBase extends LinearOpMode {
                 new InstantAction(() -> found_sample = false),
                 new ParallelAction(
                         new SequentialAction(
-                                new SleepAction(1),
+                                new SleepAction(2),
                                 outtake.readySampleAction()
                         ),
-                        pathAction(follower, sub_to_score)
+                        new RaceAction(
+                            pathAction(follower, sub_to_score, () -> !follower.isBusy()),
+                            foreverAction(()->{telemetry.addData("isBusy", follower.isBusy()); telemetry.update();})
+                        )
+
                 ),
                 outtake.scoreAction(),
                 new RaceAction(
-                        new ParallelAction(
-                                outtake.slideWaitAction(),
-                                // SUB 2
-                                pathAction(follower, score_to_sub)
-                        ),
-                        foreverAction(intake.slide::movementLoop)
+                    new ParallelAction(
+                        outtake.slideWaitAction(),
+                        // SUB 2
+                        pathAction(follower, score_to_sub)
+                    ),
+                    foreverAction(intake.slide::movementLoop)
                 ),
                 new RaceAction(
                         triggerAction(() -> found_sample),
@@ -249,11 +254,11 @@ public abstract class SampleAutoBase extends LinearOpMode {
                 ),
                 new InstantAction(() -> found_sample = false),
                 new ParallelAction(
-                        new SequentialAction(
-                                new SleepAction(1),
-                                outtake.readySampleAction()
-                        ),
-                        pathAction(follower, sub_to_score)
+                    new SequentialAction(
+                        new SleepAction(2),
+                        outtake.readySampleAction()
+                    ),
+                    pathAction(follower, sub_to_score)
                 ),
                 outtake.fullScoreAction()
         );
