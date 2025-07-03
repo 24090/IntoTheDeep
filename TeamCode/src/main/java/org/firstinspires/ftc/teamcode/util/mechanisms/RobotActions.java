@@ -62,10 +62,12 @@ public class RobotActions {
     }
     public static Action fullTransferAction(Intake intake, Outtake outtake){
         return new SequentialAction(
-                new ParallelAction(
-                        intake.readyTransferAction(),
-                        outtake.readyTransferAction(),
-                        new InstantAction(outtake.claw::open)
+                new RaceAction(
+                    new ParallelAction(
+                            intake.readyTransferAction(),
+                            outtake.readyTransferAction(),
+                            new InstantAction(outtake.claw::open)
+                    )
                 ),
                 new InstantAction(outtake.claw::grab),
                 new SleepAction(0.3),

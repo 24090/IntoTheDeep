@@ -9,8 +9,11 @@ import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.moveLi
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -87,12 +90,22 @@ public class Controlled extends LinearOpMode{
                 outtake.claw.open();
             }
             if (gamepad2.right_bumper){
-                runBlocking(
-                    new RaceAction(
-                        foreverAction(movement::run),
-                        fullTransferAction(intake, outtake)
+                runBlocking(new RaceAction(
+                    foreverAction(movement::run),
+                    new SequentialAction(
+                        new RaceAction(
+                            new ParallelAction(
+                                intake.readyTransferAction(),
+                                outtake.readyTransferAction(),
+                                new InstantAction(outtake.claw::open)
+                            ),
+                            triggerAction(() -> gamepad2.dpad_left)
+                        ),
+                        new InstantAction(outtake.claw::grab),
+                        new SleepAction(0.3),
+                        new InstantAction(intake.claw::open)
                     )
-                );
+                ));
             }
             if (gamepad2.right_stick_button){
                 intake.claw.turret_angle = 0;
