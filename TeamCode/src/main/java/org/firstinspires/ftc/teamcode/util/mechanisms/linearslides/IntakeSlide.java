@@ -36,6 +36,9 @@ public class IntakeSlide extends LinearSlide {
     }
 
     public void stop(){
+        if (target_pos < 10){
+            setMotorPower(-0.1);
+        }
         if (target_pos > 290) {
             setMotorPower(0.1 + 0.1 * (target_pos - getPosition())/20);
         } else {

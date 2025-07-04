@@ -101,15 +101,22 @@ public abstract class SampleAutoBase extends LinearOpMode {
             new InstantAction(intake.sweeper::moveIn),
         futureAction(() -> reachSample(sample.pose, intake, follower)),
                 new RaceAction(
-                        new SequentialAction(
-                                intake.pickUpAction(),
-                                futureAction(() -> new SleepAction(
-                                        Math.abs((sample.pose.getHeading()%(PI) + PI)%(PI) - PI/2) < PI/4? 0.6: 0.3
-                                )),
-                                new InstantAction(outtake.claw::open),
-                                fullTransferAction(intake, outtake)
-                        ),
-                        foreverAction(follower::update)
+                    new SequentialAction(
+                        intake.pickUpAction(),
+                        futureAction(() -> new SleepAction(
+                                Math.abs((sample.pose.getHeading()%(PI) + PI)%(PI) - PI/2) < PI/4? 0.6: 0.3
+                        )),
+                        new InstantAction(outtake.claw::open),
+                        new RaceAction(
+                            foreverAction(() -> {
+                                telemetry.addData("intake", intake.slide.getPosition());
+                                telemetry.addData("outtake", outtake.slide.getPosition());
+                                telemetry.update();
+                            }),
+                            fullTransferAction(intake, outtake)
+                        )
+                    ),
+                    foreverAction(follower::update)
                 ),
                 new InstantAction(() ->
                         found_sample = clawCheck()
@@ -128,28 +135,28 @@ public abstract class SampleAutoBase extends LinearOpMode {
         follower.setStartingPose(start_pose);
 
         final Pose inner_sample = new Pose(48-1.75, 121.75, 0);
-        final Pose score_pose = new Pose(18.75,144-18.75, -PI / 4);
-        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0.5, 0);
+        final Pose score_pose = new Pose(18.75 - 0.5,144-18.75 + 0.5, -PI / 4);
+        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0, 0);
         final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX() , inner_sample.getY() + 21.5, 0.7);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX() , inner_sample.getY() + 20, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 88 + GameMap.RobotLength/2, -PI/2);
         final Vector outer_offset = new Vector(Intake.MaxDistance + 0.5, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
         final PathChain score_to_sub = follower.pathBuilder()
-                .addPath(new BezierCurve(
-                        new Point(score_pose),
-                        new Point(submersible_pose.getX(), score_pose.getY() + 30),
-                        new Point(submersible_pose)
-                ))
-                .setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
-                .build();
+            .addPath(new BezierCurve(
+                new Point(score_pose),
+                new Point(submersible_pose.getX() - 15, score_pose.getY() + 30),
+                new Point(submersible_pose)
+            ))
+            .setLinearHeadingInterpolation(score_pose.getHeading(), submersible_pose.getHeading())
+            .build();
         final PathChain sub_to_score = follower.pathBuilder()
-                .addPath(new BezierCurve(
-                        new Point(submersible_pose),
-                        new Point(submersible_pose.getX(), score_pose.getY()),
-                        new Point(score_pose)
-                )).setLinearHeadingInterpolation(submersible_pose.getHeading(), score_pose.getHeading())
-                .build();
+            .addPath(new BezierCurve(
+                new Point(submersible_pose),
+                new Point(submersible_pose.getX(), score_pose.getY()),
+                new Point(score_pose)
+            )).setLinearHeadingInterpolation(submersible_pose.getHeading(), score_pose.getHeading())
+            .build();
         intake = new Intake(hardwareMap);
         outtake = new Outtake(hardwareMap);
         // real init
@@ -159,7 +166,7 @@ public abstract class SampleAutoBase extends LinearOpMode {
         Action path = new SequentialAction(
                 // Preload
                 new ParallelAction(
-                        moveLineAction(follower, start_pose, score_pose, () -> follower.atPose(score_pose, 3, 3, 0.17)),
+                        moveLineAction(follower, start_pose, new Pose(score_pose.getX(), score_pose.getY(), score_pose.getHeading()), () -> follower.atPose(score_pose, 4, 4, 0.17)),
                         outtake.readySampleAction()
                 ),
                 outtake.openClawAction(),
@@ -167,52 +174,73 @@ public abstract class SampleAutoBase extends LinearOpMode {
                         outtake.readyTransferAction(),
                         // Inner
                         intake.readyGrabAction(Intake.MaxDistance - 0.5, 0),
-                        moveLineAction(follower, score_pose, inner_grab_pose)
+                        moveLineAction(follower, score_pose, inner_grab_pose, () -> follower.atPose(inner_grab_pose, 1,1, 0.04) && follower.getVelocityMagnitude() < 2)
                 ),
                 intake.pickUpAction(),
                 new InstantAction(outtake.claw::open),
                 new ParallelAction(
-                        new SequentialAction(
-                                RobotActions.fullTransferAction(intake, outtake),
-                                outtake.readySampleAction()
+                    new SequentialAction(
+                        new RaceAction(
+                            foreverAction(() -> {
+                                telemetry.addData("intake", intake.slide.getPosition());
+                                telemetry.addData("outtake", outtake.slide.getPosition());
+                                telemetry.update();
+                            }),
+                            fullTransferAction(intake, outtake)
                         ),
-                        moveLineAction(follower, inner_grab_pose, score_pose)
+                        outtake.readySampleAction()
+                    ),
+                    moveLineAction(follower, inner_grab_pose, score_pose)
                 ),
                 new ParallelAction(
-                        outtake.scoreAction(),
-                        // Middle
-                        intake.readyGrabAction(Intake.MaxDistance - 0.5, 0)
+                    outtake.scoreAction(),
+                    // Middle
+                    intake.readyGrabAction(Intake.MaxDistance - 0.5, 0)
                 ),
                 new ParallelAction(
-                        outtake.slideWaitAction(),
-                        moveLineAction(follower, score_pose, center_grab_pose)
+                    outtake.slideWaitAction(),
+                    moveLineAction(follower, score_pose, center_grab_pose,  () -> follower.atPose(center_grab_pose, 1.5,1, 0.04))
                 ),
                 intake.pickUpAction(),
                 new InstantAction(outtake.claw::open),
                 new ParallelAction(
-                        new SequentialAction(
-                                RobotActions.fullTransferAction(intake, outtake),
-                                outtake.readySampleAction()
+                    new SequentialAction(
+                        new RaceAction(
+                            foreverAction(() -> {
+                                telemetry.addData("intake", intake.slide.getPosition());
+                                telemetry.addData("outtake", outtake.slide.getPosition());
+                                telemetry.update();
+                            }),
+                            fullTransferAction(intake, outtake)
                         ),
-                        moveLineAction(follower, center_grab_pose, score_pose)
+                        outtake.readySampleAction()
+                    ),
+                    moveLineAction(follower, center_grab_pose, score_pose)
                 ),
                 new ParallelAction(
-                        outtake.scoreAction(),
-                        // Outer
-                        intake.readyGrabAction(Intake.MaxDistance - 0.5, 0.7)
+                    outtake.scoreAction(),
+                    // Outer
+                    intake.readyGrabAction(Intake.MaxDistance - 0.5, 0.7)
                 ),
                 new ParallelAction(
-                        outtake.slideWaitAction(),
-                        moveLineAction(follower, score_pose, outer_grab_pose)
+                    outtake.slideWaitAction(),
+                    moveLineAction(follower, score_pose, outer_grab_pose,  () -> follower.atPose(outer_grab_pose, 1,1, 0.04)  && follower.getVelocityMagnitude() < 2)
                 ),
                 intake.pickUpAction(),
                 new InstantAction(outtake.claw::open),
                 new ParallelAction(
-                        new SequentialAction(
-                                RobotActions.fullTransferAction(intake, outtake),
-                                outtake.readySampleAction()
+                    new SequentialAction(
+                        new RaceAction(
+                            foreverAction(() -> {
+                                telemetry.addData("intake", intake.slide.getPosition());
+                                telemetry.addData("outtake", outtake.slide.getPosition());
+                                telemetry.update();
+                            }),
+                            fullTransferAction(intake, outtake)
                         ),
-                        moveLineAction(follower, outer_grab_pose, score_pose)
+                        outtake.readySampleAction()
+                    ),
+                    moveLineAction(follower, outer_grab_pose, score_pose)
                 ),
                 outtake.scoreAction(),
                 new RaceAction(

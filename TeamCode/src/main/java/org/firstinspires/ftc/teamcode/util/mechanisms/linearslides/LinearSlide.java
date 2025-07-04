@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.mechanisms.linearslides;
 
+import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 

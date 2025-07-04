@@ -45,44 +45,44 @@ public class VisionTesting extends LinearOpMode {
     }
     Action getSampleAction(){
         return new SequentialAction(
-                new RaceAction(
-                        vision.findSample(sample),
-                        foreverAction(() ->
-                                new SequentialAction(
-                                        new SleepAction(2),
-                                        new InstantAction(intake.sweeper::moveOut),
-                                        new SleepAction(0.5),
-                                        new InstantAction(intake.sweeper::moveIn),
-                                        new SleepAction(1.5),
-                                        moveLineAction(
-                                                follower,
-                                                follower.getPose(),
-                                                new Pose(
-                                                        follower.getPose().getX(),
-                                                        follower.getPose().getY() + GameMap.RobotWidth/2,
-                                                        follower.getPose().getHeading())
-                                        ),
-                                        new SleepAction(2)
-                                )
+            new RaceAction(
+                vision.findSample(sample),
+                foreverAction(() ->
+                    new SequentialAction(
+                        new SleepAction(2),
+                        new InstantAction(intake.sweeper::moveOut),
+                        new SleepAction(0.5),
+                        new InstantAction(intake.sweeper::moveIn),
+                        new SleepAction(1.5),
+                        moveLineAction(
+                            follower,
+                            follower.getPose(),
+                            new Pose(
+                                follower.getPose().getX(),
+                                follower.getPose().getY() + GameMap.RobotWidth/2,
+                                follower.getPose().getHeading())
                         ),
-                        foreverAction(follower::update)
+                        new SleepAction(2)
+                    )
                 ),
-                new InstantAction(intake.sweeper::moveIn),
-                futureAction(() -> reachSample(sample.pose, intake, follower)),
-                new RaceAction(
-                        new SequentialAction(
-                                intake.pickUpAction(),
-                                futureAction(() -> new SleepAction(
-                                        Math.abs((sample.pose.getHeading()%(PI) + PI)%(PI) - PI/2) < PI/4? 0.6: 0.3
-                                )),
-                                new InstantAction(outtake.claw::open),
-                                fullTransferAction(intake, outtake)
-                        ),
-                        foreverAction(follower::update)
+                foreverAction(follower::update)
+            ),
+            new InstantAction(intake.sweeper::moveIn),
+            futureAction(() -> reachSample(sample.pose, intake, follower)),
+            new RaceAction(
+                new SequentialAction(
+                    intake.pickUpAction(),
+                    futureAction(() -> new SleepAction(
+                            Math.abs((sample.pose.getHeading()%(PI) + PI)%(PI) - PI/2) < PI/4? 0.6: 0.3
+                    )),
+                    new InstantAction(outtake.claw::open),
+                    fullTransferAction(intake, outtake)
                 ),
-                new InstantAction(() ->
-                        found_sample = clawCheck()
-                )
+                foreverAction(follower::update)
+            ),
+            new InstantAction(() ->
+                    found_sample = clawCheck()
+            )
         );
     }
     @Override

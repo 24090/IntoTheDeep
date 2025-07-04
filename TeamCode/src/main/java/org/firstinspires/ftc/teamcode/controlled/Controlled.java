@@ -61,6 +61,12 @@ public class Controlled extends LinearOpMode{
             outtake.backgroundIter();
             intake.slide.movementLoop();
             movement.run();
+            if (gamepad1.guide){
+                outtake.slide.setZero();
+            }
+            if (gamepad2.guide){
+                intake.slide.setZero();
+            }
             if (gamepad1.dpad_down){
                 follower.breakFollowing();
                 runBlocking(

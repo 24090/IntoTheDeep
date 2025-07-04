@@ -18,6 +18,7 @@ import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.pathgen.Vector;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
 import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
 
@@ -25,7 +26,9 @@ import java.util.function.Supplier;
 
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
-        Vector movement_vector = new Vector(relative_sample.getY(), follower.getPose().getHeading()+PI/2);
+        Vector movement_vector = relative_sample.getY() > 0 ?
+            new Vector(relative_sample.getY(), follower.getPose().getHeading()+PI/2):
+            new Vector(relative_sample.getY() + 1.5, follower.getPose().getHeading()+PI/2);
         Point target_point = new Point(
                 follower.getPose().getX() + movement_vector.getXComponent(),
                 follower.getPose().getY() + movement_vector.getYComponent()
@@ -39,7 +42,7 @@ public class RobotActions {
                             new Point(follower.getPose()),
                             target_point
                         )))
-                        .setZeroPowerAccelerationMultiplier(5)
+                        .setZeroPowerAccelerationMultiplier(6)
                         .setConstantHeadingInterpolation(follower.getPose().getHeading())
                         .build(),
                         true
@@ -62,16 +65,14 @@ public class RobotActions {
     }
     public static Action fullTransferAction(Intake intake, Outtake outtake){
         return new SequentialAction(
-                new RaceAction(
-                    new ParallelAction(
-                            intake.readyTransferAction(),
-                            outtake.readyTransferAction(),
-                            new InstantAction(outtake.claw::open)
-                    )
-                ),
-                new InstantAction(outtake.claw::grab),
-                new SleepAction(0.3),
-                new InstantAction(intake.claw::open)
+            new ParallelAction(
+                intake.readyTransferAction(),
+                outtake.readyTransferAction(),
+                new InstantAction(outtake.claw::open)
+            ),
+            new InstantAction(outtake.claw::grab),
+            new SleepAction(0.35),
+            new InstantAction(intake.claw::open)
         );
     }
     public static Action specFullTransferAction(Intake intake, Outtake outtake){

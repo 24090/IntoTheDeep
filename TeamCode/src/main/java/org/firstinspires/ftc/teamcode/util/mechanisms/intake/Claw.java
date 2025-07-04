@@ -29,8 +29,8 @@ public class Claw {
     }
     public double turret_angle;
     public static double CLAW_OPEN = 0.82;
-    public static double CLAW_LOOSE = 0.54;
-    public static double CLAW_GRAB = 0.54;
+    public static double CLAW_LOOSE = 0.44;
+    public static double CLAW_GRAB = 0.44;
 
     public static double ELBOW_LEFT_IN = 0.47;
     public static double ELBOW_LEFT_READY = 0.66;
@@ -140,7 +140,7 @@ public class Claw {
         if (hsv[0] <= 45 || hsv[0] > 290) {
             return ColorSensorOut.RED;
         }
-        if (hsv[0] >= 45 && hsv[0] <= 160) {
+        if (hsv[0] >= 45 && hsv[0] <= 140) {
             return ColorSensorOut.YELLOW;
         }
         if (hsv[0] >= 200 && hsv[0] <= 290) {

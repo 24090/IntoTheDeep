@@ -12,8 +12,6 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.IntakeSlide;
 
@@ -46,9 +44,9 @@ public class Intake {
     public Action pickUpAction(){
         return new SequentialAction(
                 new InstantAction(claw::toGrabPos),
-                new SleepAction(0.25),
+                new SleepAction(0.3),
                 new InstantAction(claw::grab),
-                new SleepAction(0.15),
+                new SleepAction(0.2),
                 new InstantAction(() -> claw.toReadyGrabPos(0)));
     }
     public Action readyGrabAction(double linear_slide_to_in, double claw_rotation){
@@ -68,9 +66,7 @@ public class Intake {
                 new InstantAction(this::readyTransfer),
                 new ParallelAction(
                         new SequentialAction(
-                                new SleepAction(0.4),
-                                new InstantAction(this.claw::grab),
-                                new SleepAction(0.2)
+                                new SleepAction(0.7)
                         ),
                         slide.loopUntilDone()
                 ),

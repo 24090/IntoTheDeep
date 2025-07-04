@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.util.mechanisms.linearslides.OuttakeSlide;
 public class Outtake {
     public static int HANG_UP = 1600;
     public static int HANG_DOWN = 1300;
-    public static int READY_SPECIMEN = 350;
+    public static int READY_SPECIMEN = 300;
     public final MirrorMotor mirror_slide;
     public OuttakeSlide slide;
     public OuttakeClaw claw;
