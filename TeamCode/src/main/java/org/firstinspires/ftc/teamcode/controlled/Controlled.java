@@ -1,21 +1,30 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
+import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.triggerAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.specFullTransferAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.fullTransferAction;
+import static org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions.moveLineAction;
+import static java.lang.Math.PI;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
+import com.acmerobotics.roadrunner.SleepAction;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.util.GameMap;
-import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.Outtake;
 import org.firstinspires.ftc.teamcode.util.PoseStorer;
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
+import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
+import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 /**
  * TODO:
@@ -26,77 +35,132 @@ import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
 @TeleOp(name = "Controller")
 public class Controlled extends LinearOpMode{
     FtcDashboard dash = FtcDashboard.getInstance();
+    Follower follower;
+    Intake intake;
+    Outtake outtake;
     public void runOpMode(){
         double last_time = 0;
-        MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
-        Intake intake;
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        follower.setStartingPose(PoseStorer.pose);
+        boolean old_sweep = false;
         intake = new Intake(hardwareMap);
-        Outtake outtake;
-        intake.claw.toReadyGrabPos();
+        intake.claw.toReadyGrabPos(0);
         outtake = new Outtake(hardwareMap);
-
-        InstantAction movement = new InstantAction(() -> {
-                if (intake.linear_slide.getPosition() > 100) {
-                    drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), -gamepad1.right_stick_x / 3));
-                } else {
-                    drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x), gamepad1.right_stick_x));
-                }
-
-                drive.updatePoseEstimate();
-            }
-        );
-        
+        outtake.readyTransfer();
+        Runnable movement = () -> {
+            follower.setTeleOpMovementVectors(
+                    -gamepad1.left_stick_y - gamepad2.left_stick_y / 7,
+                    -gamepad1.left_stick_x - gamepad2.left_stick_x / 4,
+                    -gamepad1.right_stick_x - gamepad2.right_stick_x / 7
+            );
+            follower.update();
+        };
+        follower.startTeleopDrive();
         waitForStart();
         while (opModeIsActive()){
-            double turret_angle = 0;
             outtake.backgroundIter();
-            intake.linear_slide.movementLoop();
-            movement.getF().run();
-            if (gamepad1.left_bumper){
-                intake.readyGrab(
-                        gamepad1.left_trigger * (Intake.MaxDistance - Intake.MinDistance) + Intake.MinDistance,
-                        0 // TODO: Claw rotation
-                );
-            } else if (gamepad1.right_bumper){
-                Actions.runBlocking(
-                        new RaceAction(
-                            new ForeverAction(movement),
-                            new ForeverAction(outtake::backgroundIter),
-                            new SequentialAction(
-                                intake.fullTransferAction(),
-                                new InstantAction(intake.claw::toReadyGrabPos)
-                            )
+            intake.slide.movementLoop();
+            movement.run();
+            if (gamepad1.guide){
+                outtake.slide.setZero();
+            }
+            if (gamepad2.guide){
+                intake.slide.setZero();
+            }
+            if (gamepad1.dpad_down){
+                follower.breakFollowing();
+                runBlocking(
+                    new RaceAction(
+                        triggerAction(() -> !gamepad1.dpad_down),
+                        new ParallelAction(
+                            moveLineAction(
+                                follower,
+                                follower.getPose(),
+                                new Pose(19.25,144-19.25, -PI / 4)
+                            ),
+                            outtake.readySampleAction()
                         )
+                    )
+                );
+                follower.breakFollowing();
+                follower.startTeleopDrive();
+            }
+            if (gamepad1.right_bumper){
+                outtake.readySpecimen();
+            }
+            if (gamepad1.y){
+                outtake.readySample();
+            } else if (gamepad1.a){
+                outtake.readyTransfer();
+            } else if (gamepad1.b){
+                outtake.claw.open();
+            }
+            if (gamepad2.right_bumper){
+                runBlocking(new RaceAction(
+                    foreverAction(movement::run),
+                    new SequentialAction(
+                        new RaceAction(
+                            new ParallelAction(
+                                intake.readyTransferAction(),
+                                outtake.readyTransferAction(),
+                                new InstantAction(outtake.claw::open)
+                            ),
+                            triggerAction(() -> gamepad2.dpad_left)
+                        ),
+                        new InstantAction(outtake.claw::grab),
+                        new SleepAction(0.3),
+                        new InstantAction(intake.claw::open)
+                    )
+                ));
+            }
+            if (gamepad2.right_stick_button){
+                intake.claw.turret_angle = 0;
+                intake.readyGrab(
+                        Intake.MaxDistance
+                );
+                outtake.claw.open();
+            }
+            if (gamepad2.back && !old_sweep){
+                intake.sweeper.toggle();
+            }
+            if (gamepad2.dpad_up){
+                runBlocking(
+                    new RaceAction(
+                        foreverAction(movement::run),
+                        specFullTransferAction(intake, outtake)
+                    )
                 );
             }
-            if (gamepad1.dpad_up){
-                Actions.runBlocking(
+            intake.slide.goTo(intake.slide.trimTicks(
+                    intake.slide.target_pos +
+                    (int) ((gamepad2.dpad_up? 1 : (gamepad2.dpad_down? -1 :0)) * 70 * (time - last_time))
+            ));
+            if (gamepad2.a){
+                runBlocking(
                         new RaceAction(
-                                new ForeverAction(movement),
-                                new ForeverAction(outtake::backgroundIter),
+                                foreverAction(movement::run),
+                                foreverAction(outtake::backgroundIter),
+                                foreverAction(intake.slide::movementLoop),
                                 intake.pickUpAction()
                         )
                 );
-            } else if (gamepad1.dpad_down){
+            }
+            if (gamepad2.y){
                 intake.claw.open();
             }
-            if (gamepad1.dpad_left){
-                turret_angle -= (time - last_time);
-                intake.claw.rotate(turret_angle);
-            } else if (gamepad1.dpad_right){
-                turret_angle += (time - last_time);
-                intake.claw.rotate(turret_angle);
-            }
-            if (gamepad1.y){
-                outtake.slide.up();
-            } else if (gamepad1.a){
-                outtake.down();
-            } else if (gamepad1.b){
-                outtake.open();
-            } else if (gamepad1.x){
-                outtake.close();
+            if (gamepad2.b){
+                intake.claw.turret_angle = 0;
+                intake.claw.toReadyGrabPos(intake.claw.turret_angle);
+                intake.claw.wrist_ready();
+                outtake.claw.open();
+            } else if (gamepad2.x){
+                intake.claw.turret_angle = PI/2;
+                intake.claw.toReadyGrabPos(intake.claw.turret_angle);
+                intake.claw.wrist_ready();
+                outtake.claw.open();
             }
             last_time = time;
+            old_sweep = gamepad2.back;
         }
     }
 }

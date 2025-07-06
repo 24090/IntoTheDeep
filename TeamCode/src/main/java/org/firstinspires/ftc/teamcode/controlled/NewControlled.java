@@ -1,135 +1,111 @@
 package org.firstinspires.ftc.teamcode.controlled;
 
+import static org.firstinspires.ftc.teamcode.util.CustomActions.foreverAction;
+import static org.firstinspires.ftc.teamcode.util.CustomActions.runBlocking;
 import static java.lang.Math.PI;
-import static java.lang.Math.min;
+import static java.lang.Math.atan2;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
-import org.firstinspires.ftc.teamcode.util.Intake;
-import org.firstinspires.ftc.teamcode.util.Outtake;
-import org.firstinspires.ftc.teamcode.util.PoseStorer;
-import org.firstinspires.ftc.teamcode.util.customactions.ForeverAction;
-import org.firstinspires.ftc.teamcode.util.customactions.TriggerAction;
-import org.firstinspires.ftc.teamcode.util.linearslides.IntakeSlide;
+import org.firstinspires.ftc.teamcode.util.mechanisms.RobotActions;
+import org.firstinspires.ftc.teamcode.util.mechanisms.intake.Intake;
+import org.firstinspires.ftc.teamcode.util.mechanisms.outtake.Outtake;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 @TeleOp(name = "New Controlled")
 public class NewControlled extends LinearOpMode {
     FtcDashboard dash = FtcDashboard.getInstance();
     double last_time = 0;
     public void runOpMode(){
-        MecanumDrive drive = new MecanumDrive(hardwareMap, PoseStorer.pose);
+        Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         Intake intake;
         intake = new Intake(hardwareMap);
         Outtake outtake;
-        intake.claw.toReadyGrabPos();
+        intake.claw.toReadyGrabPos(0);
         outtake = new Outtake(hardwareMap);
-
         InstantAction intake_update = new InstantAction(() -> {
             if (Math.abs(gamepad1.left_stick_y) > 0.5) {
-                intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 100 * Math.signum(gamepad1.left_stick_y)),
+                intake.slide.goTo(
+                        intake.slide.trimTicks(intake.slide.getPosition() - 100 * (int) Math.signum(gamepad1.left_stick_y)),
                         50
                 );
-                intake.linear_slide.setMotorPower(-gamepad1.left_stick_y * 2 + Math.signum(gamepad1.left_stick_y));
-            } else if (gamepad1.dpad_up) {
-                intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() + 200 * (last_time - time)),
-                        50
-                );
-                intake.linear_slide.setMotorPower(0.1);
-            } else if (gamepad1.dpad_down) {
-                intake.linear_slide.goTo(
-                        intake.linear_slide.trimTicks(intake.linear_slide.getPosition() - 200 * (last_time - time)),
-                        50
-                );
-                intake.linear_slide.setMotorPower(-0.1);
+                intake.slide.setMotorPower(-gamepad1.left_stick_y/4);
             } else {
                 if (gamepad1.left_stick_button) {
-                    intake.linear_slide.moveOut();
+                    intake.slide.moveOut();
                 }
-                intake.linear_slide.movementLoop();
+                intake.slide.movementLoop();
             }
         });
-
-        InstantAction movement = new InstantAction(() -> {
-            if (intake.linear_slide.getPosition() > 200 || gamepad1.right_stick_button) {
-                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.right_stick_y/3, -gamepad1.left_stick_x/3), -gamepad1.right_stick_x/3));
+        Runnable movement = () -> {
+            if (intake.slide.getPosition() > 200 || gamepad1.right_stick_button) {
+                follower.setTeleOpMovementVectors(-gamepad1.right_stick_y/3, -gamepad1.right_stick_x/3, -gamepad1.left_stick_x/3);
             } else {
-                drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.right_stick_y, -gamepad1.right_stick_x), gamepad1.left_stick_x));
+                follower.setTeleOpMovementVectors(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x);
             }
-            drive.updatePoseEstimate();
-        }
-        );
+            follower.update();
+        };
         boolean old_a = false;
         boolean old_b = false;
+        follower.startTeleopDrive();
         waitForStart();
+        outtake.readyTransfer();
+        intake.readyGrab(0);
         while (opModeIsActive()){
-            double turret_angle = 0;
             outtake.backgroundIter();
             telemetry.addData("loop time after outtake", (time - last_time) * 1000);
             intake_update.getF().run();
             telemetry.addData("loop time after intake+outtake", (time - last_time) * 1000);
-            movement.getF().run();
+            movement.run();
             telemetry.addData("loop time after intake+outtake+movement", (time - last_time) * 1000);
             if (gamepad1.left_bumper){
-                Actions.runBlocking(
+                runBlocking(
                     new RaceAction(
-                        new ForeverAction(movement),
-                        new ForeverAction(outtake::backgroundIter),
+                        foreverAction(movement),
+                        foreverAction(outtake::backgroundIter),
                         new SequentialAction(
-                            intake.fullTransferAction(),
-                            new InstantAction(intake.claw::toReadyGrabPos)
+                            RobotActions.fullTransferAction(intake, outtake),
+                            new InstantAction(() -> intake.claw.toReadyGrabPos())
                         )
                     )
                 );
             }
             if (gamepad1.right_bumper) {
-                Actions.runBlocking(
+                runBlocking(
                     new RaceAction(
-                        new ForeverAction(movement),
-                        new ForeverAction(outtake::backgroundIter),
+                        foreverAction(movement),
+                        foreverAction(outtake::backgroundIter),
                         intake.pickUpAction()
                     )
                 );
-
             }
             if (gamepad1.x) {
-                outtake.slide.up();
+                outtake.readySample();
             } else if (gamepad1.y) {
-                outtake.slide.down();
-            }
-            if (gamepad1.left_trigger > 0.4) {
-                outtake.slide.down();
-            } else if (gamepad1.right_trigger > 0.4) {
-                outtake.slide.up();
+                outtake.readyTransfer();
             }
             if (gamepad1.a && !old_a){
-                outtake.toggleBucket();
+                outtake.claw.toggleGrab();
             }
             if (gamepad1.b && !old_b){
                 intake.claw.toggleGrab();
             }
-            if (gamepad1.dpad_left) {
-                turret_angle += (time-last_time);
-                intake.claw.rotate(turret_angle);
-            } else if (gamepad1.dpad_right){
-                turret_angle -= (time-last_time);
-                intake.claw.rotate(turret_angle);
+            if (gamepad2.left_stick_button) {
+                intake.claw.turret_angle = atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
             }
+            intake.claw.wrist_ready();
             old_a = gamepad1.a;
             old_b = gamepad1.b;
             telemetry.addData("loop time (ms))", (time - last_time) * 1000);
-            telemetry.addData("turret angle (deg)", turret_angle/PI * 180);
+            telemetry.addData("turret angle (deg)", intake.claw.turret_angle/PI * 180);
             last_time = time;
             telemetry.update();
         }

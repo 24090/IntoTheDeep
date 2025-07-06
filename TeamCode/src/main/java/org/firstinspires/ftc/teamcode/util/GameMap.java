@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.acmerobotics.roadrunner.Vector2d;
-
 public class GameMap {
 
     //------ROBOT CONSTANTS-------------

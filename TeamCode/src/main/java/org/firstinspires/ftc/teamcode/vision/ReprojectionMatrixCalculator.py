@@ -1,14 +1,13 @@
 import numpy as np
 import scipy
 
-res_scale = 1
-
-focal_length       = (952.90362321, 960.00009409)
-principal_point    = (337.90515333, 165.08917237)
-rotation_xyz_euler = [50, 0, 0]
+focal_length       = (960.04759489, 955.66073989)
+principal_point    = (285.88567653, 259.32328781)
+rotation_xyz_euler = [40, 0, 0]
 degrees            = True
-position           = [0, 3.65 , 16.013 - 1.5]
-distortion         = [ 8.86386337e-04, 1.89532355e+00, -2.82422652e-02, -7.42910733e-03, -1.11640100e+01]
+position           = [-2.65, 4.37, 16.19 - 1.5]
+distortion         = [ 4.84124426e-02,  1.12119387e+00,  7.82766988e-03, -4.26765995e-04, -8.51215210e+00]
+res_scale = 1
 
 # find intrinsics matrix
 intrinsics_matrix = np.asarray([
@@ -30,10 +29,14 @@ extrinsics_matrix = homogenous_transformation_matrix[:-1]
 
 # find reprojection matrix
 
-projection_matrix = (intrinsics_matrix @ extrinsics_matrix)
-reprojection_matrix = np.linalg.inv(projection_matrix[:, [0,1,3]])
+projection_matrix = (intrinsics_matrix @ extrinsics_matrix)[:, [0,1,3]]
+reprojection_matrix = np.linalg.inv(projection_matrix)
+print(projection_matrix)
 # generate code to make it
 code = "// generated with ReprojectionMatrixCalculator.py\n"
+for row_num in range(3):
+	code += f"\t\tpm.put({row_num}, 0, {projection_matrix[row_num][0]: e}); pm.put({row_num}, 1, {projection_matrix[row_num][1]: e}); pm.put({row_num}, 2, {projection_matrix[row_num][2]: e});\n"
+code += "\n"
 for row_num in range(3):
 	code += f"\t\trm.put({row_num}, 0, {reprojection_matrix[row_num][0]: e}); rm.put({row_num}, 1, {reprojection_matrix[row_num][1]: e}); rm.put({row_num}, 2, {reprojection_matrix[row_num][2]: e});\n"
 code += "\n"
@@ -46,8 +49,8 @@ code += "\t\t// end"
 print(code)
 
 # test functions
-def project(x, y, z):
-	v = projection_matrix @ [x, y, z, 1]
+def project(x, y):
+	v = projection_matrix @ [x, y, 1]
 	v = v/v[2]
 	return v
 
@@ -55,6 +58,8 @@ def reproject(u, v):
 	v = reprojection_matrix @ [u, v, 1]
 	v = v/v[2]
 	return v
+
+print(project(1, 20))
 
 text = open("Camera.java", "r").read()
 text = text.replace("// generated with ReprojectionMatrixCalculator.py", "RMC_SPLIT")
