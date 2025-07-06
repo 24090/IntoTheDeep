@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 public class RobotActions {
     public static Action reachSample(Pose relative_sample, Intake intake, Follower follower){
         Vector movement_vector = relative_sample.getY() > 0 ?
-            new Vector(relative_sample.getY(), follower.getPose().getHeading()+PI/2):
+            new Vector(relative_sample.getY() - 1.5, follower.getPose().getHeading()+PI/2):
             new Vector(relative_sample.getY() + 1.5, follower.getPose().getHeading()+PI/2);
         Point target_point = new Point(
                 follower.getPose().getX() + movement_vector.getXComponent(),
@@ -58,7 +58,8 @@ public class RobotActions {
                         !follower.isBusy() &&
                         follower.atPoint(target_point,1, 1) &&
                         intake.slide.within_error
-                    )))
+                    ))),
+                    new SleepAction(2)
                 )
             )
         );
@@ -70,9 +71,15 @@ public class RobotActions {
                 outtake.readyTransferAction(),
                 new InstantAction(outtake.claw::open)
             ),
-            new InstantAction(outtake.claw::grab),
-            new SleepAction(0.35),
-            new InstantAction(intake.claw::open)
+            new RaceAction(
+                foreverAction(intake.slide::movementLoop),
+                new SequentialAction(
+                    new InstantAction(outtake.claw::grab),
+                    new SleepAction(0.35),
+                    new InstantAction(intake.claw::open)
+                )
+            )
+
         );
     }
     public static Action specFullTransferAction(Intake intake, Outtake outtake){

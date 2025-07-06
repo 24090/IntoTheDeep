@@ -134,13 +134,13 @@ public abstract class SampleAutoBase extends LinearOpMode {
         final Pose start_pose = new Pose(GameMap.RobotWidth/2, 120.5 - GameMap.RobotLength / 2, -PI/2);
         follower.setStartingPose(start_pose);
 
-        final Pose inner_sample = new Pose(48-1.75, 121.75, 0);
-        final Pose score_pose = new Pose(18.75 - 0.5,144-18.75 + 0.5, -PI / 4);
-        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 0, 0);
-        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10, 0);
-        final Pose outer_grab_pose = new Pose(inner_sample.getX() , inner_sample.getY() + 20, 0.7);
+        final Pose inner_sample = new Pose(48-2.75, 122.75, 0);
+        final Pose score_pose = new Pose(18.75,144-18.75, -PI / 4);
+        final Pose inner_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance + 1.5, inner_sample.getY() + 0, 0);
+        final Pose center_grab_pose = new Pose(inner_sample.getX() - Intake.MaxDistance, inner_sample.getY() + 10 - 0.5, 0);
+        final Pose outer_grab_pose = new Pose(inner_sample.getX() , inner_sample.getY() + 20 + 1, 0.7);
         final Pose submersible_pose = new Pose(72 - GameMap.RobotWidth/2, 88 + GameMap.RobotLength/2, -PI/2);
-        final Vector outer_offset = new Vector(Intake.MaxDistance + 0.5, 0.7);
+        final Vector outer_offset = new Vector(Intake.MaxDistance, 0.7);
         outer_grab_pose.subtract(new Pose(outer_offset.getXComponent(), outer_offset.getYComponent(), 0));
         final PathChain score_to_sub = follower.pathBuilder()
             .addPath(new BezierCurve(
@@ -174,7 +174,10 @@ public abstract class SampleAutoBase extends LinearOpMode {
                         outtake.readyTransferAction(),
                         // Inner
                         intake.readyGrabAction(Intake.MaxDistance - 0.5, 0),
-                        moveLineAction(follower, score_pose, inner_grab_pose, () -> follower.atPose(inner_grab_pose, 1,1, 0.04) && follower.getVelocityMagnitude() < 2)
+                        new RaceAction(
+                            moveLineAction(follower, score_pose, inner_grab_pose, () -> follower.atPose(inner_grab_pose, 1,1, 0.04) && follower.getVelocityMagnitude() < 2),
+                            new SleepAction(4)
+                        )
                 ),
                 intake.pickUpAction(),
                 new InstantAction(outtake.claw::open),
@@ -199,7 +202,10 @@ public abstract class SampleAutoBase extends LinearOpMode {
                 ),
                 new ParallelAction(
                     outtake.slideWaitAction(),
-                    moveLineAction(follower, score_pose, center_grab_pose,  () -> follower.atPose(center_grab_pose, 1.5,1, 0.04))
+                    new RaceAction(
+                        moveLineAction(follower, score_pose, center_grab_pose,  () -> follower.atPose(center_grab_pose, 1.5,1, 0.04)),
+                        new SleepAction(4)
+                    )
                 ),
                 intake.pickUpAction(),
                 new InstantAction(outtake.claw::open),
@@ -224,7 +230,10 @@ public abstract class SampleAutoBase extends LinearOpMode {
                 ),
                 new ParallelAction(
                     outtake.slideWaitAction(),
-                    moveLineAction(follower, score_pose, outer_grab_pose,  () -> follower.atPose(outer_grab_pose, 1,1, 0.04)  && follower.getVelocityMagnitude() < 2)
+                    new RaceAction(
+                            moveLineAction(follower, score_pose, outer_grab_pose,  () -> follower.atPose(outer_grab_pose, 1,1, 0.04)  && follower.getVelocityMagnitude() < 2),
+                            new SleepAction(4)
+                    )
                 ),
                 intake.pickUpAction(),
                 new InstantAction(outtake.claw::open),
